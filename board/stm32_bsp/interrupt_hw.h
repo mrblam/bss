@@ -18,8 +18,6 @@
                    SysTick_CTRL_TICKINT_Msk   |\
                    SysTick_CTRL_ENABLE_Msk)
 
-#define SIM800_INTERRUPT_PRIORITY                       1
-#define TIMER_SERVICE_INTERRUPT_PRIORITY                2
 #define CAN_IRQN_PRIORITY		                1
 
 #endif /* BOARD_STM32_BSP_INTERRUPT_HW_H_ */
