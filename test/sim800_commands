@@ -1,0 +1,206 @@
+AT+CGATT=1
+AT+CIPSTATUS
+AT+CIPSHUT
+AT+CSTT
+AT+CIICR
+AT+CIFSR
+AT+CIPSTART="TCP","139.162.3.35","1883"
+AT+CIPSEND
+
+-MQTTConnectPack
+102300064D514973647003C2003C000753322D43426F78000573656C6578000573656C6578
+
+buff[0]		const char	0x10 (Hex)	
+buff[1]		const char	0x23 (Hex)	
+buff[2]		const char	0x0 (Hex)	
+buff[3]		const char	0x6 (Hex)	
+buff[4]		const char	0x4d (Hex)	
+buff[5]		const char	0x51 (Hex)	
+buff[6]		const char	0x49 (Hex)	
+buff[7]		const char	0x73 (Hex)	
+buff[8]		const char	0x64 (Hex)	
+buff[9]		const char	0x70 (Hex)	
+buff[10]	const char	0x3 (Hex)	
+buff[11]	const char	0xc2 (Hex)	
+buff[12]	const char	0x0 (Hex)	
+buff[13]	const char	0x3c (Hex)	
+buff[14]	const char	0x0 (Hex)	
+buff[15]	const char	0x7 (Hex)	
+buff[16]	const char	0x53 (Hex)	
+buff[17]	const char	0x32 (Hex)	
+buff[18]	const char	0x2d (Hex)	
+buff[19]	const char	0x43 (Hex)	
+buff[20]	const char	0x42 (Hex)	
+buff[21]	const char	0x6f (Hex)	
+buff[22]	const char	0x78 (Hex)	
+buff[23]	const char	0x0 (Hex)	
+buff[24]	const char	0x5 (Hex)	
+buff[25]	const char	0x73 (Hex)	
+buff[26]	const char	0x65 (Hex)	
+buff[27]	const char	0x6c (Hex)	
+buff[28]	const char	0x65 (Hex)	
+buff[29]	const char	0x78 (Hex)	
+buff[30]	const char	0x0 (Hex)	
+buff[31]	const char	0x5 (Hex)	
+buff[32]	const char	0x73 (Hex)	
+buff[33]	const char	0x65 (Hex)	
+buff[34]	const char	0x6c (Hex)	
+buff[35]	const char	0x65 (Hex)	
+buff[36]	const char	0x78 (Hex)	
+buff[37]	const char	0x0 (Hex)	
+
+-MQTT Publish topic "bat/serial/data" from ioc-project
+301B000F6261742F73657269616C2F6461746173706565643A31303030
+
+pack_buffer[0]		char	0x30 (Hex)	
+pack_buffer[1]		char	0x1b (Hex)	
+pack_buffer[2]		char	0x0 (Hex)	
+pack_buffer[3]		char	0xf (Hex)	
+pack_buffer[4]		char	0x62 (Hex)	
+pack_buffer[5]		char	0x61 (Hex)	
+pack_buffer[6]		char	0x74 (Hex)	
+pack_buffer[7]		char	0x2f (Hex)	
+pack_buffer[8]		char	0x73 (Hex)	
+pack_buffer[9]		char	0x65 (Hex)	
+pack_buffer[10]		char	0x72 (Hex)	
+pack_buffer[11]		char	0x69 (Hex)	
+pack_buffer[12]		char	0x61 (Hex)	
+pack_buffer[13]		char	0x6c (Hex)	
+pack_buffer[14]		char	0x2f (Hex)	
+pack_buffer[15]		char	0x64 (Hex)	
+pack_buffer[16]		char	0x61 (Hex)	
+pack_buffer[17]		char	0x74 (Hex)	
+pack_buffer[18]		char	0x61 (Hex)	
+pack_buffer[19]		char	0x73 (Hex)	
+pack_buffer[20]		char	0x70 (Hex)	
+pack_buffer[21]		char	0x65 (Hex)	
+pack_buffer[22]		char	0x65 (Hex)	
+pack_buffer[23]		char	0x64 (Hex)	
+pack_buffer[24]		char	0x3a (Hex)	
+pack_buffer[25]		char	0x31 (Hex)	
+pack_buffer[26]		char	0x30 (Hex)	
+pack_buffer[27]		char	0x30 (Hex)	
+pack_buffer[28]		char	0x30 (Hex)	
+
+-MQTT Publish topic "bat/serial/data" from paho mqtt c lib
+3223000F6261742F73657269616C2F6461746100027B227370656564223A2231303030227D
+3223000F6261742F73657269616C2F6461746100407B227370656564223A2231303030227D
+
+buf[0]	unsigned char	0x32 (Hex)	   0x32  0x32 
+buf[1]	unsigned char	0x23 (Hex)	   0x23  0x23
+buf[2]	unsigned char	0x0 (Hex)	   0x0   0x0 
+buf[3]	unsigned char	0xf (Hex)	   0xf   0xf 
+buf[4]	unsigned char	0x62 (Hex)	   0x62  0x62
+buf[5]	unsigned char	0x61 (Hex)	   0x61  0x61
+buf[6]	unsigned char	0x74 (Hex)	   0x74  0x74
+buf[7]	unsigned char	0x2f (Hex)	   0x2f  0x2f
+buf[8]	unsigned char	0x73 (Hex)	   0x73  0x73
+buf[9]	unsigned char	0x65 (Hex)	   0x65  0x65
+buf[10]	unsigned char	0x72 (Hex)	   0x72  0x72
+buf[11]	unsigned char	0x69 (Hex)	   0x69  0x69
+buf[12]	unsigned char	0x61 (Hex)	   0x61  0x61
+buf[13]	unsigned char	0x6c (Hex)	   0x6c  0x6c
+buf[14]	unsigned char	0x2f (Hex)	   0x2f  0x2f
+buf[15]	unsigned char	0x64 (Hex)	   0x64  0x64
+buf[16]	unsigned char	0x61 (Hex)	   0x61  0x61
+buf[17]	unsigned char	0x74 (Hex)	   0x74  0x74
+buf[18]	unsigned char	0x61 (Hex)	   0x61  0x61
+buf[19]	unsigned char	0x0 (Hex)	   0x0   0x3 
+buf[20]	unsigned char	0x2 (Hex)	   0x40  0xd6
+buf[21]	unsigned char	0x7b (Hex)	   0x7b  0x7b
+buf[22]	unsigned char	0x22 (Hex)	   0x22  0x22
+buf[23]	unsigned char	0x73 (Hex)	   0x73  0x73
+buf[24]	unsigned char	0x70 (Hex)	   0x70  0x70
+buf[25]	unsigned char	0x65 (Hex)	   0x65  0x65
+buf[26]	unsigned char	0x65 (Hex)	   0x65  0x65
+buf[27]	unsigned char	0x64 (Hex)	   0x64  0x64
+buf[28]	unsigned char	0x22 (Hex)	   0x22  0x22
+buf[29]	unsigned char	0x3a (Hex)	   0x3a  0x3a
+buf[30]	unsigned char	0x22 (Hex)	   0x22  0x22
+buf[31]	unsigned char	0x31 (Hex)	   0x31  0x31
+buf[32]	unsigned char	0x30 (Hex)	   0x30  0x30
+buf[33]	unsigned char	0x30 (Hex)	   0x30  0x30
+buf[34]	unsigned char	0x30 (Hex)	   0x30  0x30
+buf[35]	unsigned char	0x22 (Hex)	   0x22  0x22
+buf[36]	unsigned char	0x7d (Hex)	   0x7d  0x7d
+
+
+
+buf[0]	unsigned char	0x32 (Hex)	
+buf[1]	unsigned char	0x23 (Hex)	
+buf[2]	unsigned char	0x0 (Hex)	
+buf[3]	unsigned char	0xf (Hex)	
+buf[4]	unsigned char	0x62 (Hex)	
+buf[5]	unsigned char	0x61 (Hex)	
+buf[6]	unsigned char	0x74 (Hex)	
+buf[7]	unsigned char	0x2f (Hex)	
+buf[8]	unsigned char	0x73 (Hex)	
+buf[9]	unsigned char	0x65 (Hex)	
+buf[10]	unsigned char	0x72 (Hex)	
+buf[11]	unsigned char	0x69 (Hex)	
+buf[12]	unsigned char	0x61 (Hex)	
+buf[13]	unsigned char	0x6c (Hex)	
+buf[14]	unsigned char	0x2f (Hex)	
+buf[15]	unsigned char	0x64 (Hex)	
+buf[16]	unsigned char	0x61 (Hex)	
+buf[17]	unsigned char	0x74 (Hex)	
+buf[18]	unsigned char	0x61 (Hex)	
+buf[19]	unsigned char	0x0 (Hex)	
+buf[20]	unsigned char	0x40 (Hex)	
+buf[21]	unsigned char	0x7b (Hex)	
+buf[22]	unsigned char	0x22 (Hex)	
+buf[23]	unsigned char	0x73 (Hex)	
+buf[24]	unsigned char	0x70 (Hex)	
+buf[25]	unsigned char	0x65 (Hex)	
+buf[26]	unsigned char	0x65 (Hex)	
+buf[27]	unsigned char	0x64 (Hex)	
+buf[28]	unsigned char	0x22 (Hex)	
+buf[29]	unsigned char	0x3a (Hex)	
+buf[30]	unsigned char	0x22 (Hex)	
+buf[31]	unsigned char	0x31 (Hex)	
+buf[32]	unsigned char	0x30 (Hex)	
+buf[33]	unsigned char	0x30 (Hex)	
+buf[34]	unsigned char	0x30 (Hex)	
+buf[35]	unsigned char	0x22 (Hex)	
+buf[36]	unsigned char	0x7d (Hex)	
+
+
+buff[0]		const char	0x32 (Hex)	
+buff[1]		const char	0x23 (Hex)	
+buff[2]		const char	0x0 (Hex)	
+buff[3]		const char	0xf (Hex)	
+buff[4]		const char	0x62 (Hex)	
+buff[5]		const char	0x61 (Hex)	
+buff[6]		const char	0x74 (Hex)	
+buff[7]		const char	0x2f (Hex)	
+buff[8]		const char	0x73 (Hex)	
+buff[9]		const char	0x65 (Hex)	
+buff[10]	const char	0x72 (Hex)	
+buff[11]	const char	0x69 (Hex)	
+buff[12]	const char	0x61 (Hex)	
+buff[13]	const char	0x6c (Hex)	
+buff[14]	const char	0x2f (Hex)	
+buff[15]	const char	0x64 (Hex)	
+buff[16]	const char	0x61 (Hex)	
+buff[17]	const char	0x74 (Hex)	
+buff[18]	const char	0x61 (Hex)	
+buff[19]	const char	0x3 (Hex)	
+buff[20]	const char	0xd6 (Hex)	
+buff[21]	const char	0x7b (Hex)	
+buff[22]	const char	0x22 (Hex)	
+buff[23]	const char	0x73 (Hex)	
+buff[24]	const char	0x70 (Hex)	
+buff[25]	const char	0x65 (Hex)	
+buff[26]	const char	0x65 (Hex)	
+buff[27]	const char	0x64 (Hex)	
+buff[28]	const char	0x22 (Hex)	
+buff[29]	const char	0x3a (Hex)	
+buff[30]	const char	0x22 (Hex)	
+buff[31]	const char	0x31 (Hex)	
+buff[32]	const char	0x30 (Hex)	
+buff[33]	const char	0x30 (Hex)	
+buff[34]	const char	0x30 (Hex)	
+buff[35]	const char	0x22 (Hex)	
+buff[36]	const char	0x7d (Hex)	
+
+ 

@@ -1,0 +1,18 @@
+/*
+ * core_hw.c
+ *
+ *  Created on: Sep 16, 2020
+ *      Author: quangnd
+ */
+
+#include "stm32f0xx.h"
+#include "core_hw.h"
+
+void core_hw_init(void){
+
+	SystemInit();
+	SystemCoreClockUpdate();
+	SysTick_Config(SystemCoreClock/SYSTICK_FREQ_Hz);
+}
+
+
