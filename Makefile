@@ -3,32 +3,27 @@
 # http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/
 # Microcontroller properties.
 
-export TARGET=s2_cbox
+export TARGET=bss_storage_control
 export PROJ_ROOT=.
 export BOARD_TYPE=stm32_bsp
 include board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include gcc.mk
 
 SRCS:=board/board.c
-SRCS+=util/string/string_util.c util/json/json.c
+SRCS+=util/string/string_util.c
 	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 INCLUDES:=. app_config board service component util app
-INCLUDES+= app/mqtt app/canopen
-INCLUDES+=	component/sim800a component/at_modem
-INCLUDES+= service/timer service/network
-
-INCLUDES+= util/delay util/string util/json
+INCLUDES+=app/canopen/
+INCLUDES+= util/delay util/string 
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
 USER_LIBS=CANopen
 
-PAHO_MQTT_ROOT=libs/paho.mqtt.embedded-c
-
-LIB_INCLUDES:=libs $(PAHO_MQTT_ROOT)/MQTTClient-C/src
-LIB_INCLUDES+=$(PAHO_MQTT_ROOT)/MQTTPacket/src
+LIB_INCLUDES:=libs
+LIB_INCLUDES+=
 OBJDIR=build
 
 INCLUDES+=$(LIB_INCLUDES)			
@@ -37,23 +32,7 @@ INCLUDES:=$(addprefix -I$(PROJ_ROOT)/,$(INCLUDES))
 INCLUDES+=$(addprefix -I,$(USER_LIB_INCLUDES))
 
 SRCS+=$(BSP_SRCS)
-SRCS+= app/mqtt/mqtt_init.c app/canopen/canopen_init.c
-SRCS+= component/sim800a/sim800a.c component/at_modem/at_modem.c
-SRCS+= service/timer/timer.c service/network/network.c
-
-
-#SRCS+=libs/MQTT-C/src/mqtt_pal.c libs/MQTT-C/src/mqtt.c
-SRCS+=$(PAHO_MQTT_ROOT)/MQTTClient-C/src/MQTTClient.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTConnectClient.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTConnectServer.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTDeserializePublish.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTFormat.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTPacket.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTSerializePublish.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTSubscribeClient.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTSubscribeServer.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTUnsubscribeClient.c \
-	$(PAHO_MQTT_ROOT)/MQTTPacket/src/MQTTUnsubscribeServer.c
+SRCS+= app/canopen/canopen_init.c
 
 SRCS+= main.c 
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))

@@ -1,4 +1,0 @@
-mon reset halt
-file bms.elf
-load
-mon reset halt

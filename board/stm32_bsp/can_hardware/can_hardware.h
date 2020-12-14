@@ -1,16 +1,13 @@
 
 #ifndef BOARD_CAN_HARDWARE_H_
 #define BOARD_CAN_HARDWARE_H_
+#include "stm32f10x.h"
 
-#include "stm32f0xx_rcc.h"
-#include "stm32f0xx_gpio.h"
-#include "stm32f0xx_can.h"
-
-#define CAN_DEV_CLK				RCC_APB1Periph_CAN
+#define CAN_DEV_CLK				RCC_APB1Periph_CAN1
 
 #define CAN_TX_PIN				GPIO_Pin_9
 #define CAN_TX_PORT				GPIOB
-#define CAN_TX_PORT_CLK			        RCC_AHBPeriph_GPIOB
+#define CAN_TX_PORT_CLK			        RCC_APB2Periph_GPIOB
 #define CAN_TX_PINSOURCE		        GPIO_PinSource9
 
 #define CAN_RX_PIN				GPIO_Pin_8
@@ -18,10 +15,6 @@
 #define CAN_RX_PORT_CLK			        RCC_AHBPeriph_GPIOB
 #define CAN_RX_PINSOURCE		        GPIO_PinSource8
 
-#define CAN_AF_PORT                             GPIO_AF_4
-
-
-#define CAN_IRQN				CEC_CAN_IRQn
 #define CAN_PRE_DEFAULT			        6
 
 typedef struct CAN_Hw_t CAN_Hw;

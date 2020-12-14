@@ -1,8 +1,6 @@
 #ifndef DEBUG_PORT_H_
 #define DEBUG_PORT_H_
-#include "stm32f0xx.h"
-#include "stm32f0xx_gpio.h"
-#include "stm32f0xx_rcc.h"
+#include "stm32f10x.h"
 
 typedef struct DEBUG_COM_HW_t DEBUG_COM_HW;
 struct DEBUG_COM_HW_t{
