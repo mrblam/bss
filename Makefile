@@ -17,6 +17,10 @@ BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 INCLUDES:=. app_config board service component util app
 INCLUDES+=app/canopen/
+INCLUDES+=component/adc_sensor \
+			component/ntc \
+			component/switch \
+			component/storage_cell
 INCLUDES+= util/delay util/string 
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
@@ -33,6 +37,10 @@ INCLUDES+=$(addprefix -I,$(USER_LIB_INCLUDES))
 
 SRCS+=$(BSP_SRCS)
 SRCS+= app/canopen/canopen_init.c
+SRCS+=component/adc_sensor/adc_sensor.c \
+			component/ntc/ntc.c \
+			component/switch/switch.c \
+			component/storage_cell/storage_cell.c
 
 SRCS+= main.c 
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))
