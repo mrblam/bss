@@ -5,13 +5,7 @@
 #include "debug_io_hw.h"
 #include "ioe_hw.h"
 
-void board_init(void){
-        core_hw_init();
-        debug_io_hw_init();
-	//debug_com_hw_init();
-	can_hardware_init();
-	ioe_hw_init();
-}
+
 
 void global_interrupt_enable(void){
 	__enable_irq();

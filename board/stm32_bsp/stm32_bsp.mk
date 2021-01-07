@@ -30,6 +30,7 @@ BSP_SRCS=  \
 BSP_SRCS+=$(BOARD_TYPE).c  \
 	debug_com_port_hardware/debug_com_port_hardware.c \
 	can_hardware/can_hardware.c \
+	adc_hw/adc_hw.c \
 	debug_io_hw/debug_io_hw.c \
 	core_hw/core_hw.c \
 	ioe_hw/ioe_hw.c \
@@ -68,6 +69,7 @@ BSP_INCLUDES = . debug_com_port_hardware \
 	can_hardware \
 	delay_hw \
 	core_hw \
+	adc_hw \
 	ioe_hw \
 	debug_io_hw \
 	sdk/CMSIS/CM3/DeviceSupport/ST/STM32F10x/ \

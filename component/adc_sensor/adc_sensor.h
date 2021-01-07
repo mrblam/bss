@@ -9,22 +9,20 @@
 #define COMPONENT_ADC_SENSOR_ADC_SENSOR_H_
 
 #include "stdint.h"
+#include "adc_hw_hal.h"
 
 typedef struct ADC_Sensor_t ADC_Sensor;
 
 struct ADC_Sensor_t{
 
-	int32_t adc;
+	ADC_Hw* hw;
 	int32_t result;
-	int32_t offset;
 	int32_t gain;
-	void (*update_adc)(ADC_Sensor* p_ss);
-	void (*update_offset)(ADC_Sensor* p_ss);
 	void (*update_result)(ADC_Sensor* p_ss);
 };
 
 void adc_sensor_init(ADC_Sensor* p_ss);
-static inline int32_t adc_sensor_get_result(ADC_Sensor* p_ss){
+static inline int32_t adc_sensor_get_result(const ADC_Sensor* const p_ss){
 	return p_ss->result;
 }
 
