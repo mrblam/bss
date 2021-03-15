@@ -1,5 +1,5 @@
 #include "stm32f0xx.h"
-#include "adc.h"
+//#include "adc.h"
 #include "debug_com_port_hardware.h"
 
 char* buffer[10];

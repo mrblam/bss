@@ -7,7 +7,7 @@
 
 #ifndef ADC_ADC_H_
 #define ADC_ADC_H_
-#include "stm32f10x.h"
+//#include "stm32f10x.h"
 void Config_Adc_Ntc();
 uint16_t Value_Adc_Ntc();
 
