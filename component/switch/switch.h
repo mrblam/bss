@@ -8,6 +8,8 @@
 #ifndef COMPONENT_SWITCH_SWITCH_H_
 #define COMPONENT_SWITCH_SWITCH_H_
 
+#include "stdlib.h"
+
 typedef enum SW_STATE
 {
 	SW_ST_ON,
@@ -21,6 +23,8 @@ struct Switch_t{
 	void (*sw_off)(Switch* p_sw);
 	void (*sw_init)(Switch* p_sw);
 };
+
+Switch* sw_construct(void);
 
 static inline void sw_on(Switch* p_sw){
 	p_sw->sw_on(p_sw);

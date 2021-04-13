@@ -9,6 +9,8 @@
 #define COMPONENT_NTC_NTC_H_
 
 #include "stdint.h"
+#include "stdlib.h"
+#include "adc_sensor.h"
 
 typedef struct NTC_t NTC;
 
