@@ -12,7 +12,7 @@ void cab_app_init(Cabinet_app* p_ca){
 	p_ca->state = CABIN_ST_SETUP;
 	p_ca->empty_cab = cab_list_init();
 	p_ca->full_cab = cab_list_init();
-	p_ca->cabin[0]->cell_fan->sw_on(p_ca->cabin[0]->cell_fan) = ioe_set((Switch*)p_ca->ioe_cfan);
+	//p_ca->cabin[0]->cell_fan->sw_on(p_ca->cabin[0]->cell_fan) = ioe_set((Switch*)p_ca->ioe_cfan);
 
 	p_ca->state = CABIN_ST_ACTIVE;
 	for(uint8_t cab_id = CAB1 - 1; cab_id < CAB15; cab_id++){

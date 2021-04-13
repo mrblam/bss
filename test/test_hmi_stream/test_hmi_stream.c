@@ -5,11 +5,10 @@
  *      Author: KhanhDinh
  */
 
-#include "cabinet_cell.h"
-#include "ntc.h"
-#include "uart.h"
+#include "cabinet_app.h"
+#include "board.h"
 
 int main(void){
-
+	board_init();
 }
 

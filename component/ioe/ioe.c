@@ -17,7 +17,7 @@ IOE* ioe_construct(void){
 	return p_ioe;
 }
 
-static void ioe_set_channel_mask(IOE* p_ioe, uint8_t channel){
+void ioe_set_channel(IOE* p_ioe, uint8_t channel){
 	uint8_t data[2];
 	if(channel < 8){
 		p_ioe->p0_data |= 0x01<<channel;
@@ -25,8 +25,11 @@ static void ioe_set_channel_mask(IOE* p_ioe, uint8_t channel){
 	else{
 		p_ioe->p1_data |= 0x01<<(channel - 8);
 	}
-	data[0] = p_ioe->p0_data;
-	data[1] = p_ioe->p1_data;
-	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, data);
+	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p0_data);
+	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p1_data);
+}
+
+void ioe_clear_channel(IOE* p_ioe, uint8_t channel){
+
 }
 
