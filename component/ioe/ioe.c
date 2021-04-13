@@ -18,15 +18,14 @@ IOE* ioe_construct(void){
 }
 
 void ioe_set_channel(IOE* p_ioe, uint8_t channel){
-	uint8_t data[2];
 	if(channel < 8){
 		p_ioe->p0_data |= 0x01<<channel;
 	}
 	else{
 		p_ioe->p1_data |= 0x01<<(channel - 8);
 	}
-	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p0_data);
-	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p1_data);
+	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p_ioe->p0_data);
+	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p_ioe->p1_data);
 }
 
 void ioe_clear_channel(IOE* p_ioe, uint8_t channel){
