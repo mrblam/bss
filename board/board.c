@@ -6,8 +6,8 @@
 #include "ioe_hal.h"
 
 void board_init(void){
-    core_hw_init();
-    debug_io_hw_init();
+        core_hw_init();
+        debug_io_hw_init();
 	//debug_com_hw_init();
 	can_hardware_init();
 	ioe_hw_init();

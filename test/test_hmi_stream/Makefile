@@ -13,8 +13,7 @@ OBJDIR=build
 
 SRCS=board/board.c
 SRCS+=	app/cabinet_app/cabinet_app.c \
-	app/can_master/can_master.c \
-	app/canopen/canopen_init.c
+	app/can_master/can_master.c 
 SRCS+=	component/adc_sensor/adc_sensor.c \
 	component/bat_pack/bat_pack.c \
 	component/cabinet_cell/cabinet_cell.c \

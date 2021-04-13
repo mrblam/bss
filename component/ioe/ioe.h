@@ -18,8 +18,6 @@ struct IOE_t{
 	uint8_t channel;
 	uint8_t p0_data;
 	uint8_t p1_data;
-	void (*set_channel)(IOE* p_ioe, uint8_t channel);
-	void (*clear_channel)(IOE* p_ioe, uint8_t channel);
 };
 
 IOE* ioe_construct(void);
