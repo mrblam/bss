@@ -25,6 +25,7 @@ int main(void){
 	GPIO_WriteBit(GPIOC, GPIO_Pin_13, 1);
 }
 
-void HAL_STATE_MACHINE_UPDATE_TICK(void){
+void SysTick_Handler(void){
 
 }
+
