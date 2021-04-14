@@ -11,7 +11,8 @@
 void core_hw_init(void){
 	SystemInit();
 	SystemCoreClockUpdate();
-	SysTick_Config(SystemCoreClock/SYSTICK_FREQ_Hz);
+	//SysTick_Config(SystemCoreClock/SYSTICK_FREQ_Hz);
+	SysTick_Config(SystemCoreClock/1000);
 }
 
 

@@ -7,6 +7,7 @@
 
 void board_init(void){
         core_hw_init();
+    	SysTick_Config(SystemCoreClock/1000);
         debug_io_hw_init();
 	//debug_com_hw_init();
 	can_hardware_init();

@@ -12,6 +12,7 @@ include ../../gcc.mk
 OBJDIR=build
 
 SRCS=board/board.c
+SRCS+=	board/stm32f10x_it.c
 SRCS+=	app/cabinet_app/cabinet_app.c \
 	app/can_master/can_master.c 
 SRCS+=	component/adc_sensor/adc_sensor.c \
