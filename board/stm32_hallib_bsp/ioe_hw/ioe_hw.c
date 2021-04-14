@@ -5,8 +5,6 @@
  *      Author: quangnd
  */
 #include "ioe_hw.h"
-#include "stm32f10x.h"
-#include "stm32f10x_i2c.h"
 
 void ioe_hw_init(void){
 

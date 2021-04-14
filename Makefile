@@ -5,7 +5,7 @@
 
 export TARGET=bss_storage_control
 export PROJ_ROOT=.
-export BOARD_TYPE=stm32_bsp
+export BOARD_TYPE=stm32_hallib_bsp
 include board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include gcc.mk
 
@@ -64,7 +64,7 @@ CFLAGS+=-fmessage-length=0
 CFLAGS+=-fsigned-char
 CFLAGS+=-Wall -Winline -ggdb -lm -MMD -MP -Wno-unused-function -Wextra -Wstrict-prototypes
 CFLAGS+=-std=gnu11
-CFLAGS+=--specs=nosys.specs
+CFLAGS+=--specs=nano.specs
 CFLAGS+=-ffunction-sections -fdata-sections
 
 LFLAGS:=-T$(PROJ_ROOT)/board/$(BOARD_TYPE)/$(LD_FILES)

@@ -6,7 +6,6 @@
  */
 
 #include "debug_io_hw.h"
-#include "stm32f10x_rcc.h"
 
 static void debug_io_rcc_init(void);
 static void debug_io_gpio_init(void);

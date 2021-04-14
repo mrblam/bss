@@ -1,4 +1,3 @@
-#include "stm32f10x.h"
 #include "can_hardware.h"
 #include "debug_com_port_hardware.h"
 #include "core_hw.h"
