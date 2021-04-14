@@ -37,7 +37,7 @@ BSP_SRCS+=$(BOARD_TYPE).c  \
 	delay_hw/delay_hw.c
 
 # ASM sources
-BSP_ASM_SRCS = sdk/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/gcc_ride7/startup_stm32f10x_md_vl.s
+BSP_ASM_SRCS = Core/Startup/startup_stm32f103rbtx.s
 BSP_SRCS+=$(BSP_ASM_SRCS)
 
 # CFLAGS
@@ -60,9 +60,7 @@ ASFLAGS+= $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS = 
 
 # C defines
-C_DEFS =  \
--DUSE_STDPERIPH_DRIVER \
--DSTM32F10X_MD_VL
+C_DEFS =-DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB
 
 # C includes
 BSP_INCLUDES = . debug_com_port_hardware \
@@ -72,9 +70,11 @@ BSP_INCLUDES = . debug_com_port_hardware \
 	adc_hw \
 	ioe_hw \
 	debug_io_hw \
-	sdk/CMSIS/CM3/DeviceSupport/ST/STM32F10x/ \
-	sdk/CMSIS/CM3/CoreSupport/ \
-	sdk/STM32F10x_StdPeriph_Driver/inc
+	Core/Inc \
+	Drivers/STM32F1xx_HAL_Driver/Inc  \
+	Drivers/STM32F1xx_HAL_Driver/Inc/Legacy  \
+	Drivers/CMSIS/Device/ST/STM32F1xx/Include \
+	Drivers/CMSIS/Include
 
 # compile gcc flags
 ASFLAGS+= $(AS_DEFS) $(AS_INCLUDES)
