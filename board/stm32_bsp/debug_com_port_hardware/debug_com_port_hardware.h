@@ -1,6 +1,5 @@
 #ifndef DEBUG_PORT_H_
 #define DEBUG_PORT_H_
-#include "stm32f10x.h"
 
 typedef struct UART_HW_t UART_HW;
 struct UART_HW_t{

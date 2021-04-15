@@ -7,22 +7,29 @@
 
 #include "board.h"
 #include "delay.h"
-#include "stm32f10x_gpio.h"
-#include "stm32f10x_it.h"
+#include "stm32f1xx_hal_gpio.h"
+#include "stm32f1xx_hal.h"
 
 int main(void){
 	board_init();
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);
-	GPIO_InitTypeDef GPIO_Initstructure;
-	GPIO_Initstructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-	GPIO_Initstructure.GPIO_Speed = GPIO_Speed_10MHz;
-	GPIO_Initstructure.GPIO_Pin   = GPIO_Pin_13;
-	GPIO_Init(GPIOC, &GPIO_Initstructure);
 
-	__enable_irq();
+	  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-	GPIO_WriteBit(GPIOC, GPIO_Pin_13, 0);
-	GPIO_WriteBit(GPIOC, GPIO_Pin_13, 1);
+	  /* GPIO Ports Clock Enable */
+	  //__HAL_RCC_GPIOC_CLK_ENABLE();
+	  //__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	  /*Configure GPIO pin Output Level */
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
+	  /*Configure GPIO pin : PC13 */
+	  GPIO_InitStruct.Pin = GPIO_PIN_13;
+	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	  GPIO_InitStruct.Pull = GPIO_NOPULL;
+	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
 }
 
 void SysTick_Handler(void){

@@ -5,7 +5,7 @@
 
 export TARGET=test_hmi_stream
 export PROJ_ROOT=../..
-export BOARD_TYPE=stm32_bsp
+export BOARD_TYPE=stm32_hallib_bsp
 include ../../board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include ../../gcc.mk
 
@@ -82,7 +82,7 @@ CFLAGS+=--specs=nosys.specs
 CFLAGS+=-ffunction-sections -fdata-sections
 
 LFLAGS:=-T$(PROJ_ROOT)/board/$(BOARD_TYPE)/$(LD_FILES)
-LFLAGS	+=-nostartfiles -Xlinker --gc-sections
+LFLAGS	+= -Xlinker --gc-sections
 LFLAGS  +=-Wl,-Map=$(TARGET).map
 
 LINK_LIBS:=
