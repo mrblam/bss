@@ -8,7 +8,6 @@
 #include "delay.h"
 #include "can_hal.h"
 #include "string_util.h"
-#include "canopen_init.h"
 #include "app_config.h"
 
 static volatile uint32_t sys_timestamp=0;
@@ -17,7 +16,6 @@ static volatile uint32_t sync_counter=0;
 static void app_init(void){
 	global_interrupt_disable();
 	board_init();
-	canopen_service_init();
 	global_interrupt_enable();
 }
 

@@ -3,7 +3,7 @@
 # http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/
 # Microcontroller properties.
 
-export TARGET=bss_storage_control
+export TARGET=bss_cabinet_control
 export PROJ_ROOT=.
 export BOARD_TYPE=stm32_hallib_bsp
 include board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
@@ -16,11 +16,9 @@ BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 INCLUDES:=. app_config board service component util app
-INCLUDES+=app/canopen/
 INCLUDES+=component/adc_sensor \
 			component/ntc \
 			component/switch \
-			component/storage_cell
 INCLUDES+= util/delay util/string 
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
@@ -36,11 +34,9 @@ INCLUDES:=$(addprefix -I$(PROJ_ROOT)/,$(INCLUDES))
 INCLUDES+=$(addprefix -I,$(USER_LIB_INCLUDES))
 
 SRCS+=$(BSP_SRCS)
-SRCS+= app/canopen/canopen_init.c
 SRCS+=component/adc_sensor/adc_sensor.c \
 			component/ntc/ntc.c \
 			component/switch/switch.c \
-			component/storage_cell/storage_cell.c
 
 SRCS+= main.c 
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))
@@ -68,7 +64,8 @@ CFLAGS+=--specs=nano.specs
 CFLAGS+=-ffunction-sections -fdata-sections
 
 LFLAGS:=-T$(PROJ_ROOT)/board/$(BOARD_TYPE)/$(LD_FILES)
-LFLAGS	+=-nostartfiles -Xlinker --gc-sections
+#LFLAGS	+=-nostartfiles -Xlinker --gc-sections
+LFLAGS	+=-Xlinker --gc-sections
 LFLAGS  +=-Wl,-Map=$(TARGET).map
 
 LINK_LIBS:= $(addprefix -L,$(USER_LIB_INCLUDES))

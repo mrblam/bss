@@ -5,6 +5,9 @@ BSP_SRCS=  \
 	Core/Src/system_stm32f1xx.c \
 	Core/Src/stm32f1xx_it.c \
 	Core/Src/stm32f1xx_hal_msp.c \
+	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c \
+	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
+
 #BSP_SRCS+=sdk/CMSIS/CM3/CoreSupport/core_cm3.c
 
 BSP_SRCS+=$(BOARD_TYPE).c  \
@@ -28,7 +31,7 @@ CPU = -mcpu=cortex-m3
 # NONE for Cortex-M0/M0+/M3
 
 # float-abi
-
+FLOAT-ABI=-mfloat-abi=soft
 
 # mcu
 CFLAGS+= $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
