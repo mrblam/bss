@@ -26,7 +26,6 @@ BSP_SRCS=  \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_irda.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_iwdg.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_mmc.c \
-	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_msp_template.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_nand.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_nor.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pccard.c\
@@ -43,8 +42,6 @@ BSP_SRCS=  \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_sram.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c \
-	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_timebase_rtc_alarm_template.c \
-	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_timebase_tim_template.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_usart.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_wwdg.c \
