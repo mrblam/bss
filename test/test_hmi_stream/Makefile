@@ -6,63 +6,44 @@
 export TARGET=test_hmi_stream
 export PROJ_ROOT=../..
 export BOARD_TYPE=stm32_hallib_bsp
-include ../../board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
-include ../../gcc.mk
+include $(PROJ_ROOT)/board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
+include $(PROJ_ROOT)/gcc.mk
 
-OBJDIR=build
-
-SRCS=board/board.c
-SRCS+=	app/cabinet_app/cabinet_app.c \
-	app/can_master/can_master.c 
-SRCS+=	component/adc_sensor/adc_sensor.c \
-	component/bat_pack/bat_pack.c \
-	component/cabinet_cell/cabinet_cell.c \
-	component/cabinet_door/cabinet_door.c \
-	component/io_state/io_state.c \
-	component/ioe/ioe.c \
-	component/mux/mux.c \
-	component/ntc/ntc.c \
-	component/switch/switch.c \
-	component/uart/uart.c
-SRCS+=	service/linked_list/linked_list.c
-SRCS+=	util/delay/delay.c \
-	util/string/string_util.c
-
+SRCS:=board/board.c
+SRCS+=util/string/string_util.c
+	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
+INCLUDES:=. app_config board service component util app
+INCLUDES+=component/adc_sensor \
+			component/ntc \
+			component/switch \
+INCLUDES+= util/delay util/string 
 
-INCLUDES:=. board 
-INCLUDES+=. app_config
-INCLUDES+=	app/cabinet_app \
-		app/can_master \
-		app/canopen 
-INCLUDES+= 	component/adc_sensor \
-       	component/bat_pack \
-       	component/cabinet_cell \
-       	component/cabinet_door \
-       	component/io_state \
-       	component/ioe \
-       	component/mux \
-       	component/ntc \
-       	component/switch \
-       	component/uart
-INCLUDES+=	service/linked_list
-INCLUDES+=	util/delay \
-		util/string
-       	
+USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
+USER_LIBS=CANopen
+
+LIB_INCLUDES:=libs
+LIB_INCLUDES+=
+OBJDIR=build
+
+INCLUDES+=$(LIB_INCLUDES)			
 INCLUDES+=$(BSP_INCLUDES)
 INCLUDES:=$(addprefix -I$(PROJ_ROOT)/,$(INCLUDES))
+INCLUDES+=$(addprefix -I,$(USER_LIB_INCLUDES))
 
 SRCS+=$(BSP_SRCS)
+SRCS+=component/adc_sensor/adc_sensor.c \
+			component/ntc/ntc.c \
+			component/switch/switch.c \
+
+SRCS+= main.c 
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))
 OBJS:= $(patsubst %.c,%.o,$(OBJS))
 OBJS:= $(patsubst %.s,%.o,$(OBJS))
-OBJS+= $(TARGET).o 
 DEPS:= $(patsubst %.o,%.d,$(OBJS))
 SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
-SRCS+= $(TARGET).c 
-
 
 LDSCRIPT_INC=
 DEFS:=
@@ -70,6 +51,7 @@ DEFS:=
 #--------------------------------------------------------
 
 OPTIMIZE=-O0
+#OPTIMIZE=-O3
 
 # Option arguments for C compiler.
 CFLAGS+= $(INCLUDES)
@@ -78,14 +60,16 @@ CFLAGS+=-fmessage-length=0
 CFLAGS+=-fsigned-char
 CFLAGS+=-Wall -Winline -ggdb -lm -MMD -MP -Wno-unused-function -Wextra -Wstrict-prototypes
 CFLAGS+=-std=gnu11
-CFLAGS+=--specs=nosys.specs
+CFLAGS+=--specs=nano.specs
 CFLAGS+=-ffunction-sections -fdata-sections
 
 LFLAGS:=-T$(PROJ_ROOT)/board/$(BOARD_TYPE)/$(LD_FILES)
-LFLAGS	+= -Xlinker --gc-sections
+#LFLAGS	+=-nostartfiles -Xlinker --gc-sections
+LFLAGS	+=-Xlinker --gc-sections
 LFLAGS  +=-Wl,-Map=$(TARGET).map
 
-LINK_LIBS:=
+LINK_LIBS:= $(addprefix -L,$(USER_LIB_INCLUDES))
+LINK_LIBS+= $(addprefix -l,$(USER_LIBS))
 
 #LFLAGS  += -flto -fuse-linker-plugin
 # Flags for objcopy
@@ -104,14 +88,15 @@ FLASHER_FLAGS=
 
 .PHONY:all proj debug libs test_suit test_suit_clean flash
 
-all: proj $(DEPS)
+all: proj
 	$(HEX)   $(TARGET).elf 	$(TARGET).hex
 	$(BIN)   $(TARGET).elf  $(TARGET).bin
 	$(DUMP) -St $(TARGET).elf >$(TARGET).lst
-	$(SIZE)  $(OBJS) $(TARGET).elf
+	$(SIZE)  $(OBJS) $(TARGET).elf $(TARGET).hex
 
 proj: 	$(TARGET).elf
 
+-include $(DEPS)
 $(PROJ_ROOT)/$(OBJDIR)/%.o: $(PROJ_ROOT)/%.c
 	@echo Compiling $<...
 	@mkdir -p $(dir $@)
@@ -139,9 +124,6 @@ clean:
 	rm -f $(TARGET).map
 	rm -f $(TARGET).lst
 
-debug:
-	$(JLINKGDB) -xc jlinkgdb.conf -device PAC55XX -singlerun -strict -timeout 0 -nogui
-
 libs:
 	make -C libs/selex-libc/canopen_clib all
 test_suit:
@@ -151,4 +133,3 @@ test_suit_clean:
 	
 flash:
 	./flasher.sh
-	
