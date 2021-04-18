@@ -21,6 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+asdadwqd
 #include "stm32f10x_it.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Examples

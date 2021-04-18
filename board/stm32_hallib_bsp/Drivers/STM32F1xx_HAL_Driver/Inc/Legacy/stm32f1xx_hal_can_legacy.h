@@ -32,7 +32,7 @@
   *
   ******************************************************************************
   */
-
+#if 0
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __STM32F1xx_HAL_CAN_LEGACY_H
 #define __STM32F1xx_HAL_CAN_LEGACY_H
@@ -40,7 +40,7 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-     
+
 #if defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || \
     defined(STM32F103xG) || defined(STM32F105xC) || defined(STM32F107xC)
 
@@ -792,5 +792,5 @@ HAL_CAN_StateTypeDef HAL_CAN_GetState(CAN_HandleTypeDef* hcan);
 
 #endif /* __STM32F1xx_HAL_CAN_LEGACY_H */
 
-
+#endif
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

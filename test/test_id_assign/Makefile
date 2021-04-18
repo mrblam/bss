@@ -6,19 +6,10 @@
 export TARGET=bss_storage_control
 export PROJ_ROOT=../..
 export BOARD_TYPE=stm32_hallib_bsp
-include $(PROJ_ROOT)/board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
-include $(PROJ_ROOT)/gcc.mk
+include ../../board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
+include ../../gcc.mk
 
 SRCS:=board/board.c
-SRCS+=component/adc_sensor/adc_sensor.c \
-	component/bat_pack/bat_pack.c \
-	component/cabinet_cell/cabinet_cell.c \
-	component/cabinet_door/cabinet_door.c \
-	component/io_state/io_state.c \
-	component/ioe/ioe.c \
-	component/mux/mux.c	\
-	component/switch/switch.c 
-SRCS+=service/linked_list/linked_list.c 
 SRCS+=util/string/string_util.c
 	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
@@ -26,15 +17,8 @@ BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 INCLUDES:=. app_config board service component util app
 INCLUDES+=component/adc_sensor \
-			component/bat_pack \
-			component/cabinet_cell \
-			component/cabinet_door \
-			component/io_state \
-			component/ioe \
-			component/mux \
 			component/ntc \
 			component/switch \
-INCLUDES+=service/linked_list
 INCLUDES+= util/delay util/string 
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
@@ -50,13 +34,22 @@ INCLUDES:=$(addprefix -I$(PROJ_ROOT)/,$(INCLUDES))
 INCLUDES+=$(addprefix -I,$(USER_LIB_INCLUDES))
 
 SRCS+=$(BSP_SRCS)
+SRCS+=component/adc_sensor/adc_sensor.c \
+			component/ntc/ntc.c \
+			component/switch/switch.c \
+	
+OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))		
+SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
 
-SRCS+= main.c 
-OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))
+TEST_SRCS+= test_id_assign.c 
+
+SRCS+=$(TEST_SRCS)
+OBJS+=$(TEST_SRCS)
+
+
 OBJS:= $(patsubst %.c,%.o,$(OBJS))
 OBJS:= $(patsubst %.s,%.o,$(OBJS))
 DEPS:= $(patsubst %.o,%.d,$(OBJS))
-SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
 
 LDSCRIPT_INC=
 DEFS:=

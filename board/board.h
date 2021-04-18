@@ -4,6 +4,7 @@
 #include "compiler_optimize.h"
 #include "stdint.h"
 #include "hw_delay_hal.h"
+#include "stm32f1xx_hal.h"
 
 void board_init(void) WEAK;
 void global_interrupt_enable(void) WEAK;

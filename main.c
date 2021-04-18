@@ -9,6 +9,7 @@
 #include "can_hal.h"
 #include "string_util.h"
 #include "app_config.h"
+#include "stm32f1xx_hal.h"
 
 static volatile uint32_t sys_timestamp=0;
 static volatile uint32_t sync_counter=0;
@@ -26,8 +27,9 @@ int main(void){
 	return 0;
 }
 
-void HAL_STATE_MACHINE_UPDATE_TICK(void) {
+void HAL_STATE_MACHINE_UPDATE_TICK(void){
 
         sys_timestamp+=APP_STATE_MACHINE_UPDATE_TICK_mS;
         sync_counter++;
 }
+
