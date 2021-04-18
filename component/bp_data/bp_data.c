@@ -5,23 +5,15 @@
  *      Author: KhanhDinh
  */
 
-#include "bat_pack.h"
+#include "bp_data.h"
+
+static void bp_data_serialize_impl(BP* p_bp, char* buff);
 
 BP* bp_construct(void){
 	BP* p_bp = (BP*)malloc(sizeof(BP));
 	while(p_bp == NULL);
+	p_bp->data_serialize = bp_data_serialize_impl;
 	return p_bp;
-}
-
-void bp_init(BP* p_bp){
-	p_bp->state = BP_ST_IDLE;
-	p_bp->pos = 0;
-	p_bp->soc = 0;
-	p_bp->soh = 0;
-	p_bp->vol = 0;
-	p_bp->cur = 0;
-	p_bp->temp = 0;
-	p_bp->cycle = 0;
 }
 
 void bp_update_state(BP* p_bp, BP_STATE state){
@@ -37,14 +29,6 @@ void bp_update_serial_number(BP* p_bp, char* sn){
 }
 
 char* bp_get_serial_number(BP* p_bp){
-	return 0;
-}
-
-void bp_update_pos(BP* p_bp, uint8_t pos){
-
-}
-
-uint8_t bp_get_pos(BP* p_bp){
 	return 0;
 }
 
@@ -94,4 +78,28 @@ void bp_update_cycle(BP* p_bp, uint32_t cycle){
 
 uint32_t bp_get_cycle(BP* p_bp){
 	return 0;
+}
+
+static void bp_data_serialize_impl(BP* p_bp, char* buff){
+	*buff++=':';
+	*buff++='R';
+	*buff++='B';
+    *buff++=',';
+	buff+=long_to_string(p_bp->serial_number,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bp->vol,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bp->cur,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bp->state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bp->soc,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bp->soh,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bp->temp,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bp->cycle,buff);
+    *buff++='*';
+    *buff++='\0';
 }

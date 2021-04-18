@@ -7,6 +7,8 @@
 
 #include "cabinet_cell.h"
 
+static void cab_cell_data_serialze_impl(Cabinet_cell* p_cc, char* buff);
+
 Cabinet_cell* cab_cell_construct(void){
 	Cabinet_cell* p_cc = (Cabinet_cell*)malloc(sizeof(Cabinet_cell));
 	while(p_cc == NULL);
@@ -15,6 +17,7 @@ Cabinet_cell* cab_cell_construct(void){
 	p_cc->bp = bp_construct();
 	p_cc->cell_fan = sw_construct();
 	p_cc->door = door_construct();
+	p_cc->data_serialize = cab_cell_data_serialze_impl;
 	return p_cc;
 }
 
@@ -44,4 +47,26 @@ void cab_cell_active_cell_fan(Cabinet_cell* p_cc){
 
 void cab_cell_deactive_cell_fan(Cabinet_cell* p_cc){
 
+}
+
+static void cab_cell_data_serialze_impl(Cabinet_cell* p_cc, char* buff){
+	*buff++=':';
+	*buff++='R';
+	*buff++='C';
+    *buff++=',';
+	buff+=long_to_string(p_cc->cab_id,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->op_state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->door->state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->cell_fan->state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->temp,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->bp.serial_number,buff);
+    *buff++='*';
+    *buff++='\0';
 }

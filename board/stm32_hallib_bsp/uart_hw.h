@@ -9,6 +9,7 @@
 #define BOARD_STM32_BSP_UART_HW_H_
 
 #include "stdint.h"
+#include "string.h"
 #include "stdio.h"
 
 #define UART_RX_BUFF_SIZE                    64

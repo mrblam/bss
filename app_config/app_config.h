@@ -52,4 +52,15 @@ typedef enum SLAVE_ID{
 	SL15 = 19,
 } SLAVE_ID;
 
+#define RSDO_ID			0x600			/* BSS to BP (Server Receive) */
+#define TSDO_ID			0x580			/* BP to BSS (Server Transmitt) */
+#define MASTER_ID		3
+
+#define TPDO1_ID		0x180
+#define TPDO2_ID		0x280
+#define	TPDO3_ID		0x380
+#define TPDO4_ID		0x480
+
+#define NODE_ID_RESPONSE_TIMEOUT	10
+
 #endif /* APP_CONFIG_APP_CONFIG_H_ */

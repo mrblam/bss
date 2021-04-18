@@ -9,7 +9,7 @@
 #define BOARD_STM32_BSP_INTERRUPT_HW_H_
 
 
-#define STATE_MACHINE_UPDATE_TICK SysTick_Handler
+#define STATE_MACHINE_UPDATE_TICK 	SysTick_Handler
 #define DISABLE_STM_UPDATE_TICK	 		SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |\
                    SysTick_CTRL_TICKINT_Msk   |\
                    SysTick_CTRL_ENABLE_Msk

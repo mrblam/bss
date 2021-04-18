@@ -10,16 +10,39 @@ include ../../board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include ../../gcc.mk
 
 SRCS:=board/board.c
+SRCS+=app/cabinet_app/cabinet_app.c \
+	app/can_master/can_master.c
+SRCS+=component/adc_sensor/adc_sensor.c \
+	component/bp_data/bp_data.c \
+	component/bss_data/bss_data \
+	component/cabinet_cell/cabionet_cell.c \
+	component/cabinet_door/cabinet_door.c \
+	component/io_state/io_state.c \
+	component/ioe/ioe.c \
+	component/mux/mux.c \
+	component/ntc/ntc.c \
+	component/switch/switch.c 
+SRCS+=service/linked_list/linked_list.c
 SRCS+=util/string/string_util.c
 	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 INCLUDES:=. app_config board service component util app
+INCLUDES+=app/cabinet_app \
+	app/can_master
 INCLUDES+=component/adc_sensor \
-			component/ntc \
-			component/switch \
-INCLUDES+= util/delay util/string 
+	component/bp_data \
+	component/bss_data \
+	component/cabinet_cell \
+	component/cabinet_door \
+	component/io_state \
+	component/ioe \
+	component/mux \
+	component/ntc \
+	component/switch
+INCLUDES+=service/linked_list
+INCLUDES+= util/string
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
 USER_LIBS=CANopen

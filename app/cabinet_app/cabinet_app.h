@@ -14,9 +14,9 @@
 #include "cabinet_cell.h"
 #include "ioe.h"
 #include "mux.h"
-#include "uart.h"
 #include "can_master.h"
 #include "linked_list.h"
+#include "bss_data.h"
 
 typedef struct Cabinet_app_t Cabinet_app;
 
@@ -33,6 +33,14 @@ typedef enum TIMING_STATE{
 	TIMING_ST_ACTIVE = 1
 } TIMING_STATE;
 
+typedef enum ASSIGN_ID_STATE{
+	ASSIGN_ST_START,
+	ASSIGN_ST_SELECT_SLAVE,
+	ASSIGN_ST_SEND_ID,
+	ASSIGN_ST_WAIT,
+	ASSIGN_ST_DONE
+}ASSIGN_ID_STATE;
+
 struct Cabinet_app_t{
 	CAN_master		base;
 	Cabinet_cell*	cabin[CABINET_CELL_NUM];
@@ -43,6 +51,7 @@ struct Cabinet_app_t{
 	uint8_t 		time_stamp;
 	Cabinet_list*	empty_cab;
 	Cabinet_list*	full_cab;
+	BSS_Data*		bss_data;
 };
 
 Cabinet_app* cab_app_construct(void);

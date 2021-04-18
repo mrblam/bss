@@ -10,8 +10,9 @@
 
 #include "stdint.h"
 #include "stdlib.h"
+
+#include "../bp_data/bp_data.h"
 #include "debug_com_port_hal.h"
-#include "bat_pack.h"
 #include "cabinet_cell.h"
 #include "app_config.h"
 #include "string_util.h"
