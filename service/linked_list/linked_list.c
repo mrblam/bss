@@ -9,7 +9,7 @@
 
 Cabinet_node* cab_node_construct(Cabinet_cell* p_cc){
 	Cabinet_node* p_node = (Cabinet_node*)malloc(sizeof(Cabinet_node));
-	while(p_node == NULL) return NULL;
+	while(p_node == NULL);
 	p_node->data = p_cc;
 	p_node->p_next = NULL;
 	return p_node;
@@ -17,7 +17,7 @@ Cabinet_node* cab_node_construct(Cabinet_cell* p_cc){
 
 Cabinet_list* cab_list_init(void){
 	Cabinet_list* p_list = (Cabinet_list*)malloc(sizeof(Cabinet_list));
-	while(p_list == NULL) return NULL;
+	while(p_list == NULL);
 	p_list->p_head = NULL;
 	p_list->p_tail = NULL;
 	p_list->p_temp = NULL;

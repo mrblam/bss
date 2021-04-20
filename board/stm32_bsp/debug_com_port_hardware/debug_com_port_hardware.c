@@ -7,12 +7,12 @@ UART_HW power_sync_port;
 UART_HW	hmi_sync_port;
 
 
-
+#if 0
 void uart_hw_init(void){
 	power_sync_hw_gpio_init();
 	hmi_sync_hw_gpio_init();
 }
-
+#endif
 void power_sync_hw_gpio_init(void){
 	GPIO_InitTypeDef PowerSync_GPIO_InitStruct;
 

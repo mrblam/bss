@@ -12,7 +12,7 @@ static void cab_cell_data_serialze_impl(Cabinet_cell* p_cc, char* buff);
 Cabinet_cell* cab_cell_construct(void){
 	Cabinet_cell* p_cc = (Cabinet_cell*)malloc(sizeof(Cabinet_cell));
 	while(p_cc == NULL);
-	p_cc->state = CELL_ST_EMPTY;
+
 	p_cc->node_id = DEFAULT_BP_ID;
 	p_cc->bp = bp_construct();
 	p_cc->cell_fan = sw_construct();
@@ -66,7 +66,7 @@ static void cab_cell_data_serialze_impl(Cabinet_cell* p_cc, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cc->temp,buff);
     *buff++=',';
-	buff+=long_to_string(p_cc->bp.serial_number,buff);
+	buff+=long_to_string(p_cc->bp->serial_number,buff);
     *buff++='*';
     *buff++='\0';
 }

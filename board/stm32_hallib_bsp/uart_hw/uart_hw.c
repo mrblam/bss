@@ -10,8 +10,8 @@ static void uart_sim_hw_init(void);
 
 void uart_hw_init(void){
 	uart_hmi_hw_init();
-	//uart_power_hw_init();
-	//uart_sim_hw_init();
+	uart_power_hw_init();
+	uart_sim_hw_init();
 }
 
 static void uart_hmi_hw_init(void){

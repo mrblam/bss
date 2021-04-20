@@ -12,6 +12,7 @@
 #include "cabinet_cell.h"
 #include "stdint.h"
 #include "stdlib.h"
+#include "malloc.h"
 
 #define END_OF_LIST	0
 

@@ -11,31 +11,37 @@
 
 Cabinet_app selex_bss;
 char buff[50];
+uint8_t cnt = 0;
+uint8_t i = 0;
 
 int main (void){
+	__disable_irq();
 	board_init();
 	cab_app_init(&selex_bss);
+	__enable_irq();
+	while(1){
+
+	};
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
-	if(htim->Instance == TIM2){
+void SysTick_Handler(void){
+#if 1
 		if(cnt < 15){
-			cab_cell_data_serialize(selex_bss->cabin[cnt], buff);
+			cab_cell_data_serialize(selex_bss.cabin[cnt], buff);
 			cnt++;
 		}
 		else if(cnt < 30){
-			bp_data_serialize(selex_bss->cabin[cnt-15]->bp, buff);
+			bp_data_serialize(selex_bss.cabin[cnt-15]->bp, buff);
 			cnt++;
 		}
 		else {
-			bss_data_serialize(selex_bss->bss_data, buff);
+			bss_data_serialize(selex_bss.bss_data, buff);
 			cnt = 0;
 		}
-
 		while(*(buff+i)!= '\0'){
-			HAL_UART_Transmit(&huart1, (uint8_t*)(data + i), 1, 1000);
+			HAL_UART_Transmit(&uart_power, (uint8_t*)(buff + i), 1, 1000);
 			i++;
 		}
 			i = 0;
-	}
+#endif
 }

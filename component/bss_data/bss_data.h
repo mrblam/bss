@@ -10,7 +10,7 @@
 
 #include "stdint.h"
 #include "stdlib.h"
-#include "../../util/string/string_util.h"
+#include "string_util.h"
 
 typedef struct BSS_Data_t BSS_Data;
 struct BSS_Data_t{
