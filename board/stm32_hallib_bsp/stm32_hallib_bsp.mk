@@ -32,6 +32,7 @@ BSP_SRCS+=$(BOARD_TYPE).c  \
 	debug_io_hw/debug_io_hw.c \
 	ioe_hw/ioe_hw.c \
 	delay_hw/delay_hw.c \
+	core_hw/core_hw.c \
 	gpio_hw/gpio_hw.c \
 	timer_hw/timer_hw.c
 
