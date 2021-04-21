@@ -23,6 +23,7 @@ typedef enum BP_STATE{
 struct BP_t{
 	char 	serial_number[32];
 	BP_STATE 	state;
+	uint8_t 	pos;
 	uint8_t 	soc;
 	uint8_t 	soh;
 	uint8_t 	vol;

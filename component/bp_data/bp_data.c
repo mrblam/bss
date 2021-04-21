@@ -98,6 +98,8 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){
 	*buff++='R';
 	*buff++='B';
     *buff++=',';
+    buff+=long_to_string(p_bp->pos, buff);
+    *buff++=',';
     for(uint8_t i = 0; *(p_bp->serial_number + i) != '\0'; i++){
     	*buff++= *(p_bp->serial_number + i);
     }

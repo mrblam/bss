@@ -80,7 +80,7 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 			else sync_counter = 21;
 			break;
 		case 21:
-			if(cab_list_walk_down(selex_bss.full_cab)){
+			if(cab_list_walk_down(selex_bss.empty_cab)){
 				cab_app_sync_bp_data_hmi(&selex_bss, selex_bss.full_cab->p_temp->data->bp);
 			}
 			else sync_counter = 22;

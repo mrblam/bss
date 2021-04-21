@@ -13,6 +13,7 @@ Cabinet_cell* cab_cell_construct(void){
 	Cabinet_cell* p_cc = (Cabinet_cell*)malloc(sizeof(Cabinet_cell));
 	while(p_cc == NULL);
 
+	p_cc->bp = bp_construct();
 	p_cc->state = CAB_CELL_ST_EMPTY;
 	p_cc->op_state = CAB_CELL_OP_ST_INACTIVE;
 	p_cc->node_id = DEFAULT_BP_ID;
