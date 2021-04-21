@@ -21,7 +21,7 @@ static void hmi_process_data_timer_init(void){
 	TIM_MasterConfigTypeDef sMasterConfig = {0};
 
 	hmi_timer.Instance = HMI_TIMER;
-	hmi_timer.Init.Prescaler = 799;
+	hmi_timer.Init.Prescaler = 3599;
 	hmi_timer.Init.CounterMode = TIM_COUNTERMODE_UP;
 	hmi_timer.Init.Period = 9999;
 	hmi_timer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
