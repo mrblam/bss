@@ -35,8 +35,9 @@ Cabinet_node* cab_node_construct(Cabinet_cell* p_cc);
 Cabinet_list* cab_list_init(void);
 void cab_list_insert_to_tail(Cabinet_list* p_list, Cabinet_cell* p_cc);
 void cab_list_remove_node(Cabinet_list* p_list, Cabinet_cell* p_cc);
-Cabinet_cell* cab_list_walk_down(Cabinet_list* p_list);
+Cabinet_node* cab_list_walk_down(Cabinet_list* p_list);
 void cab_list_export_data(Cabinet_list* p_list);
+void cab_list_reset_temp(Cabinet_list* p_list);
 
 /* -------------------------------------------------------------------------------- */
 typedef struct Node_t Node;
@@ -61,5 +62,6 @@ void list_insert_to_head(List* p_list, uint8_t data);
 void list_remove_node(List* p_list, uint8_t data);
 uint8_t list_walk_down(List* p_list);
 void list_export_data(List* p_list);
+void list_reset_temp(List* p_list);
 
 #endif /* SERVICE_LINKED_LIST_LINKED_LIST_H_ */

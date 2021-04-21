@@ -1,8 +1,8 @@
 #include "uart_hw.h"
 
-UART_HandleTypeDef uart_sim;
-UART_HandleTypeDef uart_power;
-UART_HandleTypeDef uart_hmi;
+UART_hw sim_port;
+UART_hw hmi_port;
+UART_hw power_sys_port;
 
 static void uart_hmi_hw_init(void);
 static void uart_power_hw_init(void);
@@ -15,55 +15,55 @@ void uart_hw_init(void){
 }
 
 static void uart_hmi_hw_init(void){
-	uart_hmi.Instance = UART_HMI;
-	uart_hmi.Init.BaudRate = 115200;
-	uart_hmi.Init.WordLength = UART_WORDLENGTH_8B;
-	uart_hmi.Init.StopBits = UART_STOPBITS_1;
-	uart_hmi.Init.Parity = UART_PARITY_NONE;
-	uart_hmi.Init.Mode = UART_MODE_TX_RX;
-	uart_hmi.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	uart_hmi.Init.OverSampling = UART_OVERSAMPLING_16;
-	if (HAL_UART_Init(&uart_hmi) != HAL_OK)
+	hmi_port.uart_module.Instance = HMI_PORT_COM;
+	hmi_port.uart_module.Init.BaudRate = UART_BAUDRATE;
+	hmi_port.uart_module.Init.WordLength = UART_WORDLENGTH_8B;
+	hmi_port.uart_module.Init.StopBits = UART_STOPBITS_1;
+	hmi_port.uart_module.Init.Parity = UART_PARITY_NONE;
+	hmi_port.uart_module.Init.Mode = UART_MODE_TX_RX;
+	hmi_port.uart_module.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	hmi_port.uart_module.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&hmi_port.uart_module) != HAL_OK)
 	{
 		Error_Handler();
 	}
 }
 
 static void uart_power_hw_init(void){
-	uart_power.Instance = UART_POWER;
-	uart_power.Init.BaudRate = 115200;
-	uart_power.Init.WordLength = UART_WORDLENGTH_8B;
-	uart_power.Init.StopBits = UART_STOPBITS_1;
-	uart_power.Init.Parity = UART_PARITY_NONE;
-	uart_power.Init.Mode = UART_MODE_TX_RX;
-	uart_power.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	uart_power.Init.OverSampling = UART_OVERSAMPLING_16;
-	if (HAL_UART_Init(&uart_power) != HAL_OK)
+	power_sys_port.uart_module.Instance = POWER_SYS_PORT_COM;
+	power_sys_port.uart_module.Init.BaudRate = UART_BAUDRATE;
+	power_sys_port.uart_module.Init.WordLength = UART_WORDLENGTH_8B;
+	power_sys_port.uart_module.Init.StopBits = UART_STOPBITS_1;
+	power_sys_port.uart_module.Init.Parity = UART_PARITY_NONE;
+	power_sys_port.uart_module.Init.Mode = UART_MODE_TX_RX;
+	power_sys_port.uart_module.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	power_sys_port.uart_module.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&power_sys_port.uart_module) != HAL_OK)
 	{
 		Error_Handler();
 	}
 }
 
 static void uart_sim_hw_init(void){
-	uart_sim.Instance = UART_SIM;
-	uart_sim.Init.BaudRate = 115200;
-	uart_sim.Init.WordLength = UART_WORDLENGTH_8B;
-	uart_sim.Init.StopBits = UART_STOPBITS_1;
-	uart_sim.Init.Parity = UART_PARITY_NONE;
-	uart_sim.Init.Mode = UART_MODE_TX_RX;
-	uart_sim.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	uart_sim.Init.OverSampling = UART_OVERSAMPLING_16;
-	if (HAL_UART_Init(&uart_sim) != HAL_OK)
+	sim_port.uart_module.Instance = SIM_PORT_COM;
+	sim_port.uart_module.Init.BaudRate = UART_BAUDRATE;
+	sim_port.uart_module.Init.WordLength = UART_WORDLENGTH_8B;
+	sim_port.uart_module.Init.StopBits = UART_STOPBITS_1;
+	sim_port.uart_module.Init.Parity = UART_PARITY_NONE;
+	sim_port.uart_module.Init.Mode = UART_MODE_TX_RX;
+	sim_port.uart_module.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	sim_port.uart_module.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&sim_port.uart_module) != HAL_OK)
 	{
 		Error_Handler();
 	}
 }
 
-void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
-{
+void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle){
 
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	if(uartHandle->Instance==UART_SIM){
+
+	if(uartHandle->Instance == SIM_PORT_COM){
 		/* USART2 clock enable */
 		__HAL_RCC_USART2_CLK_ENABLE();
 		__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -86,7 +86,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 		HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
 		HAL_NVIC_EnableIRQ(USART2_IRQn);
   }
-	else if(uartHandle->Instance==UART_POWER){
+	else if(uartHandle->Instance == POWER_SYS_PORT_COM){
 		/* USART1 clock enable */
 		__HAL_RCC_USART1_CLK_ENABLE();
 		__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -104,8 +104,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+		/* USART1 interrupt Init */
+		HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+		HAL_NVIC_EnableIRQ(USART1_IRQn);
 	}
-	else if(uartHandle->Instance==UART_HMI){
+	else if(uartHandle->Instance == HMI_PORT_COM){
 	    /* USART3 clock enable */
 	    __HAL_RCC_USART3_CLK_ENABLE();
 	    __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -124,4 +128,16 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 	    GPIO_InitStruct.Pull = GPIO_NOPULL;
 	    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 	}
+}
+
+void uart_sends(UART_hw* p_hw, uint8_t* s){
+	while(*s){
+		HAL_UART_Transmit(&p_hw->uart_module, s, 1, 500);
+		s++;
+	}
+}
+
+char uart_receives(UART_hw* p_hw, char* s){
+	HAL_UART_Receive_IT(&p_hw->uart_module, (uint8_t*)s, 1);
+	return *s;
 }

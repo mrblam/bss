@@ -10,11 +10,29 @@
 
 #include "bss_data.h"
 
+static const char* default_serial_number="Selex_BSS";
+
 static void bss_data_serialize_impl(BSS_Data* p_bss_data, char* buff);
 
 BSS_Data* bss_data_construct(void){
 	BSS_Data* p_bss_data = (BSS_Data*)malloc(sizeof(BSS_Data));
 	while(p_bss_data == NULL);
+
+    char* sn=(char*)default_serial_number;
+    char* sn_buff=p_bss_data->serial_number;
+    while(*sn){
+            *sn_buff++=*sn++;
+    }
+    *sn_buff++='\0';
+
+    p_bss_data->cab_num = CABINET_CELL_NUM;
+    p_bss_data->active_cab_num = 0;
+    p_bss_data->tilt_ss_state = TILT_SS_INACTIVE;
+    p_bss_data->charger_state = CHARGER_ST_INACTIVE;
+    p_bss_data->fan_state = FAN_ST_INACTIVE;
+    p_bss_data->lamp_state = LAMP_ST_ACTIVE;
+    p_bss_data->temp = 0;
+
 	p_bss_data->data_serialize = bss_data_serialize_impl;
 	return p_bss_data;
 }
@@ -24,7 +42,9 @@ static void bss_data_serialize_impl(BSS_Data* p_bss_data, char* buff){
 	*buff++='R';
 	*buff++='S';
     *buff++=',';
-	buff+=long_to_string(p_bss_data->serial_number,buff);
+    for(uint8_t i = 0; *(p_bss_data->serial_number + i) != '\0'; i++){
+    	*buff++= *(p_bss_data->serial_number + i);
+    }
     *buff++=',';
 	buff+=long_to_string(p_bss_data->cab_num,buff);
     *buff++=',';

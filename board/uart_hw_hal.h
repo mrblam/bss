@@ -12,6 +12,12 @@
 #include "stdint.h"
 #include "uart_hw.h"
 
+extern UART_hw 	sim_port;
+extern UART_hw	hmi_port;
+extern UART_hw	power_sys_port;
+
 void uart_hw_init(void) WEAK;
+void uart_sends(UART_hw* p_hw, uint8_t* s) WEAK;
+char uart_receives(UART_hw* p_hw, char* s) WEAK;
 
 #endif /* BOARD_UART_HW_HAL_H_ */

@@ -96,3 +96,16 @@ uint16_t slen(const char *str) {
 	}
 	return -1;
 }
+
+uint32_t string_to_long(char* str)
+{
+    uint32_t mult = 1;
+    uint32_t re = 0;
+    uint8_t len = slen(str);
+    for(int i = len -1 ; i >= 0 ; i--)
+    {
+        re = re + ((uint8_t)str[i]- 48)*mult;
+        mult = mult*10;
+    }
+    return re;
+}

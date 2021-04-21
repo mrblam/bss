@@ -6,21 +6,23 @@
 #include "stm32f1xx_hal.h"
 #include "core.h"
 
-#define UART_SIM	USART2
-#define UART_HMI	USART3
-#define UART_POWER	USART1
+typedef struct UART_hw_t UART_hw;
+struct UART_hw_t{
+	UART_HandleTypeDef uart_module;
+};
 
-typedef struct UART_HW_t UART_HW;
+extern UART_hw sim_port;
+extern UART_hw hmi_port;
+extern UART_hw power_sys_port;
 
-extern UART_HandleTypeDef uart_sim;
-extern UART_HandleTypeDef uart_power;
-extern UART_HandleTypeDef uart_hmi;
+#define SIM_PORT_COM		USART2
+#define HMI_PORT_COM		USART3
+#define POWER_SYS_PORT_COM	USART1
+
+#define UART_BAUDRATE		115200
 
 void uart_hw_init(void);
-void uart_sends(UART_HW* p_hw,const uint8_t* s);
-
-void debug_com_hw_init(void);
-//void debug_port_set_receive_handle(Uart_Receive_Handle handle);
-//void USART_Write_String(char *a);
+void uart_sends(UART_hw* p_hw, uint8_t* s);
+char uart_receives(UART_hw* p_hw, char* s);
 
 #endif

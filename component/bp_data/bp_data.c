@@ -9,9 +9,22 @@
 
 static void bp_data_serialize_impl(BP* p_bp, char* buff);
 
+static const char* default_serial_number="Selex_Battery";
+
 BP* bp_construct(void){
 	BP* p_bp = (BP*)malloc(sizeof(BP));
 	while(p_bp == NULL);
+
+	p_bp->state = BP_ST_IDLE;
+
+    char* sn=(char*)default_serial_number;
+    char* sn_buff=p_bp->serial_number;
+    while(*sn){
+            *sn_buff++=*sn++;
+    }
+    *sn_buff++='\0';
+
+    p_bp->vol = p_bp->cur = p_bp->soc = p_bp->soh = p_bp->temp = p_bp->cycle = 0;
 	p_bp->data_serialize = bp_data_serialize_impl;
 	return p_bp;
 }
@@ -85,7 +98,9 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){
 	*buff++='R';
 	*buff++='B';
     *buff++=',';
-	buff+=long_to_string(p_bp->serial_number,buff);
+    for(uint8_t i = 0; *(p_bp->serial_number + i) != '\0'; i++){
+    	*buff++= *(p_bp->serial_number + i);
+    }
     *buff++=',';
 	buff+=long_to_string(p_bp->vol,buff);
     *buff++=',';

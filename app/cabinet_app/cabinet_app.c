@@ -10,6 +10,7 @@
 void cab_app_init(Cabinet_app* p_ca){
 	can_master_init((CAN_master*) p_ca);
 	p_ca->state = CABIN_ST_SETUP;
+	p_ca->timing_state = TIMING_ST_DEACTIVE;
 	p_ca->empty_cab = cab_list_init();
 	p_ca->full_cab = cab_list_init();
 
@@ -23,6 +24,7 @@ void cab_app_init(Cabinet_app* p_ca){
 
 	p_ca->ioe_cfan = ioe_construct();
 	p_ca->ioe_sol = ioe_construct();
+	p_ca->bss_data = bss_data_construct();
 }
 
 void cab_app_set_state(Cabinet_app* p_ca, CABIN_STATE state){
@@ -71,25 +73,93 @@ void cab_app_update_tilt_ss(Cabinet_app* p_ca){
 }
 
 void cab_app_sync_bss_data_hmi(Cabinet_app* p_ca){
+	char buff[50];
 
+	bss_data_serialize(p_ca->bss_data, buff);
+	uart_sends(&power_sys_port, (uint8_t*)buff);
 }
 
-void cab_app_sync_cab_data_hmi(Cabinet_app* p_ca){
+void cab_app_sync_bp_data_hmi(__attribute__((unused)) Cabinet_app* p_ca, BP* p_bp){
+	char buff[50];
 
+	bp_data_serialize(p_bp, buff);
+	uart_sends(&power_sys_port, (uint8_t*)buff);
 }
 
-void cab_app_sync_bp_data_hmi(Cabinet_app* p__ca){
+void cab_app_sync_cab_data_hmi(Cabinet_app* p_ca, uint8_t cab_id){
+	char buff[50];
 
+	cab_cell_data_serialize(p_ca->cabin[cab_id], buff);
+	uart_sends(&power_sys_port, (uint8_t*)buff);
 }
 
-void cab_app_stream_data_hmi(Cabinet_app* p_ca){
+void cab_app_decode_cmd_hmi(Cabinet_app* p_ca, char* buff){
+	char* token;
 
+	token = strtok(buff, ",");
+	switch(*token){
+	case 'C':
+		cab_app_process_cab_cmd_hmi(p_ca, token);
+		break;
+	case 'B':
+		break;
+	case 'S':
+		break;
+	default:
+		break;
+	}
 }
 
-void cab_app_stream_data_sim(Cabinet_app* p_ca){
+void cab_app_process_bss_cmd_hmi(__attribute__((unused)) Cabinet_app* p_ca, char* token){
+	token = strtok(NULL, ",");
+	char* obj = token;
+	token = strtok(NULL, ",");
+	uint8_t state = string_to_long(token);
 
+	switch(*obj){
+	case 'F':
+		break;
+	case 'C':
+		break;
+	case 'L':
+		break;
+	default:
+		break;
+	}
 }
 
-void cab_app_send_warning_msg(Cabinet_app* p_ca){
+void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_app* p_ca, char* token){
+	token = strtok(NULL, ",");
+	uint8_t id = string_to_long(token);
+	token = strtok(NULL, ",");
+	char* obj = token;
+	token = strtok(NULL, ",");
+	uint8_t state = string_to_long(token);
 
+	switch(*obj){
+	case 'F':
+		if(state == 1){
+			cab_cell_active_cell_fan(p_ca->cabin[id]);
+		}
+		else {
+			cab_cell_deactive_cell_fan(p_ca->cabin[id]);
+		}
+		break;
+	case 'D':
+		if(state == 1){
+			cab_cell_open_door(p_ca->cabin[id]);
+		}
+		break;
+	case 'C':
+		if(state == 1){
+			cab_cell_active_charger(p_ca->cabin[id]);
+		}
+		else {
+			cab_cell_deactive_charger(p_ca->cabin[id]);
+		}
+		break;
+	default:
+		break;
+	}
 }
+

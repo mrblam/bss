@@ -32,7 +32,8 @@ BSP_SRCS+=$(BOARD_TYPE).c  \
 	debug_io_hw/debug_io_hw.c \
 	ioe_hw/ioe_hw.c \
 	delay_hw/delay_hw.c \
-	gpio_hw/gpio_hw.c
+	gpio_hw/gpio_hw.c \
+	timer_hw/timer_hw.c
 
 # ASM sources
 BSP_ASM_SRCS = Core/Startup/startup_stm32f103rbtx.s
@@ -69,6 +70,7 @@ BSP_INCLUDES = . uart_hw \
 	ioe_hw \
 	debug_io_hw \
 	gpio_hw \
+	timer_hw \
 	Core/Inc \
 	Drivers/STM32F1xx_HAL_Driver/Inc  \
 	Drivers/STM32F1xx_HAL_Driver/Inc/Legacy  \

@@ -21,7 +21,7 @@ typedef enum BP_STATE{
 } BP_STATE;
 
 struct BP_t{
-	int32_t 	serial_number;
+	char 	serial_number[32];
 	BP_STATE 	state;
 	uint8_t 	soc;
 	uint8_t 	soh;
@@ -33,7 +33,6 @@ struct BP_t{
 };
 
 BP* bp_construct(void);
-void bp_init(BP* p_bp);
 
 void bp_update_state(BP* p_bp, BP_STATE state);
 BP_STATE bp_get_state(BP* p_bp);
@@ -59,7 +58,7 @@ uint16_t bp_get_temp(BP* p_bp);
 void bp_update_cycle(BP* p_bp, uint32_t cycle);
 uint32_t bp_get_cycle(BP* p_bp);
 
-static inline bp_data_serialize(BP* p_bp, char* buff){
+static inline void bp_data_serialize(BP* p_bp, char* buff){
 	p_bp->data_serialize(p_bp, buff);
 }
 

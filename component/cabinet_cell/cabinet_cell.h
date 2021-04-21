@@ -42,6 +42,7 @@ struct Cabinet_cell_t{
 	BP*					bp;
 	Cabinet_door*		door;
 	Switch*				cell_fan;
+	Switch*				charger;
 	NTC*				temp_ss;
 	int32_t				temp;
 	void				(*data_serialize)(Cabinet_cell* p_cc, char* buff);

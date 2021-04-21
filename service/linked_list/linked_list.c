@@ -65,20 +65,19 @@ uint8_t cab_list_find_data(Cabinet_list* p_list, Cabinet_cell* p_cc){
 	return pos;
 }
 
-Cabinet_cell* cab_list_walk_down(Cabinet_list* p_list){
+Cabinet_node* cab_list_walk_down(Cabinet_list* p_list){
 	if(p_list->cnt == 0){
 		p_list->cnt++;
 		p_list->p_temp = p_list->p_head;
-		return p_list->p_temp->data;
+		return p_list->p_temp;
 	}
 	else{
 		while(p_list->p_temp->p_next != NULL){
 			p_list->p_temp = p_list->p_temp->p_next;
 			if(p_list->p_temp == NULL) break;
-			return p_list->p_temp->data;
+			return p_list->p_temp;
 		}
 	p_list->cnt = 0;
-	return NULL; /* END OF LIST */
 	}
 }
 
@@ -87,6 +86,10 @@ void cab_list_export_data(Cabinet_list* p_list){
 	for(p_temp = p_list->p_head; p_temp != NULL; p_temp = p_temp->p_next){
 		printf("%d ", p_temp->data->cab_id);
 	}
+}
+
+void cab_list_reset_temp(Cabinet_list* p_list){
+	p_list->p_temp = p_list->p_head;
 }
 
 /* ---------------------------------------------------------------------------*/
@@ -170,5 +173,9 @@ void list_export_data(List* p_list){
 	for(p_temp = p_list->p_head; p_temp != NULL; p_temp = p_temp->p_next){
 		printf("%d ", p_temp->data);
 	}
+}
+
+void list_reset_temp(List* p_list){
+	p_list->p_temp = p_list->p_head;
 }
 

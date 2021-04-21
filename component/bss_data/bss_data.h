@@ -11,19 +11,51 @@
 #include "stdint.h"
 #include "stdlib.h"
 #include "string_util.h"
+#include "app_config.h"
+
+typedef enum BSS_STATE{
+	BSS_ST_STANDBY,
+	BSS_ST_ACTIVE,
+	BSS_ST_MAINTAIN,
+	BSS_ST_FAIL
+} BSS_STATE;
+
+typedef enum TILT_SS_STATE{
+	TILT_SS_INACTIVE,
+	TILT_SS_ACTIVE,
+	TILT_SS_FAIL
+} TILT_SS_STATE;
+
+typedef enum CHARGER_STATE{
+	CHARGER_ST_INACTIVE,
+	CHARGER_ST_ACTIVE,
+	CHARGER_ST_FAIL
+} CHARGER_STATE;
+
+typedef enum FAN_STATE{
+	FAN_ST_INACTIVE,
+	FAN_ST_ACTIVE,
+	FAN_ST_FAIL,
+} FAN_STATE;
+
+typedef enum LAMP_STATE{
+	LAMP_ST_INACTIVE,
+	LAMP_ST_ACTIVE,
+	LAMP_ST_FAIL,
+} LAMP_STATE;
 
 typedef struct BSS_Data_t BSS_Data;
 struct BSS_Data_t{
-	int32_t	serial_number;
-	uint8_t state;
-	uint8_t cab_num;
-	uint8_t active_cab_num;
-	uint8_t tilt_ss_state;
-	uint8_t charger_state;
-	uint8_t fan_state;
-	uint8_t lamp_state;
-	int32_t temp;
-	void	(*data_serialize)(BSS_Data* p_bss_data, char* buff);
+	char			serial_number[32];
+	BSS_STATE 		state;
+	uint8_t 		cab_num;
+	uint8_t 		active_cab_num;
+	TILT_SS_STATE 	tilt_ss_state;
+	CHARGER_STATE 	charger_state;
+	FAN_STATE		fan_state;
+	LAMP_STATE 		lamp_state;
+	int32_t 		temp;
+	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
 };
 
 BSS_Data* bss_data_construct(void);
