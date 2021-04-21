@@ -78,6 +78,7 @@ Cabinet_node* cab_list_walk_down(Cabinet_list* p_list){
 			return p_list->p_temp;
 		}
 	p_list->cnt = 0;
+	return NULL;
 	}
 }
 
