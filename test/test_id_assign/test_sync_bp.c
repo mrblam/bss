@@ -48,7 +48,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 		break;
 	case CABIN_ST_ACTIVE:
 		can_receive(&can_port, can_port.rx_data);
-		uint32_t cob_id = can_port.can_rx.StdId - DEFAULT_BP_ID;
+		uint32_t cob_id = can_port.can_rx.StdId - selex_bss.full_cab->p_head->data->node_id;
 		switch(cob_id){
 		case CO_CAN_ID_TPDO_1:
 			selex_bss.cabin[selex_bss.full_cab->p_head->data->cab_id]->bp->vol = 10*(uint32_t)CO_getUint16(can_port.rx_data);
@@ -126,7 +126,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 		break;
 	case ASSIGN_ST_AUTHENTIC:
 		can_receive(&can_port, can_port.rx_data);
-		if(can_port.can_rx.StdId == CO_CAN_ID_RSDO + (uint32_t)selex_bss.full_cab->p_head->data->node_id + 4){
+		if(can_port.can_rx.StdId == CO_CAN_ID_RSDO + (uint32_t)selex_bss.full_cab->p_head->data->node_id){
 			CO_memcpy((uint8_t*)(selex_bss.cabin[selex_bss.full_cab->p_head->data->cab_id]->bp->serial_number + sdo_rec_idx),
 					can_port.rx_data, can_port.can_rx.DLC);
 			if(can_port.can_rx.DLC < 8){
