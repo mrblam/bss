@@ -16,29 +16,30 @@
 
 #define END_OF_LIST	0
 
-typedef struct Cabinet_node_t Cabinet_node;
-typedef struct Cabinet_list_t Cabinet_list;
+typedef struct Cabinet_Node_t Cabinet_Node;
+typedef struct Cabinet_List_t Cabinet_List;
 
-struct Cabinet_node_t{
-	Cabinet_cell* data;
-	Cabinet_node* p_next;
+struct Cabinet_Node_t{
+	Cabinet_Cell* data;
+	Cabinet_Node* p_next;
 };
 
-struct Cabinet_list_t{
-	Cabinet_node* p_head;
-	Cabinet_node* p_tail;
+struct Cabinet_List_t{
+	Cabinet_Node* p_head;
+	Cabinet_Node* p_tail;
 	uint8_t cnt;
-	Cabinet_node* p_temp;
+	Cabinet_Node* p_temp;
 };
 
-Cabinet_node* cab_node_construct(Cabinet_cell* p_cc);
-Cabinet_list* cab_list_init(void);
-void cab_list_insert_to_tail(Cabinet_list* p_list, Cabinet_cell* p_cc);
-void cab_list_remove_node(Cabinet_list* p_list, Cabinet_cell* p_cc);
-Cabinet_node* cab_list_walk_down(Cabinet_list* p_list);
-void cab_list_export_data(Cabinet_list* p_list);
-void cab_list_reset_temp(Cabinet_list* p_list);
+Cabinet_Node* cab_node_construct(Cabinet_Cell* p_cc);
+Cabinet_List* cab_list_init(void);
+void cab_list_insert_to_tail(Cabinet_List* p_list, Cabinet_Cell* p_cc);
+void cab_list_remove_node(Cabinet_List* p_list, Cabinet_Cell* p_cc);
+Cabinet_Node* cab_list_walk_down(Cabinet_List* p_list);
+void cab_list_export_data(Cabinet_List* p_list);
+void cab_list_reset_temp(Cabinet_List* p_list);
 
+#if 1
 /* -------------------------------------------------------------------------------- */
 typedef struct Node_t Node;
 typedef struct List_t List;
@@ -63,5 +64,6 @@ void list_remove_node(List* p_list, uint8_t data);
 uint8_t list_walk_down(List* p_list);
 void list_export_data(List* p_list);
 void list_reset_temp(List* p_list);
+#endif
 
 #endif /* SERVICE_LINKED_LIST_LINKED_LIST_H_ */

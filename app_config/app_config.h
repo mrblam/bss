@@ -34,7 +34,7 @@ typedef enum CABIN_ID{
 } CABIN_ID;
 
 typedef enum SLAVE_ID{
-	DEFAULT_BP_ID = 4,
+	BP_DEFAULT_CAN_NODE_ID = 4,
 	SL1 = 5,
 	SL2 = 6,
 	SL3 = 7,

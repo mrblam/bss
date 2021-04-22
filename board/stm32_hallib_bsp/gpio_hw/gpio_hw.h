@@ -57,6 +57,6 @@
 #define DOOR_ST_15				GPIO_PIN_14
 #define DOOR_ST_16				GPIO_PIN_15
 
-void gpio_init(void);
+void gpio_hw_init(void);
 
 #endif /* BOARD_STM32_HALLIB_BSP_GPIO_HW_GPIO_HW_H_ */

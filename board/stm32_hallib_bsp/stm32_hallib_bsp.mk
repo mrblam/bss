@@ -33,6 +33,7 @@ BSP_SRCS+=$(BOARD_TYPE).c  \
 	ioe_hw/ioe_hw.c \
 	delay_hw/delay_hw.c \
 	core_hw/core_hw.c \
+	cabinet_hw/cabinet_hw.c \
 	gpio_hw/gpio_hw.c \
 	timer_hw/timer_hw.c
 
@@ -71,6 +72,7 @@ BSP_INCLUDES = . uart_hw \
 	ioe_hw \
 	debug_io_hw \
 	gpio_hw \
+	cabinet_hw \
 	timer_hw \
 	Core/Inc \
 	Drivers/STM32F1xx_HAL_Driver/Inc  \

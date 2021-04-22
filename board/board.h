@@ -10,6 +10,7 @@
 #include "interrupt_hal.h"
 #include "ioe_hal.h"
 #include "uart_hw_hal.h"
+#include "cabinet_hw_hal.h"
 
 void board_init(void) WEAK;
 void global_interrupt_enable(void) WEAK;

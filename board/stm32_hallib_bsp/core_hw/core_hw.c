@@ -6,6 +6,7 @@
  */
 
 #include "core_hw.h"
+#include "core.h"
 
 static void system_clock_config(void);
 static void system_tick_config(void);
@@ -49,5 +50,5 @@ static void system_clock_config(void){
 }
 
 static void system_tick_config(void){
-	SysTick_Config(SystemCoreClock/100);
+	SysTick_Config(SystemCoreClock/SYSTICK_FREQ_Hz);
 }

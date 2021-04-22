@@ -12,6 +12,7 @@
 #include "stdlib.h"
 #include "string_util.h"
 #include "app_config.h"
+#include "linked_list.h"
 
 typedef enum BSS_STATE{
 	BSS_ST_STANDBY,
@@ -55,6 +56,9 @@ struct BSS_Data_t{
 	FAN_STATE		fan_state;
 	LAMP_STATE 		lamp_state;
 	int32_t 		temp;
+	Cabinet_Cell*           cabs;
+	Cabinet_List*           empty_cabs;
+	Cabinet_List*           full_cabs;
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
 };
 

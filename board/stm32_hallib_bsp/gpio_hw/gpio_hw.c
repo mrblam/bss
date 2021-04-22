@@ -11,7 +11,7 @@ static void gpio_node_id_pin_init(void);
 static void gpio_mux_pin_init(void);
 static void gpio_door_st_pin_init(void);
 
-void gpio_init(void){
+void gpio_hw_init(void){
 	gpio_node_id_pin_init();
 	gpio_mux_pin_init();
 	gpio_door_st_pin_init();

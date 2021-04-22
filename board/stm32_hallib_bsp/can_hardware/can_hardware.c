@@ -4,10 +4,8 @@
 
 CAN_hw can_port;
 
-static void can_hardware_init_clk(void);
 static void can_hardware_init_module(void);
 static void can_hardware_filter_init(void);
-static void can_hardware_init_nvic(void);
 static void can_hardware_start(void);
 static void can_hardware_init_tx(void);
 

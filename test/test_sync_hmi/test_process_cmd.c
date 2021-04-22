@@ -7,7 +7,7 @@
 
 #include "cabinet_app.h"
 
-Cabinet_app selex_bss;
+Cabinet_App selex_bss_app;
 uint8_t char_state = 0;
 uint8_t get_cmd_done = 0;
 char buff[32]={0};
@@ -17,7 +17,7 @@ uint8_t idx = 0;
 int main(void){
 	__disable_irq();
 	board_init();
-	cab_app_init(&selex_bss);
+	cab_app_init(&selex_bss_app);
 
 	uart_receives(&power_sys_port, &s);
 	__enable_irq();
@@ -62,7 +62,7 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 
 	if(get_cmd_done == 1){
 
-			cab_app_decode_cmd_hmi(&selex_bss, buff);
+			cab_app_decode_cmd_hmi(&selex_bss_app, buff);
 			get_cmd_done = 0;
 
 	}

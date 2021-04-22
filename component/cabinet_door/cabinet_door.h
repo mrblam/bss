@@ -17,24 +17,24 @@ typedef enum DOOR_STATE{
 	DOOR_ST_FAIL
 } DOOR_STATE;
 
-typedef struct Cabinet_door_t Cabinet_door;
-struct Cabinet_door_t{
+typedef struct Cabinet_Door_t Cabinet_Door;
+struct Cabinet_Door_t{
 	DOOR_STATE	state;
 	IO_State* 	io_state;
 	Switch*		solenoid;
 };
 
-Cabinet_door* door_construct(void);
+Cabinet_Door* door_construct(void);
 
-static inline void cab_door_open(Cabinet_door* p_door){
+static inline void cab_door_open(Cabinet_Door* p_door){
 	p_door->solenoid->sw_on(p_door->solenoid);
 }
 
-static inline IO_STATE cab_door_get_door_state(Cabinet_door* p_door){
+static inline IO_STATE cab_door_get_door_state(Cabinet_Door* p_door){
 	return p_door->io_state->io_get_state(p_door->io_state);
 }
 
-static inline DOOR_STATE cab_door_get_working_state(Cabinet_door* p_door){
+static inline DOOR_STATE cab_door_get_working_state(Cabinet_Door* p_door){
 	return p_door->state;
 }
 

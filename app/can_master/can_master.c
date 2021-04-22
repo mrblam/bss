@@ -13,6 +13,21 @@ CAN_master* can_master_construct(void){
 	return p_cm;
 }
 
+
+void can_master_process(CAN_master* p_cm,const uint32_t timestamp){
+
+        /* process sdo server */
+        if(p_cm->sdo_server.timeout<=timestamp){
+                p_cm->sdo_server.state=SDO_ST_IDLE;
+        }
+
+        if(p_cm->assigning_slave==NULL){
+                p_cm->assigning_slave=can_master_get_unassign_slave(p_cm);
+                p_cm->assign_state=ASSIGN_ST_START;
+        }else{
+        }
+}
+
 void can_master_init(CAN_master* p_cm){
 	p_cm->assign_state = ASSIGN_ST_INACTIVE;
 	p_cm->empty_slave_list = list_init();
@@ -59,4 +74,28 @@ void can_master_request_read_bp_sn(CAN_master* p_cm, uint8_t cab_id){
 	can_port.can_tx.DLC = 1;
 	*can_port.tx_data = 's';
 	can_send(&can_port, can_port.tx_data);
+}
+
+void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp){
+ /* sdo server is currently busy */
+        if (sdo_server_get_state(&p_bp->sdo_server) !=SDO_ST_IDLE) {
+                return;
+        }
+
+        if (bp_get_con_state(p_bp) == BP_CON_ST_DISCONNECTED) {
+                /* start request serial number , reset receive index */
+                p_bp->sdo_server.receive_index = 0;
+                for (int i = 0; i < BP_SN_SIZE; i++) {
+                        p_bp->serial_number[i] = '\0';
+                }
+                tx_msg.DLC = 0;
+        } else {
+                tx_msg.DLC = 1;
+        }
+        tx_msg.StdId = CO_CAN_ID_RSDO + p_bp->node_id;
+        can_send(&can1, &tx_msg);
+        sdo_server_set_state(&p_bp->sdo_server, SDO_ST_SENT);
+        p_bp->sdo_server.timeout = timestamp + 500; /* timeout 500mS*/
+        bp_set_con_state(p_bp, BP_CON_ST_AUTHORIZING);
+
 }
