@@ -6,8 +6,9 @@
 export TARGET=bss_storage_control
 export PROJ_ROOT=../..
 export BOARD_TYPE=stm32_hallib_bsp
-include ../../board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
-include ../../gcc.mk
+include $(PROJ_ROOT)/board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
+include $(PROJ_ROOT)/gcc.mk
+
 
 SRCS+=board/board.c
 SRCS+=app/cabinet_app/cabinet_app.c \
