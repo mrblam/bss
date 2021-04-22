@@ -1,5 +1,5 @@
 /*
- * test_id_assign.c
+ * test_detect_and_sync_bp.c
  *
  *  Created on: Apr 22, 2021
  *      Author: KhanhDinh

@@ -25,23 +25,11 @@ typedef struct Cabinet_app_t Cabinet_app;
 typedef enum CABIN_STATE{
 	CABIN_ST_SETUP = 0,
 	CABIN_ST_STANDBY = 1,
-	CABIN_ST_ACTIVE = 2,
-	CABIN_ST_MAINTAIN = 3,
-	CABIN_ST_FAULT = 4,
+	CABIN_ST_ASSIGN_ID = 2,
+	CABIN_ST_ACTIVE = 3,
+	CABIN_ST_MAINTAIN = 4,
+	CABIN_ST_FAULT = 5,
 } CABIN_STATE;
-
-typedef enum TIMING_STATE{
-	TIMING_ST_DEACTIVE = 0,
-	TIMING_ST_ACTIVE = 1
-} TIMING_STATE;
-
-typedef enum ASSIGN_ID_STATE{
-	ASSIGN_ST_START,
-	ASSIGN_ST_SELECT_SLAVE,
-	ASSIGN_ST_SEND_ID,
-	ASSIGN_ST_WAIT,
-	ASSIGN_ST_DONE
-}ASSIGN_ID_STATE;
 
 struct Cabinet_app_t{
 	CAN_master		base;
@@ -90,5 +78,6 @@ void cab_app_sync_cab_data_hmi(Cabinet_app* p_ca, uint8_t cab_id);
 
 void cab_app_decode_cmd_hmi(Cabinet_app* p_ca, char* buff);
 void cab_app_process_cab_cmd_hmi(Cabinet_app* p_ca, char* token);
+void cab_app_start_id_assign(Cabinet_app* p_ca);
 
 #endif /* CABINET_APP_CABINET_APP_H_ */

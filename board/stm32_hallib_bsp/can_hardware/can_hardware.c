@@ -2,9 +2,7 @@
 #include "string.h"
 #include "interrupt_hw.h"
 
-CAN_HandleTypeDef 	hcan;
-CAN_TxHeaderTypeDef	TxHeader;
-CAN_RxHeaderTypeDef	RxHeader;
+CAN_hw can_port;
 
 static void can_hardware_init_clk(void);
 static void can_hardware_init_module(void);
@@ -14,16 +12,10 @@ static void can_hardware_start(void);
 static void can_hardware_init_tx(void);
 
 void can_hardware_init(void) {
-	can_hardware_init_clk();
 	can_hardware_init_module();
-	can_hardware_init_nvic();
 	can_hardware_filter_init();
-	can_hardware_start();
 	can_hardware_init_tx();
-}
-
-static void can_hardware_init_clk(void) {
-	__HAL_RCC_CAN1_CLK_ENABLE();
+	can_hardware_start();
 }
 
 static void can_hardware_filter_init(void){
@@ -39,47 +31,45 @@ static void can_hardware_filter_init(void){
 	sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
 	sFilterConfig.FilterActivation = ENABLE;
 	sFilterConfig.SlaveStartFilterBank = 14;
-	HAL_CAN_ConfigFilter(&hcan, &sFilterConfig);
+	HAL_CAN_ConfigFilter(&can_port.can_module, &sFilterConfig);
 }
 
 static void can_hardware_init_module(void) {
-	hcan.Instance = CAN1;
-	hcan.Init.Prescaler = 1;
-	hcan.Init.Mode = CAN_MODE_NORMAL;
-	hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-	hcan.Init.TimeSeg1 = CAN_BS1_8TQ;
-	hcan.Init.TimeSeg2 = CAN_BS2_7TQ;
-	hcan.Init.AutoBusOff = DISABLE;
-	hcan.Init.AutoRetransmission = DISABLE;
-	hcan.Init.AutoWakeUp = DISABLE;
-	hcan.Init.ReceiveFifoLocked = DISABLE;
-	hcan.Init.TimeTriggeredMode = DISABLE;
-	hcan.Init.TransmitFifoPriority = DISABLE;
-	if(HAL_CAN_Init(&hcan) != HAL_OK){
+	__HAL_RCC_CAN1_CLK_ENABLE();
+
+	can_port.can_module.Instance = CAN1;
+	can_port.can_module.Init.Prescaler = 3;
+	can_port.can_module.Init.Mode = CAN_MODE_NORMAL;
+	can_port.can_module.Init.SyncJumpWidth = CAN_SJW_1TQ;
+	can_port.can_module.Init.TimeSeg1 = CAN_BS1_15TQ;
+	can_port.can_module.Init.TimeSeg2 = CAN_BS2_8TQ;
+	can_port.can_module.Init.AutoBusOff = DISABLE;
+	can_port.can_module.Init.AutoRetransmission = DISABLE;
+	can_port.can_module.Init.AutoWakeUp = DISABLE;
+	can_port.can_module.Init.ReceiveFifoLocked = DISABLE;
+	can_port.can_module.Init.TimeTriggeredMode = DISABLE;
+	can_port.can_module.Init.TransmitFifoPriority = DISABLE;
+	if(HAL_CAN_Init(&can_port.can_module) != HAL_OK){
 		Error_Handler();
 	}
-}
-
-static void can_hardware_init_nvic(void) {
-
 }
 
 static void can_hardware_start(void){
-	if (HAL_CAN_Start(&hcan) != HAL_OK){
+	if (HAL_CAN_Start(&can_port.can_module) != HAL_OK){
 		Error_Handler();
 	}
 
-	if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK){
+	if (HAL_CAN_ActivateNotification(&can_port.can_module, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK){
 		Error_Handler();
 	}
 }
 
 static void can_hardware_init_tx(void){
-	TxHeader.StdId = RSDO_ID + MASTER_ID;
-	TxHeader.DLC = 8;
-	TxHeader.RTR = CAN_RTR_DATA;
-	TxHeader.IDE = CAN_ID_STD;
-	TxHeader.TransmitGlobalTime = DISABLE;
+	can_port.can_tx.StdId = RSDO_ID + MASTER_ID;
+	can_port.can_tx.DLC = 8;
+	can_port.can_tx.RTR = CAN_RTR_DATA;
+	can_port.can_tx.IDE = CAN_ID_STD;
+	can_port.can_tx.TransmitGlobalTime = DISABLE;
 }
 
 void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
@@ -106,3 +96,12 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   }
 }
+
+void can_send(CAN_hw* p_hw, uint8_t* buff){
+	HAL_CAN_AddTxMessage(&p_hw->can_module, &p_hw->can_tx, buff, &p_hw->tx_mailbox);
+}
+
+void can_receive(CAN_hw* p_hw, uint8_t* buff){
+	HAL_CAN_GetRxMessage(&p_hw->can_module, CAN_RX_FIFO0, &p_hw->can_rx, buff);
+}
+

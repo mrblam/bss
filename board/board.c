@@ -6,4 +6,6 @@ void board_init(void){
 	core_hw_init();
 	uart_hw_init();
 	timer_hw_init();
+	gpio_init();
+	can_hardware_init();
 }

@@ -49,5 +49,5 @@ static void system_clock_config(void){
 }
 
 static void system_tick_config(void){
-	SysTick_Config(SystemCoreClock/1000);
+	SysTick_Config(SystemCoreClock/100);
 }

@@ -7,6 +7,9 @@
 
 #include "cabinet_app.h"
 
+void node_id_pin_active(uint8_t cab_id);
+void node_id_pin_deactive(uint8_t cab_id);
+
 void cab_app_init(Cabinet_app* p_ca){
 	can_master_init((CAN_master*) p_ca);
 	p_ca->state = CABIN_ST_SETUP;
@@ -14,8 +17,7 @@ void cab_app_init(Cabinet_app* p_ca){
 	p_ca->empty_cab = cab_list_init();
 	p_ca->full_cab = cab_list_init();
 
-	p_ca->state = CABIN_ST_ACTIVE;
-	for(uint8_t cab_id = CAB1 - 1; cab_id < CAB15; cab_id++){
+	for(uint8_t cab_id = CAB1 - 1; cab_id < CAB7; cab_id++){
 		p_ca->cabin[cab_id] = cab_cell_construct();
 		p_ca->cabin[cab_id]->cab_id = cab_id + 1;
 		p_ca->cabin[cab_id]->node_id = DEFAULT_BP_ID;
@@ -25,10 +27,13 @@ void cab_app_init(Cabinet_app* p_ca){
 	p_ca->ioe_cfan = ioe_construct();
 	p_ca->ioe_sol = ioe_construct();
 	p_ca->bss_data = bss_data_construct();
+
+	p_ca->base.active_node_id_pin = node_id_pin_active;
+	p_ca->base.deactive_node_id_pin = node_id_pin_deactive;
 }
 
 void cab_app_set_state(Cabinet_app* p_ca, CABIN_STATE state){
-
+	p_ca->state = state;
 }
 
 CABIN_STATE cab_app_get_state(Cabinet_app* p_ca){
@@ -70,6 +75,15 @@ void cab_app_check_bp_state(Cabinet_app* p_ca, CABIN_ID cab_id){
 
 void cab_app_update_tilt_ss(Cabinet_app* p_ca){
 
+}
+
+void cab_app_update_cab_node_id(Cabinet_app* p_ca){
+	p_ca->empty_cab->p_temp->data->node_id = p_ca->base.empty_slave_list->p_temp->data;
+}
+
+void cab_app_update_cabin_list(Cabinet_app* p_ca){
+	cab_list_remove_node(p_ca->empty_cab, p_ca->empty_cab->p_temp->data);
+	cab_list_insert_to_tail(p_ca->full_cab, p_ca->empty_cab->p_temp->data);
 }
 
 void cab_app_sync_bss_data_hmi(Cabinet_app* p_ca){
@@ -157,6 +171,71 @@ void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_app* p_ca, char
 		else {
 			cab_cell_deactive_charger(p_ca->cabin[id]);
 		}
+		break;
+	default:
+		break;
+	}
+}
+
+void cab_app_start_id_assign(Cabinet_app* p_ca){
+	Cabinet_node* p_temp = cab_list_walk_down(p_ca->empty_cab);
+	while(p_temp != NULL){
+		can_master_active_node_id_pin((CAN_master*)p_ca, p_temp->data->cab_id);
+		p_temp = cab_list_walk_down(p_ca->empty_cab);
+	}
+	free(p_temp);
+}
+
+void node_id_pin_active(uint8_t cab_id){
+	switch(cab_id){
+	case CAB1:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+		break;
+	case CAB2:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+		break;
+	case CAB3:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
+		break;
+	case CAB4:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+		break;
+	case CAB5:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
+		break;
+	case CAB6:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+		break;
+	case CAB7:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+		break;
+	default:
+		break;
+	}
+}
+
+void node_id_pin_deactive(uint8_t cab_id){
+	switch(cab_id){
+	case CAB1:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
+		break;
+	case CAB2:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
+		break;
+	case CAB3:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+		break;
+	case CAB4:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+		break;
+	case CAB5:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
+		break;
+	case CAB6:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+		break;
+	case CAB7:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
 		break;
 	default:
 		break;
