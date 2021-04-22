@@ -9,6 +9,8 @@
 
 Cabinet_app selex_bss;
 uint8_t sdo_rec_idx = 0;
+uint8_t status;
+uint8_t temp[8];
 
 int main(void){
 	__disable_irq();
@@ -45,7 +47,23 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 	case CABIN_ST_ASSIGN_ID:
 		break;
 	case CABIN_ST_ACTIVE:
-		cab_list_walk_down(selex_bss.full_cab);
+		can_receive(&can_port, can_port.rx_data);
+		uint32_t cob_id = can_port.can_rx.StdId - DEFAULT_BP_ID;
+		switch(cob_id){
+		case CO_CAN_ID_TPDO_1:
+			selex_bss.cabin[selex_bss.full_cab->p_head->data->cab_id]->bp->vol = 10*(uint32_t)CO_getUint16(can_port.rx_data);
+			selex_bss.cabin[selex_bss.full_cab->p_head->data->cab_id]->bp->cur = (int32_t)10*((int16_t)CO_getUint16(can_port.rx_data + 2));
+			selex_bss.cabin[selex_bss.full_cab->p_head->data->cab_id]->bp->soc = can_port.rx_data[4];
+			selex_bss.cabin[selex_bss.full_cab->p_head->data->cab_id]->bp->state = can_port.rx_data[5];
+			status = (uint16_t)CO_getUint16(can_port.rx_data + 6);
+			break;
+		case CO_CAN_ID_TPDO_4:
+			CO_memcpy(temp, can_port.rx_data, 8);
+			break;
+		default:
+			break;
+		}
+
 
 #if 0
 		while(cab_list_walk_down(selex_bss.full_cab) != NULL){
