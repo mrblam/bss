@@ -27,16 +27,18 @@
 
 typedef struct CO_Slave_t CO_Slave;
 
-typedef enum CO_SLAVE_CONNECT_STATE{
+typedef enum CO_SLAVE_NET_STATE{
 
         CO_SLAVE_CON_ST_DISCONNECT=0,
         CO_SLAVE_CON_ST_UNASSIGNED=1,
         CO_SLAVE_CON_ST_CONNECTED=2
 
-}CO_SLAVE_CONNECT_STATE;
+}CO_SLAVE_NET_STATE;
 
 struct CO_Slave_t{
-        CO_SLAVE_CONNECT_STATE con_state;
+		uint32_t node_id;
+		uint32_t sdo_server_address;
+        CO_SLAVE_NET_STATE con_state;
 };
 
 typedef struct CO_Slave_List_t CO_Slave_List;

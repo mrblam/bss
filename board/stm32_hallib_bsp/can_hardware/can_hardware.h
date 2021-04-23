@@ -4,11 +4,11 @@
 
 #include "stdint.h"
 #include "stm32f1xx_hal.h"
-#include "core.h"
+#include "core_hw.h"
 #include "app_config.h"
 
-typedef struct CAN_hw_t CAN_hw;
-struct CAN_hw_t{
+typedef struct CAN_Hw_t CAN_Hw;
+struct CAN_Hw_t{
 	CAN_HandleTypeDef 	can_module;
 	CAN_TxHeaderTypeDef	can_tx;
 	CAN_RxHeaderTypeDef	can_rx;
@@ -17,10 +17,10 @@ struct CAN_hw_t{
 	uint8_t				rx_data[8];
 };
 
-extern CAN_hw	can_port;
+extern CAN_Hw	can_port;
 
 void can_hardware_init(void);
-void can_send(CAN_hw* p_hw, uint8_t* buff);
-void can_receive(CAN_hw* p_hw, uint8_t* buff);
+void can_send(CAN_Hw* p_hw, uint8_t* buff);
+void can_receive(CAN_Hw* p_hw, uint8_t* buff);
 
 #endif /* BOARD_CAN_HARDWARE_H_ */

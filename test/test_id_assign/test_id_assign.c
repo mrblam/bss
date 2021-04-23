@@ -45,7 +45,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 	case CABIN_ST_ASSIGN_ID:
 		break;
 	case CABIN_ST_ACTIVE:
-		cab_list_walk_down(selex_bss_app.full_cabs);
+		cab_list_walk_down(selex_bss_app.bss.full_cabs);
 
 #if 0
 		while(cab_list_walk_down(selex_bss_app.full_cabs) != NULL){
@@ -76,8 +76,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 		else selex_bss_app.base.assign_state = ASSIGN_ST_DONE;
 		break;
 	case ASSIGN_ST_SEND_ID:
-		if(cab_list_walk_down(selex_bss_app.empty_cabs) != NULL){
-			can_master_send_id_msg(&selex_bss_app.base, selex_bss_app.empty_cabs->p_temp->data->cab_id);
+		if(cab_list_walk_down(selex_bss_app.bss.empty_cabs) != NULL){
+			can_master_send_id_msg(&selex_bss_app.base, selex_bss_app.bss.empty_cabs->p_temp->data->cab_id);
 			selex_bss_app.base.assign_state = ASSIGN_ST_WAIT_CONFIRM;
 		}
 		else selex_bss_app.base.assign_state = ASSIGN_ST_DONE;

@@ -8,7 +8,7 @@
 #ifndef BOARD_STM32_HALLIB_BSP_CABINET_HW_CABINET_HW_H_
 #define BOARD_STM32_HALLIB_BSP_CABINET_HW_CABINET_HW_H_
 
-#include "stm32f1xx_hal_gpio.h"
+#include "stm32f1xx_hal.h"
 
 #define HW_SW_ON                           GPIO_PIN_SET
 #define HW_SW_OFF                          GPIO_PIN_RESET

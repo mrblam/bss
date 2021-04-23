@@ -6,6 +6,8 @@
  */
 
 #include "can_master.h"
+static void can_master_assign_request_ack(CAN_master* p_cm);
+static void can_master_select_slave(CAN_master* p_cm,CO_Slave* slave);
 
 CAN_master* can_master_construct(void){
 	CAN_master* p_cm = (CAN_master*)malloc(sizeof(CAN_master));
@@ -13,36 +15,93 @@ CAN_master* can_master_construct(void){
 	return p_cm;
 }
 
+void can_master_init(CO_Slave** slaves,CAN_Hw* p_hw,CAN_master* p_cm){
+	p_cm->slaves=slaves;
+	p_cm->p_hw=p_hw;
+	p_cm->sdo_server.state=SDO_ST_IDLE;
+}
+
+CO_Slave* can_master_get_assign_request_slave(const CAN_master* const p_cm){
+	for(int i=0;i<p_cm->slave_num;i++){
+		if(p_cm->slaves[i]->con_state==CO_SLAVE_CON_ST_UNASSIGNED){
+			return p_cm->slaves[i];
+		}
+	}
+	return NULL;
+}
 
 void can_master_process(CAN_master* p_cm,const uint32_t timestamp){
 
-        /* process sdo server */
-        if(p_cm->sdo_server.timeout<=timestamp){
-                p_cm->sdo_server.state=SDO_ST_IDLE;
-        }
+		switch(p_cm->assign_state){
+		case ASSIGN_ST_START:
+			if(p_cm->sdo_server.state!=SDO_ST_SENT){
+				can_master_select_slave(p_cm, p_cm->assigning_slave);
+				p_cm->sdo_server.server_address=RSDO_ID;
+				p_cm->sdo_server.object_mux=0x222;
+				p_cm->sdo_server.state=SDO_ST_SENT;
+				p_cm->sdo_server.timeout=timestamp+200;
+			}else if(p_cm->sdo_server==SDO_ST_FAIL){
+				p_cm->assigning_slave->con_state=CO_SLAVE_CON_ST_DISCONNECT;
+				p_cm->assigning_slave=can_master_get_assign_request_slave(p_cm);
+				if(p_cm->assigning_slave==NULL){
+					p_cm->assign_state=ASSIGN_ST_DONE;
+				}
+			}
+			else if(p_cm->sdo_server.state==SDO_ST_SUCCESS){
+				p_cm->assigning_slave->con_state=CO_SLAVE_CON_ST_CONNECTED;
+				p_cm->assigning_slave=can_master_get_assign_request_slave(p_cm);
+				if(p_cm->assigning_slave==NULL){
+					p_cm->assign_state=ASSIGN_ST_DONE;
+				}
+			}
 
-        if(p_cm->assigning_slave==NULL){
-                p_cm->assigning_slave=can_master_get_unassign_slave(p_cm);
-                p_cm->assign_state=ASSIGN_ST_START;
-        }else{
-        }
-}
+			break;
+		}
 
-void can_master_init(CAN_master* p_cm){
-	p_cm->assign_state = ASSIGN_ST_INACTIVE;
-	p_cm->empty_slave_list = list_init();
-	for(uint8_t slave_id = SL1; slave_id <= SL15; slave_id++){
-		list_insert_to_tail(p_cm->empty_slave_list, slave_id);
+		if(p_cm->p_hw->can_rx.StdId==p_cm->sdo_server.tx_address){
+			p_cm->sdo_server.state=SDO_ST_IDLE;
+		}
+
+
+	/* if assign request */
+	if(p_cm->p_hw->can_rx.StdId==TSDO_ID){
+		if(p_cm->assign_state!=ASSIGN_ST_DONE){
+			p_cm->p_hw->can_tx.StdId=RSDO_ID;
+			can_send(p_cm->p_hw, buff);
+			p_cm->assigning_slave=can_master_get_assign_request_slave(p_cm);
+			p_cm->assign_state=ASSIGN_ST_START;
+		}
+	}
+
+	if(p_cm->p_hw->can_rx.StdId==p_cm->sdo_server.rx_address){
+		can_master_process_sdo(p_cm, timestamp);
 	}
 }
 
-void can_master_accept_assign_request(__attribute__((unused)) CAN_master* p_cm){
-	can_port.can_tx.StdId = CO_CAN_ID_RSDO + MASTER_ID;
-	can_send(&can_port,0);
+void can_master_process_sdo(CAN_master* p_cm,const uint32_t timestamp){
+
+	if(p_cm->sdo_server.timeout>=timestamp){
+		p_cm->sdo_server.state=SDO_ST_FAIL;
+		return;
+	}
 }
 
-uint8_t can_master_select_slave(CAN_master* p_cm){
-	return list_walk_down(p_cm->empty_slave_list);
+void can_master_start_assign_node_id(CAN_master* p_cm,const uint32_t slave_id){
+	CO_Slave* slave=&p_cm->slaves[slave_id];
+	can_master_select_slave(p_cm, slave);
+}
+
+
+void can_master_on_slave_assign_request(CAN_master* p_cm){
+	can_master_accept_assign_request(p_cm);
+}
+
+static void can_master_assign_request_ack(CAN_master* p_cm){
+	p_cm->p_hw->can_tx.StdId = CO_CAN_ID_RSDO + MASTER_ID;
+	can_send(p_cm->p_hw,0);
+}
+
+static void can_master_select_slave(CAN_master* p_cm,CO_Slave* slave){
 }
 
 void can_master_send_id_msg(CAN_master* p_cm, uint8_t cab_id){
@@ -77,6 +136,7 @@ void can_master_request_read_bp_sn(CAN_master* p_cm, uint8_t cab_id){
 }
 
 void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp){
+#if 0
  /* sdo server is currently busy */
         if (sdo_server_get_state(&p_bp->sdo_server) !=SDO_ST_IDLE) {
                 return;
@@ -97,5 +157,5 @@ void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp){
         sdo_server_set_state(&p_bp->sdo_server, SDO_ST_SENT);
         p_bp->sdo_server.timeout = timestamp + 500; /* timeout 500mS*/
         bp_set_con_state(p_bp, BP_CON_ST_AUTHORIZING);
-
+#endif
 }

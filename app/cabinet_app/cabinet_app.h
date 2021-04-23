@@ -39,16 +39,20 @@ struct Cabinet_App_t{
 	CABIN_STATE		state;
 	TIMING_STATE	timing_state;
 	uint8_t 		time_stamp;
-	//Cabinet_List*	empty_cabs;
-	//Cabinet_List*	full_cabs;
 	BSS_Data		bss;
+
 };
 
 Cabinet_App* cab_app_construct(void);
 void cab_app_init(Cabinet_App* p_ca);
 
-void cab_app_set_state(Cabinet_App* p_ca, CABIN_STATE state);
-CABIN_STATE cab_app_get_state(Cabinet_App* p_ca);
+static inline void cab_app_set_state(Cabinet_App* p_ca, CABIN_STATE state){
+	p_ca->state = state;
+}
+
+static inline CABIN_STATE cab_app_get_state(Cabinet_App* p_ca){
+	return 0;
+}
 
 void cab_app_start_id_assign(Cabinet_App* p_ca);
 Cabinet_Cell* cab_app_select_empty_cabin(Cabinet_App* p_ca);

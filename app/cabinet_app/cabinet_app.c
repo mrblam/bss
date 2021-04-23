@@ -7,15 +7,15 @@
 
 #include "cabinet_app.h"
 
+static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id);
 void node_id_pin_active(uint8_t cab_id);
 void node_id_pin_deactive(uint8_t cab_id);
 
 static Cabinet_Cell bss_cabinets[CABINET_CELL_NUM];
+static CO_Slave* bp_slaves[CABINET_CELL_NUM];
 
 void cab_app_init(Cabinet_App* p_ca){
-	can_master_init((CAN_master*) p_ca);
 	p_ca->state = CABIN_ST_SETUP;
-	p_ca->timing_state = TIMING_ST_DEACTIVE;
 	p_ca->bss.empty_cabs = cab_list_init();
 	p_ca->bss.full_cabs = cab_list_init();
 	p_ca->bss.cabs=&bss_cabinets[0];
@@ -25,35 +25,24 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bss_cabinets[i].bp->can_node_id=BP_DEFAULT_CAN_NODE_ID;
 	        while(bss_cabinets[i].bp==NULL);
 	        cab_list_insert_to_tail(p_ca->bss.empty_cabs,&bss_cabinets[i]);
-
+	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
+	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_DISCONNECT;
+	        bp_slaves[i]->node_id=5+i;
+	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
 	}
+
+	can_master_init(&(bp_slaves[0]),&can_port, &p_ca->base);
+	p_ca->base.slave_select=can_master_slave_select_impl;
 
 	p_ca->ioe_cfan = ioe_construct();
 	p_ca->ioe_sol = ioe_construct();
-
-	p_ca->base.active_node_id_pin = node_id_pin_active;
-	p_ca->base.deactive_node_id_pin = node_id_pin_deactive;
 }
 
-void cab_app_set_state(Cabinet_App* p_ca, CABIN_STATE state){
-	p_ca->state = state;
+static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){
+	(void)p_cm;
+	node_id_pin_active(id);
 }
 
-CABIN_STATE cab_app_get_state(Cabinet_App* p_ca){
-	return 0;
-}
-
-/* Enable timeout process */
-void cab_app_active_timing_state(Cabinet_App* p_ca, uint16_t time_ms){
-	p_ca->timing_state = TIMING_ST_ACTIVE;
-	p_ca->time_stamp = time_ms;
-}
-
-/* Disable timeout process */
-void cab_app_deactive_timing_state(Cabinet_App* p_ca){
-	p_ca->timing_state = TIMING_ST_DEACTIVE;
-	p_ca->time_stamp = 0;
-}
 
 void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
 
@@ -78,10 +67,6 @@ void cab_app_check_bp_state(Cabinet_App* p_ca, CABIN_ID cab_id){
 
 void cab_app_update_tilt_ss(Cabinet_App* p_ca){
 
-}
-
-void cab_app_update_cab_node_id(Cabinet_App* p_ca){
-	p_ca->bss.empty_cabs->p_temp->data->node_id = p_ca->base.empty_slave_list->p_temp->data;
 }
 
 void cab_app_update_cabin_list(Cabinet_App* p_ca){
