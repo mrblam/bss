@@ -31,7 +31,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
 	}
 
-	can_master_init(&(bp_slaves[0]),&can_port, &p_ca->base);
+	can_master_init((CAN_master*)p_ca,&(bp_slaves[0]),CABINET_CELL_NUM,&can_port);
 	p_ca->base.slave_select=can_master_slave_select_impl;
 
 	p_ca->ioe_cfan = ioe_construct();
@@ -163,15 +163,6 @@ void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char
 	default:
 		break;
 	}
-}
-
-void cab_app_start_id_assign(Cabinet_App* p_ca){
-	Cabinet_Node* p_temp = cab_list_walk_down(p_ca->bss.empty_cabs);
-	while(p_temp != NULL){
-		can_master_active_node_id_pin((CAN_master*)p_ca, p_temp->data->cab_id);
-		p_temp = cab_list_walk_down(p_ca->bss.empty_cabs);
-	}
-	free(p_temp);
 }
 
 void node_id_pin_active(uint8_t cab_id){
