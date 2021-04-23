@@ -186,6 +186,8 @@ void cab_app_start_id_assign(Cabinet_app* p_ca){
 	free(p_temp);
 }
 
+/* ----------------------------------------------------------------------------------------------*/
+
 void node_id_pin_active(uint8_t cab_id){
 	switch(cab_id){
 	case CAB1:
@@ -208,6 +210,30 @@ void node_id_pin_active(uint8_t cab_id){
 		break;
 	case CAB7:
 		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+		break;
+	case CAB8:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+		break;
+	case CAB9:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+		break;
+	case CAB10:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+		break;
+	case CAB11:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, GPIO_PIN_SET);
+		break;
+	case CAB12:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, GPIO_PIN_SET);
+		break;
+	case CAB13:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, GPIO_PIN_SET);
+		break;
+	case CAB14:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+		break;
+	case CAB15:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
 		break;
 	default:
 		break;
@@ -237,8 +263,31 @@ void node_id_pin_deactive(uint8_t cab_id){
 	case CAB7:
 		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
 		break;
+	case CAB8:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+		break;
+	case CAB9:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
+		break;
+	case CAB10:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
+		break;
+	case CAB11:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, GPIO_PIN_RESET);
+		break;
+	case CAB12:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, GPIO_PIN_RESET);
+		break;
+	case CAB13:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, GPIO_PIN_RESET);
+		break;
+	case CAB14:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+		break;
+	case CAB15:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+		break;
 	default:
 		break;
 	}
 }
-

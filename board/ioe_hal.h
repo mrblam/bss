@@ -11,7 +11,7 @@
 #include "ioe_hw.h"
 
 void ioe_hw_init(void) WEAK;
-void ioe_hw_write_reg(IOE_Hw* p_hw,const uint8_t add,const uint8_t data)WEAK;
-uint8_t ioe_hw_read_reg(IOE_Hw* p_hw,const uint8_t add) WEAK;
+void ioe_hw_write(IOE_hw* p_hw,const uint8_t add,const uint8_t* data)WEAK;
+uint8_t ioe_hw_read(IOE_hw* p_hw,const uint8_t add) WEAK;
 
 #endif /* BOARD_IOE_HAL_H_ */

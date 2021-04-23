@@ -13,6 +13,7 @@
 #include "adc_sensor.h"
 
 typedef struct NTC_t NTC;
+typedef void (*ntc_act)(NTC* p_ntc);
 
 struct NTC_t{
 	const uint16_t* lut;
@@ -21,7 +22,8 @@ struct NTC_t{
 	int16_t max_temp;
 	int16_t temp;
 	uint16_t impedance;
-	void (*update_impedance)(NTC* p_ntc);
+	ntc_act switch_channel;
+	ntc_act update_impedance;
 };
 
 static inline void ntc_update_impedance(NTC* p_ntc){

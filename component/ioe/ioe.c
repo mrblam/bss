@@ -7,24 +7,42 @@
 
 #include "ioe.h"
 
+IOE solenoid;
+IOE cell_fan;
+
 IOE* ioe_construct(void){
 	IOE* p_ioe = (IOE*)malloc(sizeof(IOE));
-
 	while(p_ioe == NULL);
 	return p_ioe;
 }
 
 void ioe_set_channel(IOE* p_ioe, uint8_t channel){
-
 	if(channel < 8){
-		p_ioe->p0_data |= 0x01<<channel;
+		p_ioe->port_data[0] |= 0x01<<channel;
 	}
 	else{
-		p_ioe->p1_data |= 0x01<<(channel - 8);
+		p_ioe->port_data[1] |= 0x01<<(channel - 8);
 	}
-	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p_ioe->p0_data);
-	ioe_hw_write_reg(p_ioe->hw, p_ioe->hw->address, p_ioe->p1_data);
+	ioe_hw_write(p_ioe->hw, p_ioe->address, p_ioe->port_data);
 }
 
+void ioe_clear_channel(IOE* p_ioe, uint8_t channel){
+	if(channel < 8){
+		p_ioe->port_data[0]  &= ~(0x01 << channel);
+	}
+	else{
+		p_ioe->port_data[1]  &= ~(0x01 << (channel - 8));
+	}
+	ioe_hw_write(p_ioe->hw, p_ioe->address, p_ioe->port_data);
+}
 
+void ioe_set_all(IOE* p_ioe){
+	p_ioe->port_data[0] = p_ioe->port_data[1] = 0xff;
+	ioe_hw_write(p_ioe->hw, p_ioe->address, p_ioe->port_data);
+}
+
+void ioe_clear_all(IOE* p_ioe){
+	p_ioe->port_data[0] = p_ioe->port_data[1] = 0x00;
+	ioe_hw_write(p_ioe->hw, p_ioe->address, p_ioe->port_data);
+}
 

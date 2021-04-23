@@ -5,4 +5,10 @@
  *      Author: KhanhDinh
  */
 
+#include "mux.h"
+
+MUX mux_ntc;
+
+
+
 

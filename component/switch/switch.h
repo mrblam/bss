@@ -17,11 +17,12 @@ typedef enum SW_STATE
 }SW_STATE;
 
 typedef struct Switch_t Switch;
+typedef void (*sw_act)(Switch* p_sw);
+
 struct Switch_t{
-	SW_STATE state;
-	void (*sw_on)(Switch* p_sw);
-	void (*sw_off)(Switch* p_sw);
-	void (*sw_init)(Switch* p_sw);
+	SW_STATE	state;
+	sw_act 		sw_on;
+	sw_act		sw_off;
 };
 
 Switch* sw_construct(void);
