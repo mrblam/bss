@@ -49,7 +49,6 @@ struct BSS_Data_t{
 	char			serial_number[32];
 	BSS_STATE 		state;
 	uint8_t 		cab_num;
-	uint8_t 		active_cab_num;
 	TILT_SS_STATE 	tilt_ss_state;
 	CHARGER_STATE 	charger_state;
 	FAN_STATE		fan_state;

@@ -26,7 +26,6 @@ BSS_Data* bss_data_construct(void){
     *sn_buff++='\0';
 
     p_bss_data->cab_num = 0;
-    p_bss_data->active_cab_num = 0;
     p_bss_data->tilt_ss_state = TILT_SS_INACTIVE;
     p_bss_data->charger_state = CHARGER_ST_INACTIVE;
     p_bss_data->fan_state = FAN_ST_INACTIVE;
@@ -54,8 +53,6 @@ static void bss_data_serialize_impl(BSS_Data* p_bss_data, char* buff){
     }
     *buff++=',';
 	buff+=long_to_string(p_bss_data->cab_num,buff);
-    *buff++=',';
-	buff+=long_to_string(p_bss_data->active_cab_num,buff);
     *buff++=',';
 	buff+=long_to_string(p_bss_data->state,buff);
     *buff++=',';
