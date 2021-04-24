@@ -267,7 +267,6 @@ void peripheral_init(Cabinet_app* p_ca){
 }
 
 static void door_switch_init(Cabinet_app* p_ca){
-	p_ca->cabin[CAB1]->door->solenoid->sw_on = door1_switch_on;
 	for(uint8_t cab_id = CAB1; cab_id < CAB15; cab_id++){
 		p_ca->cabin[cab_id]->door->solenoid->sw_on = door_interface[cab_id];
 		p_ca->cabin[cab_id]->door->io_state->get_io_state = ios_interface[cab_id];
@@ -516,6 +515,7 @@ static void mux_switch_channel15(__attribute__((unused)) NTC* p_ntc){
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
 }
+
 /*--------------------------------------------------------------------------------*/
 
 static void cell_fan1_switch_on(__attribute__((unused)) Switch* p_sw){
@@ -873,6 +873,7 @@ static void door5_switch_on(__attribute__((unused)) Switch* p_sw){
 }
 
 static void door6_switch_on(__attribute__((unused)) Switch* p_sw){
+	uint32_t cnt = 0;
 	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_5) == GPIO_PIN_RESET){
 		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_5, GPIO_PIN_SET);
 		while(cnt < 100000) cnt++;
@@ -975,9 +976,3 @@ static void door15_switch_on(__attribute__((unused)) Switch* p_sw){
 		HAL_Delay(500);
 	}
 }
-
-
-
-
-
-
