@@ -174,4 +174,7 @@ static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint3
 
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id){
 
+	(void)p_cm;
+	/* return battery to user */
+	cab_app_delivery_bp(&selex_bss_app, id);
 }
