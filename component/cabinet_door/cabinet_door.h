@@ -28,15 +28,11 @@ struct Cabinet_door_t{
 Cabinet_door* door_construct(void);
 
 static inline void cab_door_open(Cabinet_door* p_door){
-	p_door->solenoid->sw_on(p_door->solenoid);
+	sw_on(p_door->solenoid);
 }
 
 static inline IO_STATE cab_door_get_door_state(Cabinet_door* p_door){
 	return io_get_state(p_door->io_state);
-}
-
-static inline DOOR_STATE cab_door_get_working_state(Cabinet_door* p_door){
-	return p_door->state;
 }
 
 #endif /* COMPONENT_CABINET_DOOR_CABINET_DOOR_H_ */

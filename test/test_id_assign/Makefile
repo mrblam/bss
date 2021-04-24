@@ -11,7 +11,8 @@ include ../../gcc.mk
 
 SRCS+=board/board.c
 SRCS+=app/cabinet_app/cabinet_app.c \
-	app/can_master/can_master.c
+	app/can_master/can_master.c \
+	app/peripheral_init/peripheral_init.c
 SRCS+=component/adc_sensor/adc_sensor.c \
 	component/bp_data/bp_data.c \
 	component/bss_data/bss_data.c \
@@ -30,7 +31,8 @@ BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 #INCLUDES:=. app_config board service component util app
 INCLUDES+=app/cabinet_app \
-	app/can_master
+	app/can_master \
+	app/peripheral_init
 INCLUDES+=app_config
 INCLUDES+=board
 INCLUDES+=component/adc_sensor \

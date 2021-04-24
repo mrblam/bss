@@ -14,13 +14,14 @@
 typedef struct ADC_Sensor_t ADC_Sensor;
 
 struct ADC_Sensor_t{
-	ADC_Hw* hw;
+	ADC_hw* hw;
 	int32_t result;
 	int32_t gain;
 	void (*update_result)(ADC_Sensor* p_ss);
 };
 
 void adc_sensor_init(ADC_Sensor* p_ss);
+
 static inline int32_t adc_sensor_get_result(const ADC_Sensor* const p_ss){
 	return p_ss->result;
 }

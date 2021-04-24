@@ -42,7 +42,6 @@ struct Cabinet_cell_t{
 	BP*					bp;
 	Cabinet_door*		door;
 	Switch*				cell_fan;
-	Switch*				charger;
 	NTC*				temp_ss;
 	int32_t				temp;
 	void				(*data_serialize)(Cabinet_cell* p_cc, char* buff);
@@ -55,7 +54,7 @@ CABIN_CELL_STATE cab_cell_get_state(Cabinet_cell* p_cc);
 
 uint8_t cab_cell_get_slave_id(Cabinet_cell* p_cc);
 void cab_cell_open_door(Cabinet_cell* p_cc);
-void cab_cell_check_door_state(Cabinet_cell* p_cc);
+DOOR_STATE cab_cell_check_door_state(Cabinet_cell* p_cc);
 int32_t cab_cell_get_cell_temp(Cabinet_cell* p_cc);
 void cab_cell_active_cell_fan(Cabinet_cell* p_cc);
 void cab_cell_deactive_cell_fan(Cabinet_cell* p_cc);

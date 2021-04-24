@@ -6,24 +6,70 @@
  */
 #include "adc_hw.h"
 
-#define ARRAYSIZE 4
-#define ADC1_DR    ((uint32_t)0x4001244C)
+ADC_hw	ntc;
 
-static volatile uint16_t ADC_values[ARRAYSIZE];
-
-#define NTC1_ADC_VALUE_INDEX                            0
-#define NTC2_ADC_VALUE_INDEX                            1
-#define BACKUP_BAT_VOL_ADC_VALUE_INDEX                  2
-#define BP_VOL_ADC_VALUE_INDEX                          3
-
-static void adc_channels_init(void);
-static void adc_dma_init(void);
+static void adc_hw_init_module(void);
 
 void adc_hw_init(void){
+	adc_hw_init_module();
+	ntc.adc_offset = 0;
 }
 
-static void adc_channels_init(void){
+static void adc_hw_init_module(void){
+	  ADC_ChannelConfTypeDef sConfig = {0};
+
+	  /** Common config
+	  */
+	  ntc.adc_module.Instance = ADC_PORT;
+	  ntc.adc_module.Init.ScanConvMode = ADC_SCAN_DISABLE;
+	  ntc.adc_module.Init.ContinuousConvMode = ENABLE;
+	  ntc.adc_module.Init.DiscontinuousConvMode = DISABLE;
+	  ntc.adc_module.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+	  ntc.adc_module.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+	  ntc.adc_module.Init.NbrOfConversion = 1;
+	  if (HAL_ADC_Init(&ntc.adc_module) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /** Configure Regular Channel
+	  */
+	  sConfig.Channel = ADC_CHANNEL;
+	  sConfig.Rank = ADC_REGULAR_RANK_1;
+	  sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
+	  if (HAL_ADC_ConfigChannel(&ntc.adc_module, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+
+	  HAL_ADC_Start_IT(&ntc.adc_module);
 }
 
-static void adc_dma_init(void){
+void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(adcHandle->Instance==ADC_PORT)
+  {
+    /* ADC1 clock enable */
+    __HAL_RCC_ADC1_CLK_ENABLE();
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**ADC1 GPIO Configuration
+    PA5     ------> ADC1_IN5
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /* ADC1 interrupt Init */
+    HAL_NVIC_SetPriority(ADC1_2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
+  }
 }
+
+void ADC1_2_IRQHandler(void){
+	HAL_ADC_IRQHandler(&ntc.adc_module);
+	ntc.adc_value = HAL_ADC_GetValue(&ntc.adc_module);
+}
+
+

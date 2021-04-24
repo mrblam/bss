@@ -8,4 +8,5 @@ void board_init(void){
 	timer_hw_init();
 	gpio_init();
 	can_hardware_init();
+	adc_hw_init();
 }

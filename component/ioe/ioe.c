@@ -16,6 +16,11 @@ IOE* ioe_construct(void){
 	return p_ioe;
 }
 
+void ioe_init(void){
+	solenoid.address = 0x40;
+	cell_fan.address = 0x41;
+}
+
 void ioe_set_channel(IOE* p_ioe, uint8_t channel){
 	if(channel < 8){
 		p_ioe->port_data[0] |= 0x01<<channel;

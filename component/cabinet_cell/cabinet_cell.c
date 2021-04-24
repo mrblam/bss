@@ -17,25 +17,24 @@ Cabinet_cell* cab_cell_construct(void){
 	p_cc->state = CAB_CELL_ST_EMPTY;
 	p_cc->op_state = CAB_CELL_OP_ST_INACTIVE;
 	p_cc->node_id = DEFAULT_BP_ID;
-	p_cc->temp = 25;
-	p_cc->bp = bp_construct();
+	p_cc->temp = 0;
+	//p_cc->bp = bp_construct();
 	p_cc->cell_fan = sw_construct();
-	p_cc->charger = sw_construct();
 	p_cc->door = door_construct();
 	p_cc->data_serialize = cab_cell_data_serialze_impl;
 	return p_cc;
 }
 
-uint8_t cab_cell_get_slave_id(Cabinet_cell* p_cc){
-	return 1;
+uint8_t cab_cell_get_node_id(Cabinet_cell* p_cc){
+	return p_cc->node_id;
 }
 
 void cab_cell_open_door(Cabinet_cell* p_cc){
 	cab_door_open(p_cc->door);
 }
 
-void cab_cell_check_door_state(Cabinet_cell* p_cc){
-
+DOOR_STATE cab_cell_check_door_state(Cabinet_cell* p_cc){
+	return cab_door_get_door_state(p_cc);
 }
 
 void cab_cell_update_cell_temp(Cabinet_cell* p_cc){
@@ -52,14 +51,6 @@ void cab_cell_active_cell_fan(Cabinet_cell* p_cc){
 
 void cab_cell_deactive_cell_fan(Cabinet_cell* p_cc){
 	sw_off(p_cc->cell_fan);
-}
-
-void cab_cell_active_charger(Cabinet_cell* p_cc){
-	sw_on(p_cc->charger);
-}
-
-void cab_cell_deactive_charger(Cabinet_cell* p_cc){
-	sw_off(p_cc->charger);
 }
 
 static void cab_cell_data_serialze_impl(Cabinet_cell* p_cc, char* buff){
