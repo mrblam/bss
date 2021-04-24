@@ -39,37 +39,6 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 		}
 	}
 
-	switch (p_cm->assign_state) {
-	case CM_ASSIGN_ST_START:
-		can_master_slave_select(p_cm, p_cm->assigning_slave->node_id);
-		p_cm->p_hw->can_tx.StdId = p_cm->node_id_scan_cobid;
-		p_cm->p_hw->can_tx.DLC = 1;
-		p_cm->p_hw->tx_data[0] = p_cm->assigning_slave->node_id;
-		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
-		p_cm->assign_state = CM_ASSIGN_ST_WAIT_CONFIRM;
-		p_cm->assign_timeout = timestamp + 100;
-		break;
-	case CM_ASSIGN_ST_WAIT_CONFIRM:
-		if (p_cm->assign_timeout > timestamp) {
-			p_cm->assigning_slave->con_state = CO_SLAVE_CON_ST_DISCONNECT;
-			can_master_start_assign_next_slave(p_cm);
-		}
-		break;
-	case CM_ASSIGN_ST_AUTHORIZING:
-		if(p_cm->sdo_server.state==SDO_ST_FAIL){
-			p_cm->assigning_slave->con_state=CO_SLAVE_CON_ST_DISCONNECT;
-			can_master_start_assign_next_slave(p_cm);
-			p_cm->sdo_server.state=SDO_ST_IDLE;
-		}else if(p_cm->sdo_server.state==SDO_ST_SUCCESS){
-			p_cm->assigning_slave->con_state=CO_SLAVE_CON_ST_CONNECTED;
-			can_master_start_assign_next_slave(p_cm);
-			p_cm->sdo_server.state=SDO_ST_IDLE;
-		}
-		break;
-	case CM_ASSIGN_ST_DONE:
-		break;
-	}
-
 	if (p_cm->p_hw->can_rx.StdId == p_cm->sdo_server.rx_address) {
 		can_master_process_sdo(p_cm, timestamp);
 	}
@@ -161,6 +130,40 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id) {
 			(uint8_t) (p_cm->sdo_server.object_mux & 0x000000ff);
 
 	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
+}
+
+void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp){
+	switch (p_cm->assign_state) {
+	case CM_ASSIGN_ST_START:
+		can_master_slave_select(p_cm, p_cm->assigning_slave->node_id);
+		p_cm->p_hw->can_tx.StdId = p_cm->node_id_scan_cobid;
+		p_cm->p_hw->can_tx.DLC = 1;
+		p_cm->p_hw->tx_data[0] = p_cm->assigning_slave->node_id;
+		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
+		p_cm->assign_state = CM_ASSIGN_ST_WAIT_CONFIRM;
+		p_cm->assign_timeout = timestamp + 100;
+		break;
+	case CM_ASSIGN_ST_WAIT_CONFIRM:
+		if (p_cm->assign_timeout > timestamp) {
+			p_cm->assigning_slave->con_state = CO_SLAVE_CON_ST_DISCONNECT;
+			can_master_start_assign_next_slave(p_cm);
+		}
+		break;
+	case CM_ASSIGN_ST_AUTHORIZING:
+		if(p_cm->sdo_server.state==SDO_ST_FAIL){
+			p_cm->assigning_slave->con_state=CO_SLAVE_CON_ST_DISCONNECT;
+			can_master_start_assign_next_slave(p_cm);
+			p_cm->sdo_server.state=SDO_ST_IDLE;
+		}else if(p_cm->sdo_server.state==SDO_ST_SUCCESS){
+			p_cm->assigning_slave->con_state=CO_SLAVE_CON_ST_CONNECTED;
+			can_master_start_assign_next_slave(p_cm);
+			p_cm->sdo_server.state=SDO_ST_IDLE;
+		}
+		break;
+	case CM_ASSIGN_ST_DONE:
+		break;
+	}
+
 }
 
 static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_cm) {

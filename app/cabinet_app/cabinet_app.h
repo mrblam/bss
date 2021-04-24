@@ -41,7 +41,6 @@ struct Cabinet_App_t{
 	BSS_Data		bss;
 };
 
-void ca_update_cabinet_state(Cabinet_App* p_ca);
 void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_check_bp_state(Cabinet_App* p_ca, CABIN_ID cab_id);

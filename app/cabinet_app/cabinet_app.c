@@ -9,11 +9,6 @@
 #include "uart_hw_hal.h"
 
 
-void ca_update_cabinet_state(Cabinet_App* p_ca){
-	bss_update_cabinets_state(&p_ca->bss);
-	bss_update_io_state(&p_ca->bss);
-}
-
 void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
 	cab_cell_active_charger(&p_ca->bss.cabs[cab_id]);
 }

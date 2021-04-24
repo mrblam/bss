@@ -29,6 +29,8 @@ static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t
 
 static Cabinet bss_cabinets[CABINET_CELL_NUM];
 static CO_Slave* bp_slaves[CABINET_CELL_NUM];
+static uint32_t sys_timestamp=0;
+static uint32_t sys_tick_ms=0;
 
 void cab_app_init(Cabinet_App* p_ca){
 	p_ca->state = CABIN_ST_SETUP;
@@ -62,15 +64,20 @@ int main (void){
 	cab_app_init(&selex_bss_app);
 	cab_app_set_state(&selex_bss_app, CABIN_ST_STANDBY);
 	uart_receives(&power_sys_port, &s);
+	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
+	sys_timestamp=0;
 	__enable_irq();
 	while(1){
 	};
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void){
-	ca_update_cabinet_state(&selex_bss_app);
-}
 
+	sys_timestamp+= sys_tick_ms;
+	bss_update_cabinets_state(&selex_bss_app.bss);
+	can_master_process((CAN_master*)&selex_bss_app, sys_timestamp);
+	can_master_update_id_assign_process((CAN_master*)&selex_bss_app,sys_timestamp);
+}
 
 void USART1_IRQHandler(void){
 	HAL_CHECK_COM_IRQ_REQUEST(&power_sys_port.uart_module);
@@ -140,7 +147,6 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 		get_cmd_done = 0;
 	}
 }
-
 
 static void cabinet_door_close_event_handle(Cabinet* p_cab){
 	can_master_slave_select((CAN_master*)&selex_bss_app, p_cab->cab_id);

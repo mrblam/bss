@@ -3,23 +3,44 @@
 # http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/
 # Microcontroller properties.
 
-export TARGET=bss_cabinet_control
+export TARGET=bss_storage_control
 export PROJ_ROOT=.
 export BOARD_TYPE=stm32_hallib_bsp
 include $(PROJ_ROOT)/board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include $(PROJ_ROOT)/gcc.mk
 
 SRCS:=board/board.c
+SRCS+=app/cabinet_app/cabinet_app.c 
+SRCS+=component/adc_sensor/adc_sensor.c \
+	component/bp_data/bp_data.c \
+	component/bss_data/bss_data.c \
+	component/cabinet_cell/cabinet_cell.c \
+	component/cabinet_door/cabinet_door.c \
+	component/io_state/io_state.c \
+	component/ioe/ioe.c \
+	component/mux/mux.c \
+	component/ntc/ntc.c \
+	component/switch/switch.c 
+SRCS+=service/linked_list/linked_list.c  service/can_master/can_master.c
 SRCS+=util/string/string_util.c
 	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
-INCLUDES:=. app_config board service component util app
+#INCLUDES:=. app_config board service component util app
+INCLUDES:=app/cabinet_app  app_config board component
 INCLUDES+=component/adc_sensor \
-			component/ntc \
-			component/switch \
-INCLUDES+= util/delay util/string 
+	component/bp_data \
+	component/bss_data \
+	component/cabinet_cell \
+	component/cabinet_door \
+	component/io_state \
+	component/ioe \
+	component/mux \
+	component/ntc \
+	component/switch
+INCLUDES+=service/linked_list service/can_master
+INCLUDES+= util/string
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
 USER_LIBS=CANopen
@@ -34,16 +55,17 @@ INCLUDES:=$(addprefix -I$(PROJ_ROOT)/,$(INCLUDES))
 INCLUDES+=$(addprefix -I,$(USER_LIB_INCLUDES))
 
 SRCS+=$(BSP_SRCS)
-SRCS+=component/adc_sensor/adc_sensor.c \
-			component/ntc/ntc.c \
-			component/switch/switch.c \
+	
+OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))		
+SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
 
-SRCS+= main.c 
-OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))
+SRCS+=$(PROJ_ROOT)/main.c
+OBJS+=$(PROJ_ROOT)/$(OBJDIR)/main.c
+
+
 OBJS:= $(patsubst %.c,%.o,$(OBJS))
 OBJS:= $(patsubst %.s,%.o,$(OBJS))
 DEPS:= $(patsubst %.o,%.d,$(OBJS))
-SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
 
 LDSCRIPT_INC=
 DEFS:=
