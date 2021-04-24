@@ -8,7 +8,7 @@
 #include "uart.h"
 
 static char* bp_serialize(BP* p_bp, char* buff);
-static char* cab_serialize(Cabinet_Cell* p_cc, char* buff);
+static char* cab_serialize(Cabinet* p_cc, char* buff);
 static char* bss_serialize(BSS_UART_Data* p_bss, char* buff);
 
 BP_UART_Data 	bp_data[CABINET_CELL_NUM];
@@ -47,7 +47,7 @@ static char* bp_serialize(BP* p_bp, char* buff){
 	return buff;
 }
 
-static char* cab_serialize(Cabinet_Cell* p_cc, char* buff){
+static char* cab_serialize(Cabinet* p_cc, char* buff){
 	*buff++=':';
 	*buff++='R';
 	*buff++='C';

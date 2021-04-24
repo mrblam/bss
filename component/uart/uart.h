@@ -26,7 +26,7 @@ struct BP_UART_Data_t{
 };
 
 struct CAB_UART_Data_t{
-	char* (*serializer)(Cabinet_Cell* p_cc, char* buff);
+	char* (*serializer)(Cabinet* p_cc, char* buff);
 };
 
 struct BSS_UART_Data_t{

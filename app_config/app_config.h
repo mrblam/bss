@@ -15,6 +15,8 @@
 #define CABINET_CELL_NUM	15
 #define VREF				3300
 
+#define CABINET_START_NODE_ID					5
+
 typedef enum CABIN_ID{
 	CAB1 = 1,
 	CAB2 = 2,

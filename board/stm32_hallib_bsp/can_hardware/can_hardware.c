@@ -2,7 +2,7 @@
 #include "string.h"
 #include "interrupt_hw.h"
 
-CAN_hw can_port;
+CAN_Hw can_port;
 
 static void can_hardware_init_module(void);
 static void can_hardware_filter_init(void);
@@ -63,7 +63,7 @@ static void can_hardware_start(void){
 }
 
 static void can_hardware_init_tx(void){
-	can_port.can_tx.StdId = RSDO_ID + MASTER_ID;
+	can_port.can_tx.StdId = 1;
 	can_port.can_tx.DLC = 8;
 	can_port.can_tx.RTR = CAN_RTR_DATA;
 	can_port.can_tx.IDE = CAN_ID_STD;
@@ -95,11 +95,11 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
   }
 }
 
-void can_send(CAN_hw* p_hw, uint8_t* buff){
+void can_send(CAN_Hw* p_hw, uint8_t* buff){
 	HAL_CAN_AddTxMessage(&p_hw->can_module, &p_hw->can_tx, buff, &p_hw->tx_mailbox);
 }
 
-void can_receive(CAN_hw* p_hw, uint8_t* buff){
+void can_receive(CAN_Hw* p_hw, uint8_t* buff){
 	HAL_CAN_GetRxMessage(&p_hw->can_module, CAN_RX_FIFO0, &p_hw->can_rx, buff);
 }
 

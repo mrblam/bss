@@ -25,7 +25,7 @@ BSS_Data* bss_data_construct(void){
     }
     *sn_buff++='\0';
 
-    p_bss_data->cab_num = CABINET_CELL_NUM;
+    p_bss_data->cab_num = 0;
     p_bss_data->active_cab_num = 0;
     p_bss_data->tilt_ss_state = TILT_SS_INACTIVE;
     p_bss_data->charger_state = CHARGER_ST_INACTIVE;
@@ -35,6 +35,13 @@ BSS_Data* bss_data_construct(void){
 
 	p_bss_data->data_serialize = bss_data_serialize_impl;
 	return p_bss_data;
+}
+
+void bss_update_cabinets_state(BSS_Data* p_bss){
+
+	for(uint8_t i=0;i<p_bss->cab_num;i++){
+		cab_cell_update_state(&p_bss->cabs[i]);
+	}
 }
 
 static void bss_data_serialize_impl(BSS_Data* p_bss_data, char* buff){

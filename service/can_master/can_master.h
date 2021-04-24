@@ -5,14 +5,12 @@
  *      Author: KhanhDinh
  */
 
-#ifndef APP_CAN_MASTER_CAN_MASTER_H_
-#define APP_CAN_MASTER_CAN_MASTER_H_
+#ifndef SERVICE_CAN_MASTER_CAN_MASTER_H_
+#define SERVICE_CAN_MASTER_CAN_MASTER_H_
 
 #include "stdlib.h"
 #include "stdint.h"
 #include "linked_list.h"
-#include "board.h"
-#include "app_config.h"
 #include "CO.h"
 #include "can_hal.h"
 
@@ -49,40 +47,48 @@ struct CO_SDO_SERVER_t{
 
 typedef struct CAN_master_t CAN_master;
 
-typedef enum ASSIGN_STATE{
-	ASSIGN_ST_START,
-	ASSIGN_ST_WAIT_CONFIRM,
-	ASSIGN_ST_DONE
-} ASSIGN_STATE;
+typedef enum CM_ASSIGN_STATE{
+	CM_ASSIGN_ST_START,
+	CM_ASSIGN_ST_WAIT_CONFIRM,
+	CM_ASSIGN_ST_AUTHORIZING,
+	CM_ASSIGN_ST_DONE
+} CM_ASSIGN_STATE;
 
 struct CAN_master_t{
 	uint32_t slave_num;
-	ASSIGN_STATE	assign_state;
+	uint32_t slave_start_node_id;
+	uint32_t node_id_scan_cobid;
+	CM_ASSIGN_STATE	assign_state;
 	uint32_t assign_timeout;
 	CO_Slave**		slaves;
 	CO_Slave* assigning_slave;
+	CO_Slave* authorizing_slave;
 	uint16_t 		time_stamp;
 	CO_SDO_SERVER 	sdo_server;
 	CAN_Hw* p_hw;
 	void (*slave_select)(const CAN_master* p_cm,const uint32_t slave_id);
 };
 
-static inline void can_master_slave_select(const CAN_master* p_cm, const uint32_t id){
+void can_master_init(CAN_master* p_cm,CO_Slave** slaves,
+		const uint32_t slave_num,CAN_Hw* p_hw);
+void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
+void can_master_start_assign_next_slave(CAN_master* p_cm);
+void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id);
+void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave);
+void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp);
+
+static inline void can_master_slave_select(const CAN_master* p_cm,
+		const uint32_t id){
 	p_cm->slave_select(p_cm,id);
 }
-void can_master_init(CAN_master* p_cm,CO_Slave** slaves,const uint32_t slave_num,CAN_Hw* p_hw);
-void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
-void can_master_process_sdo(CAN_master* p_cm,const uint32_t timestamp);
-void can_master_start_assign_next_slave_id(CAN_master* p_cm);
-void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id);
-void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp);
 
 static inline SDO_STATE sdo_server_get_state(const CO_SDO_SERVER* const p_svr){
         return p_svr->state;
 }
 
-static inline void sdo_server_set_state(CO_SDO_SERVER* p_svr,const SDO_STATE state){
+static inline void sdo_server_set_state(CO_SDO_SERVER* p_svr,
+		const SDO_STATE state){
         p_svr->state=state;
 }
 
-#endif /* APP_CAN_MASTER_CAN_MASTER_H_ */
+#endif /* SERVICE_CAN_MASTER_CAN_MASTER_H_ */

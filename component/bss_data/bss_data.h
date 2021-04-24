@@ -11,8 +11,7 @@
 #include "stdint.h"
 #include "stdlib.h"
 #include "string_util.h"
-#include "app_config.h"
-#include "linked_list.h"
+#include "cabinet_cell.h"
 
 typedef enum BSS_STATE{
 	BSS_ST_STANDBY,
@@ -56,9 +55,7 @@ struct BSS_Data_t{
 	FAN_STATE		fan_state;
 	LAMP_STATE 		lamp_state;
 	int32_t 		temp;
-	Cabinet_Cell*           cabs;
-	Cabinet_List*           empty_cabs;
-	Cabinet_List*           full_cabs;
+	Cabinet*           cabs;
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
 };
 
@@ -67,5 +64,7 @@ BSS_Data* bss_data_construct(void);
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){
 	p_bss_data->data_serialize(p_bss_data, buff);
 }
+
+void bss_update_cabinets_state(BSS_Data* p_bss);
 
 #endif /* COMPONENT_BSS_DATA_BSS_DATA_H_ */
