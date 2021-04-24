@@ -22,6 +22,7 @@ Cabinet_cell* cab_cell_construct(void){
 	p_cc->cell_fan = sw_construct();
 	p_cc->door = door_construct();
 	p_cc->data_serialize = cab_cell_data_serialze_impl;
+	p_cc->temp_ss = ntc_construct();
 	return p_cc;
 }
 

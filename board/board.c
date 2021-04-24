@@ -9,4 +9,5 @@ void board_init(void){
 	gpio_init();
 	can_hardware_init();
 	adc_hw_init();
+	ioe_hw_init();
 }

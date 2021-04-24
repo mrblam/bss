@@ -10,15 +10,26 @@
 IOE solenoid;
 IOE cell_fan;
 
-IOE* ioe_construct(void){
-	IOE* p_ioe = (IOE*)malloc(sizeof(IOE));
-	while(p_ioe == NULL);
-	return p_ioe;
-}
-
 void ioe_init(void){
+	uint32_t cnt;
 	solenoid.address = 0x40;
 	cell_fan.address = 0x41;
+	ioe_clear_all(&solenoid);
+	while(cnt < 100000) cnt++;
+	cnt = 0;
+	ioe_clear_all(&solenoid);
+	while(cnt < 100000) cnt++;
+	cnt = 0;
+	ioe_clear_all(&solenoid);
+	while(cnt < 100000) cnt++;
+	cnt = 0;
+	ioe_clear_all(&solenoid);
+	while(cnt < 100000) cnt++;
+	cnt = 0;
+	ioe_clear_all(&solenoid);
+	while(cnt < 100000) cnt++;
+	cnt = 0;
+	ioe_clear_all(&cell_fan);
 }
 
 void ioe_set_channel(IOE* p_ioe, uint8_t channel){

@@ -34,8 +34,6 @@ typedef enum CABIN_STATE{
 struct Cabinet_app_t{
 	CAN_master		base;
 	Cabinet_cell*	cabin[CABINET_CELL_NUM];
-	IOE*			ioe_sol;
-	IOE*			ioe_cfan;
 	CABIN_STATE		state;
 	TIMING_STATE	timing_state;
 	uint8_t 		time_stamp;

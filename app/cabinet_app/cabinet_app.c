@@ -17,15 +17,13 @@ void cab_app_init(Cabinet_app* p_ca){
 	p_ca->empty_cab = cab_list_init();
 	p_ca->full_cab = cab_list_init();
 
-	for(uint8_t cab_id = CAB1 - 1; cab_id < CAB7; cab_id++){
+	for(uint8_t cab_id = CAB1; cab_id < CAB15; cab_id++){
 		p_ca->cabin[cab_id] = cab_cell_construct();
 		p_ca->cabin[cab_id]->cab_id = cab_id + 1;
 		p_ca->cabin[cab_id]->node_id = DEFAULT_BP_ID;
 		cab_list_insert_to_tail(p_ca->empty_cab, p_ca->cabin[cab_id]);
 	}
 
-	p_ca->ioe_cfan = ioe_construct();
-	p_ca->ioe_sol = ioe_construct();
 	p_ca->bss_data = bss_data_construct();
 
 	p_ca->base.active_node_id_pin = node_id_pin_active;
@@ -144,7 +142,7 @@ void cab_app_process_bss_cmd_hmi(__attribute__((unused)) Cabinet_app* p_ca, char
 
 void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_app* p_ca, char* token){
 	token = strtok(NULL, ",");
-	uint8_t id = string_to_long(token);
+	uint8_t id = string_to_long(token) + 1;
 	token = strtok(NULL, ",");
 	char* obj = token;
 	token = strtok(NULL, ",");

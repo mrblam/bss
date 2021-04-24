@@ -16,21 +16,21 @@
 #define VREF				3300
 
 typedef enum CABIN_ID{
-	CAB1 = 1,
-	CAB2 = 2,
-	CAB3 = 3,
-	CAB4 = 4,
-	CAB5 = 5,
-	CAB6 = 6,
-	CAB7 = 7,
-	CAB8 = 8,
-	CAB9 = 9,
-	CAB10 = 10,
-	CAB11 = 11,
-	CAB12 = 12,
-	CAB13 = 13,
-	CAB14 = 14,
-	CAB15 = 15
+	CAB1 = 0,
+	CAB2 = 1,
+	CAB3 = 2,
+	CAB4 = 3,
+	CAB5 = 4,
+	CAB6 = 5,
+	CAB7 = 6,
+	CAB8 = 7,
+	CAB9 = 8,
+	CAB10 = 9,
+	CAB11 = 10,
+	CAB12 = 11,
+	CAB13 = 12,
+	CAB14 = 13,
+	CAB15 = 14
 } CABIN_ID;
 
 typedef enum SLAVE_ID{

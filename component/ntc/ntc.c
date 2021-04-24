@@ -12,10 +12,12 @@ static void ntc_update_impedance_handle(NTC* p_ntc);
 NTC* ntc_construct(void){
 	NTC* p_ntc = (NTC*)malloc(sizeof(NTC));
 	while(p_ntc == NULL);
+	adc_sensor_init((ADC_Sensor*)p_ntc);
 	p_ntc->min_temp = MIN_TEMP;
 	p_ntc->max_temp = MAX_TEMP;
 	p_ntc->lut_size = LUT_SIZE;
 	p_ntc->update_impedance = ntc_update_impedance_handle;
+	return p_ntc;
 }
 
 static void ntc_update_impedance_handle(NTC* p_ntc){

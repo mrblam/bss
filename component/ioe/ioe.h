@@ -24,7 +24,7 @@ extern IOE solenoid;
 extern IOE cell_fan;
 
 
-IOE* ioe_construct(void);
+void ioe_init(void);
 void ioe_set_channel(IOE* p_ioe, uint8_t channel);
 void ioe_clear_channel(IOE* p_ioe, uint8_t channel);
 void ioe_set_all(IOE* p_ioe);
