@@ -32,13 +32,15 @@ struct Cabinet_t{
 	CABINET_STATE 	state;
 	uint8_t			cab_id;
 	uint8_t			node_id;
-	BP*			bp;
+	BP*				bp;
 	Cabinet_Door*		door;
 	Switch*			cell_fan;
 	Switch*			charger;
+	Switch*			node_id_sw;
 	NTC*			temp_ss;
 	int32_t			temp;
 	void			(*data_serialize)(Cabinet* p_cc, char* buff);
+	void (*on_door_close)(Cabinet* p_cab);
 };
 
 Cabinet* cab_cell_construct(void);
@@ -46,10 +48,10 @@ Cabinet* cab_cell_construct(void);
 void cab_cell_set_state(Cabinet* p_cc);
 CABINET_STATE cab_cell_get_state(Cabinet* p_cc);
 void cab_cell_update_state(Cabinet* p_cab);
+void cab_cell_update_door_state(Cabinet* p_cc);
 
 uint8_t cab_cell_get_slave_id(Cabinet* p_cc);
 void cab_cell_open_door(Cabinet* p_cc);
-void cab_cell_check_door_state(Cabinet* p_cc);
 int32_t cab_cell_get_cell_temp(Cabinet* p_cc);
 void cab_cell_fan_turn_on(Cabinet* p_cc);
 void cab_cell_fan_turn_off(Cabinet* p_cc);

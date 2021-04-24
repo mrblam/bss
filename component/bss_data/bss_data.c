@@ -43,6 +43,13 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 	}
 }
 
+void bss_update_io_state(BSS_Data* p_bss){
+
+	for(uint8_t i=0;i<p_bss->cab_num;i++){
+		cab_cell_update_door_state(&p_bss->cabs[i]);
+	}
+}
+
 static void bss_data_serialize_impl(BSS_Data* p_bss_data, char* buff){
 	*buff++=':';
 	*buff++='R';

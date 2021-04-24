@@ -8,6 +8,9 @@
 #include "cabinet_app.h"
 #include "uart_hw_hal.h"
 
+Cabinet_App selex_bss_app;
+static void cabinet_door_close_event_handle(Cabinet* p_cab);
+
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id);
 void node_id_pin_active(uint8_t cab_id);
 void node_id_pin_deactive(uint8_t cab_id);
@@ -21,6 +24,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	for(int i=0;i<CABINET_CELL_NUM;i++){
 	        bss_cabinets[i].cab_id=i;
 	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
+	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
 	        while(bss_cabinets[i].bp==NULL);
 	        bss_cabinets[i].bp->can_node_id=BP_DEFAULT_CAN_NODE_ID;
 	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
@@ -40,13 +44,17 @@ void cab_app_init(Cabinet_App* p_ca){
 
 void ca_update_cabinet_state(Cabinet_App* p_ca){
 	bss_update_cabinets_state(&p_ca->bss);
+	bss_update_io_state(&p_ca->bss);
+}
+
+static void cabinet_door_close_event_handle(Cabinet* p_cab){
+	can_master_slave_select((CAN_master*)&selex_bss_app, p_cab->cab_id);
 }
 
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){
 	(void)p_cm;
-	node_id_pin_active(id);
+	sw_on(selex_bss_app.bss.cabs[id].node_id_sw);
 }
-
 
 void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
 	cab_cell_active_charger(&p_ca->bss.cabs[cab_id]);

@@ -21,6 +21,7 @@ Cabinet* cab_cell_construct(void){
 	p_cc->cell_fan = sw_construct();
 	p_cc->charger = sw_construct();
 	p_cc->door = door_construct();
+	p_cc->node_id_sw=sw_construct();
 	p_cc->data_serialize = cab_cell_data_serialze_impl;
 	return p_cc;
 }
@@ -50,8 +51,18 @@ void cab_cell_open_door(Cabinet* p_cc){
 	cab_door_open(p_cc->door);
 }
 
-void cab_cell_check_door_state(Cabinet* p_cc){
+void cab_cell_update_door_state(Cabinet* p_cc){
+	IO_STATE old_state=p_cc->door->io_state->state;
+	IO_STATE new_state=p_cc->door->io_state->io_get_state(p_cc->door->io_state);
 
+	if(old_state != new_state){
+		p_cc->door->io_state->state=new_state;
+		if((old_state==IO_ST_OFF) && (new_state==IO_ST_ON)){
+			if(p_cc->on_door_close!=NULL){
+				p_cc->on_door_close(p_cc);
+			}
+		}
+	}
 }
 
 void cab_cell_update_cell_temp(Cabinet* p_cc){

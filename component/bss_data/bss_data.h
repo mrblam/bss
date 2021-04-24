@@ -65,5 +65,6 @@ static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){
 }
 
 void bss_update_cabinets_state(BSS_Data* p_bss);
+void bss_update_io_state(BSS_Data* p_bss);
 
 #endif /* COMPONENT_BSS_DATA_BSS_DATA_H_ */

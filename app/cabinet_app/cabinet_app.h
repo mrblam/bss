@@ -41,6 +41,8 @@ struct Cabinet_App_t{
 	BSS_Data		bss;
 };
 
+extern Cabinet_App selex_bss_app;
+
 Cabinet_App* cab_app_construct(void);
 void cab_app_init(Cabinet_App* p_ca);
 void cab_app_start_id_assign(Cabinet_App* p_ca);
@@ -64,6 +66,8 @@ void cab_app_sync_bp_data_hmi(__attribute__((unused)) Cabinet_App* p_ca, BP* p_b
 void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff);
 void cab_app_process_cab_cmd_hmi(Cabinet_App* p_ca, char* token);
+
+void capp_on_cabinet_door_close(Cabinet_App* p_app,Cabinet* p_cab);
 
 static inline void cab_app_set_state(Cabinet_App* p_ca, CABIN_STATE state){
 	p_ca->state = state;

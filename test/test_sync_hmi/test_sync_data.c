@@ -8,7 +8,6 @@
 #include "board.h"
 #include "cabinet_app.h"
 
-Cabinet_App selex_bss_app;
 static volatile uint8_t sync_counter = 20;
 static volatile uint8_t cab_id = 0;
 char buff[50];
