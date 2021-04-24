@@ -41,17 +41,7 @@ struct Cabinet_App_t{
 	BSS_Data		bss;
 };
 
-extern Cabinet_App selex_bss_app;
-
-Cabinet_App* cab_app_construct(void);
-void cab_app_init(Cabinet_App* p_ca);
-void cab_app_start_id_assign(Cabinet_App* p_ca);
-Cabinet* cab_app_select_empty_cabin(Cabinet_App* p_ca);
-void cab_app_process_id_assign(Cabinet_App* p_ca);
-void cab_app_update_cab_node_id(Cabinet_App* p_ca);
-void cab_app_update_cabin_list(Cabinet_App* p_ca);
-void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id);
-void cab_app_deactive_charge(Cabinet_App* p_ca, CABIN_ID cab_id);
+void ca_update_cabinet_state(Cabinet_App* p_ca);
 void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_check_bp_state(Cabinet_App* p_ca, CABIN_ID cab_id);

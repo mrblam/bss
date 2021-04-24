@@ -67,6 +67,7 @@ struct CAN_master_t{
 	CO_SDO_SERVER 	sdo_server;
 	CAN_Hw* p_hw;
 	void (*slave_select)(const CAN_master* p_cm,const uint32_t slave_id);
+	void (*slave_deselect)(const CAN_master* p_cm,const uint32_t slave_id);
 };
 
 void can_master_init(CAN_master* p_cm,CO_Slave** slaves,

@@ -22,6 +22,40 @@ char buff[50];
 char s;
 uint8_t idx, cnt, i, char_state, get_cmd_done;
 
+Cabinet_App selex_bss_app;
+static void cabinet_door_close_event_handle(Cabinet* p_cab);
+static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id);
+static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t id);
+
+static Cabinet bss_cabinets[CABINET_CELL_NUM];
+static CO_Slave* bp_slaves[CABINET_CELL_NUM];
+
+void cab_app_init(Cabinet_App* p_ca){
+	p_ca->state = CABIN_ST_SETUP;
+	p_ca->bss.cabs=&bss_cabinets[0];
+	for(int i=0;i<CABINET_CELL_NUM;i++){
+	        bss_cabinets[i].cab_id=i;
+	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
+	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
+	        while(bss_cabinets[i].bp==NULL);
+	        bss_cabinets[i].bp->can_node_id=BP_DEFAULT_CAN_NODE_ID;
+	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
+	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_DISCONNECT;
+	        bp_slaves[i]->node_id=CABINET_START_NODE_ID+i;
+	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
+	}
+
+	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
+	can_master_init((CAN_master*)p_ca,&(bp_slaves[0]),CABINET_CELL_NUM,&can_port);
+	p_ca->base.node_id_scan_cobid=TSDO_ID;
+	p_ca->base.slave_select=can_master_slave_select_impl;
+	p_ca->base.slave_deselect=can_master_slave_deselect_impl;
+
+	p_ca->ioe_cfan = ioe_construct();
+	p_ca->ioe_sol = ioe_construct();
+}
+
+
 int main (void){
 	__disable_irq();
 	board_init();
@@ -32,6 +66,11 @@ int main (void){
 	while(1){
 	};
 }
+
+void HAL_STATE_MACHINE_UPDATE_TICK(void){
+	ca_update_cabinet_state(&selex_bss_app);
+}
+
 
 void USART1_IRQHandler(void){
 	HAL_CHECK_COM_IRQ_REQUEST(&power_sys_port.uart_module);
@@ -102,9 +141,19 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 	}
 }
 
-void HAL_STATE_MACHINE_UPDATE_TICK(void){
 
+static void cabinet_door_close_event_handle(Cabinet* p_cab){
+	can_master_slave_select((CAN_master*)&selex_bss_app, p_cab->cab_id);
 }
 
+static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){
+	(void)p_cm;
+	sw_on(selex_bss_app.bss.cabs[id].node_id_sw);
+}
+
+static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t id){
+	(void)p_cm;
+	sw_off(selex_bss_app.bss.cabs[id].node_id_sw);
+}
 
 

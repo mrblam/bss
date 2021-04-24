@@ -8,52 +8,10 @@
 #include "cabinet_app.h"
 #include "uart_hw_hal.h"
 
-Cabinet_App selex_bss_app;
-static void cabinet_door_close_event_handle(Cabinet* p_cab);
-
-static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id);
-void node_id_pin_active(uint8_t cab_id);
-void node_id_pin_deactive(uint8_t cab_id);
-
-static Cabinet bss_cabinets[CABINET_CELL_NUM];
-static CO_Slave* bp_slaves[CABINET_CELL_NUM];
-
-void cab_app_init(Cabinet_App* p_ca){
-	p_ca->state = CABIN_ST_SETUP;
-	p_ca->bss.cabs=&bss_cabinets[0];
-	for(int i=0;i<CABINET_CELL_NUM;i++){
-	        bss_cabinets[i].cab_id=i;
-	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
-	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
-	        while(bss_cabinets[i].bp==NULL);
-	        bss_cabinets[i].bp->can_node_id=BP_DEFAULT_CAN_NODE_ID;
-	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
-	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_DISCONNECT;
-	        bp_slaves[i]->node_id=CABINET_START_NODE_ID+i;
-	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
-	}
-
-	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
-	can_master_init((CAN_master*)p_ca,&(bp_slaves[0]),CABINET_CELL_NUM,&can_port);
-	p_ca->base.node_id_scan_cobid=TSDO_ID;
-	p_ca->base.slave_select=can_master_slave_select_impl;
-
-	p_ca->ioe_cfan = ioe_construct();
-	p_ca->ioe_sol = ioe_construct();
-}
 
 void ca_update_cabinet_state(Cabinet_App* p_ca){
 	bss_update_cabinets_state(&p_ca->bss);
 	bss_update_io_state(&p_ca->bss);
-}
-
-static void cabinet_door_close_event_handle(Cabinet* p_cab){
-	can_master_slave_select((CAN_master*)&selex_bss_app, p_cab->cab_id);
-}
-
-static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){
-	(void)p_cm;
-	sw_on(selex_bss_app.bss.cabs[id].node_id_sw);
 }
 
 void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
@@ -66,7 +24,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, CABIN_ID cab_id){
 
 void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
-	cab_cell_check_door_state(&p_ca->bss.cabs[cab_id]);
+	cab_cell_update_door_state(&p_ca->bss.cabs[cab_id]);
 }
 
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
@@ -172,6 +130,9 @@ void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char
 	}
 }
 
+
+
+#if 0
 void node_id_pin_active(uint8_t cab_id){
 	switch(cab_id){
 	case CAB1:
@@ -227,3 +188,4 @@ void node_id_pin_deactive(uint8_t cab_id){
 		break;
 	}
 }
+#endif
