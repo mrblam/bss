@@ -43,7 +43,6 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
 	        while(bss_cabinets[i].bp==NULL);
-	        bss_cabinets[i].bp->can_node_id=BP_DEFAULT_CAN_NODE_ID;
 	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
 	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_DISCONNECT;
 	        bp_slaves[i]->node_id=CABINET_START_NODE_ID+i;

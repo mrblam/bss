@@ -41,7 +41,6 @@ struct BP_t{
 	uint8_t 	cur;
 	uint16_t 	temp;
 	uint32_t 	cycle;
-	uint32_t        can_node_id;
 	void		(*data_serialize)(BP* p_bp, char* buff);
 };
 

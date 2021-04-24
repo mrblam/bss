@@ -39,6 +39,7 @@ BSS_Data* bss_data_construct(void){
 void bss_update_cabinets_state(BSS_Data* p_bss){
 
 	for(uint8_t i=0;i<p_bss->cab_num;i++){
+		/* read battery state and update to owner cabinet */
 		cab_cell_update_state(&p_bss->cabs[i]);
 	}
 
