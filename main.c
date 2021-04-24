@@ -26,6 +26,9 @@ Cabinet_App selex_bss_app;
 static void cabinet_door_close_event_handle(Cabinet* p_cab);
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id);
 static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t id);
+static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id);
+static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id);
+
 
 static Cabinet bss_cabinets[CABINET_CELL_NUM];
 static CO_Slave* bp_slaves[CABINET_CELL_NUM];
@@ -52,6 +55,8 @@ void cab_app_init(Cabinet_App* p_ca){
 	p_ca->base.node_id_scan_cobid=TSDO_ID;
 	p_ca->base.slave_select=can_master_slave_select_impl;
 	p_ca->base.slave_deselect=can_master_slave_deselect_impl;
+	p_ca->base.on_slave_assign_fail=bp_assign_id_fail_handle;
+	p_ca->base.on_slave_assign_success=bp_assign_id_success_handle;
 
 	p_ca->ioe_cfan = ioe_construct();
 	p_ca->ioe_sol = ioe_construct();
@@ -162,4 +167,11 @@ static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t
 	sw_off(selex_bss_app.bss.cabs[id].node_id_sw);
 }
 
+static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id){
 
+
+}
+
+static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id){
+
+}

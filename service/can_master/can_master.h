@@ -68,6 +68,8 @@ struct CAN_master_t{
 	CAN_Hw* p_hw;
 	void (*slave_select)(const CAN_master* p_cm,const uint32_t slave_id);
 	void (*slave_deselect)(const CAN_master* p_cm,const uint32_t slave_id);
+	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
+	void (*on_slave_assign_fail)(const CAN_master* const p_cm,uint32_t slave_id);
 };
 
 void can_master_init(CAN_master* p_cm,CO_Slave** slaves,

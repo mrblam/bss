@@ -8,7 +8,6 @@
 #include "cabinet_app.h"
 #include "uart_hw_hal.h"
 
-
 void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
 	cab_cell_active_charger(&p_ca->bss.cabs[cab_id]);
 }
@@ -124,7 +123,6 @@ void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char
 		break;
 	}
 }
-
 
 
 #if 0
