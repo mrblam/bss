@@ -2,7 +2,7 @@ PROJ_ROOT=.
 CC=arm-none-eabi-gcc
 LIB=libCANopen
 
-CPU=-mcpu=cortex-m0
+CPU=-mcpu=cortex-m3
 OPTIMIZE=-O3
 #FPU=-mfloat-abi=hard -mfpu=fpv4-sp-d16
 FPU=-mfloat-abi=softfp -mfpu=fpv4-sp-d16
@@ -15,7 +15,7 @@ CFLAGS+=-fmessage-length=0
 CFLAGS+=-fsigned-char
 CFLAGS+=-Wall -Winline -ggdb -lm -MMD -MP -Wno-unused-function -Wextra -Wstrict-prototypes
 CFLAGS+=-std=gnu11
-CFLAGS+=--specs=nosys.specs
+CFLAGS+=--specs=nano.specs
 CFLAGS+=-ffunction-sections -fdata-sections
 CFLAGS += -I.
 

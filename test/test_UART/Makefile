@@ -3,7 +3,7 @@
 # http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/
 # Microcontroller properties.
 
-export TARGET=test_UART
+export TARGET=test_CANBus
 export PROJ_ROOT=../..
 export BOARD_TYPE=stm32_bsp
 include ../../board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
@@ -24,10 +24,10 @@ SRCS+=$(BSP_SRCS)
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))
 OBJS:= $(patsubst %.c,%.o,$(OBJS))
 OBJS:= $(patsubst %.s,%.o,$(OBJS))
-OBJS+= test_UART.o 
+OBJS+= $(TARGET).o 
 DEPS:= $(patsubst %.o,%.d,$(OBJS))
 SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
-SRCS+= test_UART.c 
+SRCS+= $(TARGET).c 
 
 
 LDSCRIPT_INC=

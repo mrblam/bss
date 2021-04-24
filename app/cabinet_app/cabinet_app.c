@@ -1,81 +1,184 @@
 /*
  * cabinet_app.c
  *
- *  Created on: Mar 25, 2021
+ *  Created on: Apr 5, 2021
  *      Author: KhanhDinh
  */
 
 #include "cabinet_app.h"
+#include "uart_hw_hal.h"
 
-Cabinet_App* ca_construct(void){
-	Cabinet_App* p_ca = (Cabinet_App*) malloc(sizeof(Cabinet_App));
-	return p_ca;
+void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
+	cab_cell_active_charger(&p_ca->bss.cabs[cab_id]);
 }
 
-void ca_init(Cabinet_App* p_ca){
-	cm_init((CAN_Master*)p_ca);
+void cab_app_deactive_charge(Cabinet_App* p_ca, CABIN_ID cab_id){
+	cab_cell_deactive_charger(&p_ca->bss.cabs[cab_id]);
+}
 
-	p_ca->state = CABIN_ST_SETUP;
-	p_ca->tilt_ss_state = TILT_ST_DEACTIVE;
-	p_ca->warning_state = NO_WARNING;
-	p_ca->timing_state = TIMIMG_ST_DEACTIVE;
-	p_ca->timing_ms = 0;
-	p_ca->cell_num = CELL_NUM;
-	p_ca->empty_cell = list_init();
-	for(uint8_t data = CELL1; data <= CELL15; data++){
-		list_insert_to_tail(p_ca->empty_cell,data);
+void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
+	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
+	cab_cell_update_door_state(&p_ca->bss.cabs[cab_id]);
+}
+
+void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
+	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
+}
+
+void cab_app_check_bp_state(Cabinet_App* p_ca, CABIN_ID cab_id){
+
+}
+
+void cab_app_update_tilt_ss(Cabinet_App* p_ca){
+
+}
+
+void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
+	char buff[50];
+
+	bss_data_serialize(&p_ca->bss, buff);
+	uart_sends(&power_sys_port, (uint8_t*)buff);
+}
+
+void cab_app_sync_bp_data_hmi(__attribute__((unused)) Cabinet_App* p_ca, BP* p_bp){
+	char buff[50];
+
+	bp_data_serialize(p_bp, buff);
+	uart_sends(&power_sys_port, (uint8_t*)buff);
+}
+
+void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){
+	char buff[50];
+
+	cab_cell_data_serialize(&p_ca->bss.cabs[cab_id], buff);
+	uart_sends(&power_sys_port, (uint8_t*)buff);
+}
+
+void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff){
+	char* token;
+
+	token = strtok(buff, ",");
+	switch(*token){
+	case 'C':
+		cab_app_process_cab_cmd_hmi(p_ca, token);
+		break;
+	case 'B':
+		break;
+	case 'S':
+		break;
+	default:
+		break;
 	}
-	p_ca->busy_cell = list_init();
-
 }
 
-void ca_accept_assign_id(Cabinet_App* p_ca){
-	cm_respone_assign_request((CAN_Master*) p_ca);
+void cab_app_process_bss_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char* token){
+	token = strtok(NULL, ",");
+	char* obj = token;
+	token = strtok(NULL, ",");
+	uint8_t state = string_to_long(token);
+
+	switch(*obj){
+	case 'F':
+		break;
+	case 'C':
+		break;
+	case 'L':
+		break;
+	default:
+		break;
+	}
 }
 
-void ca_active_timing_state(Cabinet_App* p_ca, uint16_t timestamp_ms){
-	p_ca->timing_ms = timestamp_ms;
-	p_ca->timing_state = TIMING_ST_ACTIVE;
-}
+void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char* token){
+	token = strtok(NULL, ",");
+	uint8_t id = string_to_long(token);
+	token = strtok(NULL, ",");
+	char* obj = token;
+	token = strtok(NULL, ",");
+	uint8_t state = string_to_long(token);
 
-void ca_deselect_cell(Cabinet_App* p_ca, uint8_t cell_id){
-	list_remove_node(p_ca->empty_cell, cell_id);
-}
-
-void ca_deactive_timing_state(Cabinet_App* p_ca){
-
-}
-
-CELL_STATE ca_select_cell(Cabinet_App* p_ca, LIST* p_list){
-	p_ca->cell_id = list_walk_down(p_list);
-	if(p_ca->cell_id == END_OF_LIST) return CELL_ERROR;
-	else return CELL_OK;
-}
-
-ASSIGN_STATE ca_start_assign_id(Cabinet_App* p_ca, uint16_t timestamp_ms){
-	ca_active_timing_state(p_ca, timestamp_ms);
-	cm_send_assign_msg((CAN_Master*) p_ca);
-	while((p_ca->timing_ms > 0) && (p_ca->timing_state == TIMING_ST_ACTIVE)){
-		if(cm_wait_slave_confirm((CAN_Master*) p_ca) == SLAVE_OK){
-			ca_deactive_timing_state(p_ca);
-			return ASSIGN_SUCCESS;
+	switch(*obj){
+	case 'F':
+		if(state == 1){
+			cab_cell_fan_turn_on(&p_ca->bss.cabs[id]);
 		}
-	}
-	ca_deactive_timing_state(p_ca);
-	return ASSIGN_FAIL;
-}
-
-void ca_process_assign_id(Cabinet_App* p_ca){
-	while(cm_select_slave((CAN_Master*) p_ca, p_ca->base.empty_slave) != SLAVE_ERROR){
-		while(ca_select_cell(p_ca, p_ca->empty_cell) != CELL_ERROR){
-			if(ca_start_assign_id(p_ca, 5) != ASSIGN_FAIL){
-				ca_deselect_cell(p_ca, p_ca->cell_id);
-				cm_deselect_slave((CAN_Master*) p_ca, p_ca->base.slave_id);
-				break;
-			}
+		else {
+			cab_cell_fan_turn_off(&p_ca->bss.cabs[id]);
 		}
-		if(p_ca->empty_cell->p_temp == NULL) return;
+		break;
+	case 'D':
+		if(state == 1){
+			cab_cell_open_door(&p_ca->bss.cabs[id]);
+		}
+		break;
+	case 'C':
+		if(state == 1){
+			cab_cell_active_charger(&p_ca->bss.cabs[id]);
+		}
+		else {
+			cab_cell_deactive_charger(&p_ca->bss.cabs[id]);
+		}
+		break;
+	default:
+		break;
 	}
 }
 
 
+#if 0
+void node_id_pin_active(uint8_t cab_id){
+	switch(cab_id){
+	case CAB1:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+		break;
+	case CAB2:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+		break;
+	case CAB3:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
+		break;
+	case CAB4:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+		break;
+	case CAB5:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
+		break;
+	case CAB6:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+		break;
+	case CAB7:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+		break;
+	default:
+		break;
+	}
+}
+
+void node_id_pin_deactive(uint8_t cab_id){
+	switch(cab_id){
+	case CAB1:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
+		break;
+	case CAB2:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
+		break;
+	case CAB3:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+		break;
+	case CAB4:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+		break;
+	case CAB5:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
+		break;
+	case CAB6:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+		break;
+	case CAB7:
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+		break;
+	default:
+		break;
+	}
+}
+#endif

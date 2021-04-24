@@ -1,113 +1,69 @@
 /*
  * cabinet_app.h
  *
- *  Created on: Mar 25, 2021
+ *  Created on: Apr 5, 2021
  *      Author: KhanhDinh
  */
 
-#ifndef APP_CABINET_APP_CABINET_APP_H_
-#define APP_CABINET_APP_CABINET_APP_H_
+#ifndef CABINET_APP_CABINET_APP_H_
+#define CABINET_APP_CABINET_APP_H_
 
+#include "stdlib.h"
+#include "stdint.h"
+#include "string.h"
+#include "app_config.h"
 #include "can_master.h"
+#include "cabinet_cell.h"
+#include "ioe.h"
+#include "mux.h"
 #include "linked_list.h"
+#include "bss_data.h"
 
-#define CELL_NUM	15
-
-typedef enum CELL_ID{
-	CELL1 = 1,
-	CELL2 = 2,
-	CELL3 = 3,
-	CELL4 = 4,
-	CELL5 = 5,
-	CELL6 = 6,
-	CELL7 = 7,
-	CELL8 = 8,
-	CELL9 = 9,
-	CELL10 = 10,
-	CELL11 = 11,
-	CELL12 = 12,
-	CELL13 = 13,
-	CELL14 = 14,
-	CELL15 = 15
-} CELL_ID;
+typedef struct Cabinet_App_t Cabinet_App;
 
 typedef enum CABIN_STATE{
 	CABIN_ST_SETUP = 0,
-	CABIN_ST_MAINTAIN = 1,
-	CABIN_ST_OPERATIONAL = 2,
-	CABIN_ST_FAULT = 3
+	CABIN_ST_STANDBY = 1,
+	CABIN_ST_ASSIGN_ID = 2,
+	CABIN_ST_ACTIVE = 3,
+	CABIN_ST_MAINTAIN = 4,
+	CABIN_ST_FAULT = 5,
 } CABIN_STATE;
 
-typedef enum TIMING_STATE{
-	TIMIMG_ST_DEACTIVE = 0,
-	TIMING_ST_ACTIVE = 1
-} TIMING_STATE;
+struct Cabinet_App_t{
+	CAN_master		base;
+	//Cabinet_Cell*	cabin[CABINET_CELL_NUM];
+	IOE*			ioe_sol;
+	IOE*			ioe_cfan;
+	CABIN_STATE		state;
+	TIMING_STATE	timing_state;
+	uint8_t 		time_stamp;
+	BSS_Data		bss;
+};
 
-typedef enum TILT_SS_STATE{
-	TILT_ST_DEACTIVE = 0,
-	TILT_ST_ACTIVE = 1
-} TILT_SS_STATE;
+void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
+void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
+void cab_app_check_bp_state(Cabinet_App* p_ca, CABIN_ID cab_id);
+void cab_app_update_tilt_ss(Cabinet_App* p_ca);
+void cab_app_check_hmi_msg(Cabinet_App* p_ca);
+void cab_app_check_sim_msg(Cabinet_App* p_ca);
+void cab_app_stream_data_hmi(Cabinet_App* p_ca);
+void cab_app_stream_data_sim(Cabinet_App* p_ca);
+void cab_app_send_warning_msg(Cabinet_App* p_ca);
+void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca);
+void cab_app_sync_bp_data_hmi(__attribute__((unused)) Cabinet_App* p_ca, BP* p_bp);
+void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
+void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff);
+void cab_app_process_cab_cmd_hmi(Cabinet_App* p_ca, char* token);
 
-typedef enum WARNING_STATE{
-	NO_WARNING = 0,
-	WARNING_LOST_POWER = 1,
-	WARNING_MOVEMENT = 2,
-	WARNING_CHARGER_ERROR = 3,
-	WARNING_LOST_BP = 4
-}WARNING_STATE;
+void capp_on_cabinet_door_close(Cabinet_App* p_app,Cabinet* p_cab);
 
-typedef enum ASSIGN_STATE{
-	ASSIGN_FAIL = 0,
-	ASSIGN_SUCCESS = 1
-} ASSIGN_STATE;
+static inline void cab_app_set_state(Cabinet_App* p_ca, CABIN_STATE state){
+	p_ca->state = state;
+}
 
-typedef enum CELL_STATE{
-	CELL_OK = 0,
-	CELL_ERROR = 1
-} CELL_STATE;
+static inline CABIN_STATE cab_app_get_state(Cabinet_App* p_ca){
+	return p_ca->state;
+}
 
-struct Cabinet_App_t {
-	CAN_Master 		base;
-	uint8_t 		cell_id;
-	CABIN_STATE 	state;
-	TIMING_STATE 	timing_state;
-	TILT_SS_STATE 	tilt_ss_state;
-	WARNING_STATE	warning_state;
-	uint16_t 		timing_ms;
-	uint8_t 		cell_num;
-	LIST*			empty_cell;
-	LIST*			busy_cell;
-} ;
-typedef struct Cabinet_App_t Cabinet_App;
-
-Cabinet_App* ca_construct(void);
-void ca_init(Cabinet_App* p_ca);
-void ca_update_state(Cabinet_App* p_ca, CABIN_STATE state);
-CABIN_STATE ca_get_state(Cabinet_App* p_ca);
-
-void ca_accept_assign_id(Cabinet_App* p_ca);
-CELL_STATE ca_select_cell(Cabinet_App* p_ca, LIST* p_list);
-void ca_deselect_cell(Cabinet_App* p_ca, uint8_t cell_id);
-void ca_process_assign_id(Cabinet_App* p_ca);
-ASSIGN_STATE ca_start_assign_id(Cabinet_App* p_ca, uint16_t timestamp);
-void ca_active_timing_state(Cabinet_App* p_ca, uint16_t timestamp_ms);
-void ca_deactive_timing_state(Cabinet_App* p_ca);
-void ca_process_timing(Cabinet_App* p_ca);
-
-void ca_update_cell_state(Cabinet_App* p_ca, CELL_ID cell_id);
-TILT_SS_STATE ca_update_tilt_state(Cabinet_App* p_ca);
-void ca_update_cell_temp(Cabinet_App* p_ca);
-void ca_active_cell_door(Cabinet_App* p_ca, CELL_ID cell_id);
-void ca_deactive_cell_door(Cabinet_App* p_ca, CELL_ID cell_id);
-void ca_active_cell_charge(Cabinet_App* p_ca, CELL_ID cell_id);
-void ca_deactive_cell_charge(Cabinet_App* p_ca, CELL_ID cell_id);
-void ca_active_cell_fan(Cabinet_App* p_ca, CELL_ID cell_id);
-void ca_deactive_cell_fan(Cabinet_App* p_ca, CELL_ID cell_id);
-
-void ca_stream_data_hmi(Cabinet_App* p_ca);
-void ca_check_hmi_msg(Cabinet_App* p_ca);
-void ca_stream_data_sim(Cabinet_App* p_ca);
-void ca_check_sim_msg(Cabinet_App* p_ca);
-void ca_warning_server(Cabinet_App* p_ca, WARNING_STATE warning_state);
-
-#endif /* APP_CABINET_APP_CABINET_APP_H_ */
+#endif /* CABINET_APP_CABINET_APP_H_ */

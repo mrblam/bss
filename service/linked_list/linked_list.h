@@ -1,36 +1,42 @@
 /*
  * linked_list.h
  *
- *  Created on: Mar 30, 2021
+ *  Created on: Apr 1, 2021
  *      Author: KhanhDinh
  */
 
 #ifndef SERVICE_LINKED_LIST_LINKED_LIST_H_
 #define SERVICE_LINKED_LIST_LINKED_LIST_H_
 
+#include "stdio.h"
+#include "cabinet_cell.h"
 #include "stdint.h"
 #include "stdlib.h"
+#include "malloc.h"
 
 #define END_OF_LIST	0
 
-typedef struct NODE NODE;
-struct NODE{
-	uint8_t data;
-	struct NODE* p_next;
+typedef struct Cabinet_Node_t Cabinet_Node;
+typedef struct Cabinet_List_t Cabinet_List;
+
+struct Cabinet_Node_t{
+	Cabinet* data;
+	Cabinet_Node* p_next;
 };
 
-typedef struct LIST LIST;
-struct LIST{
-	NODE* p_head;
-	NODE* p_tail;
+struct Cabinet_List_t{
+	Cabinet_Node* p_head;
+	Cabinet_Node* p_tail;
 	uint8_t cnt;
-	NODE* p_temp;
+	Cabinet_Node* p_temp;
 };
 
-NODE* node_construct(uint8_t data);
-LIST* list_init(void);
-void list_insert_to_tail(LIST* p_list, uint8_t data);
-void list_remove_node(LIST* p_list, uint8_t data);
-uint8_t list_walk_down(LIST* p_list);
+Cabinet_Node* cab_node_construct(Cabinet* p_cc);
+Cabinet_List* cab_list_init(void);
+void cab_list_insert_to_tail(Cabinet_List* p_list, Cabinet* p_cc);
+void cab_list_remove_node(Cabinet_List* p_list, Cabinet* p_cc);
+Cabinet_Node* cab_list_walk_down(Cabinet_List* p_list);
+void cab_list_export_data(Cabinet_List* p_list);
+void cab_list_reset_temp(Cabinet_List* p_list);
 
 #endif /* SERVICE_LINKED_LIST_LINKED_LIST_H_ */

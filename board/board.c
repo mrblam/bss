@@ -1,14 +1,13 @@
 #include "board.h"
 #include "core_hal.h"
-#include "can_hal.h"
-#include "adc_hw_hal.h"
-#include "debug_io_hw_hal.h"
-#include "ioe_hal.h"
+#include "gpio_hal.h"
 
 void board_init(void){
-        core_hw_init();
-        debug_io_hw_init();
-	//debug_com_hw_init();
+	HAL_Init();
+	core_hw_init();
+	uart_hw_init();
+	timer_hw_init();
+	gpio_hw_init();
 	can_hardware_init();
-	ioe_hw_init();
+	cabinet_hw_init();
 }

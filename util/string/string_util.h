@@ -5,3 +5,4 @@ int slong_to_string(const int32_t data,char* s);
 void byte_to_hex_ascii(const uint8_t s,char* hex);
 uint16_t slen(const char *str);
 void string_join(char* dst,const char* str);
+uint32_t string_to_long(char* str);

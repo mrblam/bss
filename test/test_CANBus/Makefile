@@ -3,32 +3,52 @@
 # http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/
 # Microcontroller properties.
 
-export TARGET=test_CANBus
-export PROJ_ROOT=../..
+export TARGET=bss_storage_control
+export PROJ_ROOT=.
 export BOARD_TYPE=stm32_bsp
-include ../../board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
-include ../../gcc.mk
+include board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
+include gcc.mk
 
-OBJDIR=build
-
-SRCS=board/board.c
+SRCS:=board/board.c
+SRCS+=component/cabinet_cell/cabinet_cell.c
+SRCS+=util/string/string_util.c
+	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
+INCLUDES:=. app_config board service component util app
+INCLUDES+=app/canopen/
+INCLUDES+=component/adc_sensor \
+			component/ntc \
+			component/switch \
+			component/storage_cell
+INCLUDES+= util/delay util/string 
 
-INCLUDES:=. board 
+USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
+USER_LIBS=CANopen
+
+LIB_INCLUDES:=libs
+LIB_INCLUDES+=
+OBJDIR=build
+
+INCLUDES+=$(LIB_INCLUDES)			
 INCLUDES+=$(BSP_INCLUDES)
 INCLUDES:=$(addprefix -I$(PROJ_ROOT)/,$(INCLUDES))
+INCLUDES+=$(addprefix -I,$(USER_LIB_INCLUDES))
 
 SRCS+=$(BSP_SRCS)
+SRCS+= app/canopen/canopen_init.c
+SRCS+=component/adc_sensor/adc_sensor.c \
+			component/ntc/ntc.c \
+			component/switch/switch.c \
+			component/storage_cell/storage_cell.c
+
+SRCS+= main.c 
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))
 OBJS:= $(patsubst %.c,%.o,$(OBJS))
 OBJS:= $(patsubst %.s,%.o,$(OBJS))
-OBJS+= $(TARGET).o 
 DEPS:= $(patsubst %.o,%.d,$(OBJS))
 SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
-SRCS+= $(TARGET).c 
-
 
 LDSCRIPT_INC=
 DEFS:=
@@ -36,6 +56,7 @@ DEFS:=
 #--------------------------------------------------------
 
 OPTIMIZE=-O0
+#OPTIMIZE=-O3
 
 # Option arguments for C compiler.
 CFLAGS+= $(INCLUDES)
@@ -51,7 +72,8 @@ LFLAGS:=-T$(PROJ_ROOT)/board/$(BOARD_TYPE)/$(LD_FILES)
 LFLAGS	+=-nostartfiles -Xlinker --gc-sections
 LFLAGS  +=-Wl,-Map=$(TARGET).map
 
-LINK_LIBS:=
+LINK_LIBS:= $(addprefix -L,$(USER_LIB_INCLUDES))
+LINK_LIBS+= $(addprefix -l,$(USER_LIBS))
 
 #LFLAGS  += -flto -fuse-linker-plugin
 # Flags for objcopy
@@ -70,14 +92,15 @@ FLASHER_FLAGS=
 
 .PHONY:all proj debug libs test_suit test_suit_clean flash
 
-all: proj $(DEPS)
+all: proj
 	$(HEX)   $(TARGET).elf 	$(TARGET).hex
 	$(BIN)   $(TARGET).elf  $(TARGET).bin
 	$(DUMP) -St $(TARGET).elf >$(TARGET).lst
-	$(SIZE)  $(OBJS) $(TARGET).elf
+	$(SIZE)  $(OBJS) $(TARGET).elf $(TARGET).hex
 
 proj: 	$(TARGET).elf
 
+-include $(DEPS)
 $(PROJ_ROOT)/$(OBJDIR)/%.o: $(PROJ_ROOT)/%.c
 	@echo Compiling $<...
 	@mkdir -p $(dir $@)
@@ -105,9 +128,6 @@ clean:
 	rm -f $(TARGET).map
 	rm -f $(TARGET).lst
 
-debug:
-	$(JLINKGDB) -xc jlinkgdb.conf -device PAC55XX -singlerun -strict -timeout 0 -nogui
-
 libs:
 	make -C libs/selex-libc/canopen_clib all
 test_suit:
@@ -117,4 +137,3 @@ test_suit_clean:
 	
 flash:
 	./flasher.sh
-	

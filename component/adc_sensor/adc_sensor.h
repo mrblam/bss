@@ -14,7 +14,6 @@
 typedef struct ADC_Sensor_t ADC_Sensor;
 
 struct ADC_Sensor_t{
-
 	ADC_Hw* hw;
 	int32_t result;
 	int32_t gain;

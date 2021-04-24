@@ -24,6 +24,31 @@
 
 #define LIB_OPTIMIZE_ATTR  LIB_FORCE_INLINE LIB_RAM_FUNC LIB_OPTIMIZE_SPEED_ON
 
+
+typedef struct CO_Slave_t CO_Slave;
+
+typedef enum CO_SLAVE_NET_STATE{
+
+        CO_SLAVE_CON_ST_DISCONNECT=0,
+        CO_SLAVE_CON_ST_ASSIGNING=1,
+        CO_SLAVE_CON_ST_AUTHORIZING=2,
+        CO_SLAVE_CON_ST_CONNECTED=3
+
+}CO_SLAVE_NET_STATE;
+
+struct CO_Slave_t{
+	uint32_t node_id;
+	uint32_t sdo_server_address;
+	uint8_t sn[32];
+        CO_SLAVE_NET_STATE con_state;
+};
+
+typedef struct CO_Slave_List_t CO_Slave_List;
+struct CO_Slave_List_t{
+        CO_Slave* data;
+        CO_Slave_List* next;
+};
+
 typedef struct CO_t CO;
 typedef void (*CO_Sends)(CO* p_dev,const CAN_Msg* p_msg);
 typedef void (*CO_Error_Handle)(CO* p_dev);
