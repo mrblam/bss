@@ -8,10 +8,12 @@
 
 IOE_hw ioe_module;
 
+static void ioe_write_impl(IOE_hw* p_hw, const uint8_t addr,uint8_t* data);
 static void i2c_init(void);
 
 void ioe_hw_init(void){
 	i2c_init();
+	ioe_module.ioe_write = ioe_write_impl;
 }
 
 static void i2c_init(void){
@@ -48,6 +50,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle){
   }
 }
 
-void ioe_hw_write(IOE_hw* p_hw, const uint8_t add, const uint8_t* data){
-	HAL_I2C_Master_Transmit(&ioe_module.i2c_com, add, data, 2, 500);
+static void ioe_write_impl(IOE_hw* p_hw, const uint8_t addr, uint8_t* data){
+	HAL_I2C_Master_Transmit(&p_hw->i2c_com, addr, data, 2, 500);
 }
+

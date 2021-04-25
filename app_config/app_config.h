@@ -14,6 +14,7 @@
 
 #define CABINET_CELL_NUM	15
 #define VREF				3300
+#define ADC_RESOLUTION		4095
 
 typedef enum CABIN_ID{
 	CAB1 = 0,

@@ -16,7 +16,7 @@ void adc_sensor_init(ADC_Sensor* p_ss){
 }
 
 static void adc_sensor_update_result_default_impl(ADC_Sensor* p_ss){
-	p_ss->result = (p_ss->hw->adc_value - p_ss->hw->adc_offset)* p_ss->gain;
+	p_ss->result = VREF*(p_ss->hw->adc_value - p_ss->hw->adc_offset)* p_ss->gain/ADC_RESOLUTION;
 }
 
 

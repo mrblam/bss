@@ -4,7 +4,8 @@
 
 CAN_hw can_port;
 
-static void can_hardware_init_clk(void);
+static void can_send_impl(CAN_hw* p_hw, uint8_t* buff);
+
 static void can_hardware_init_module(void);
 static void can_hardware_filter_init(void);
 static void can_hardware_init_nvic(void);
@@ -13,8 +14,10 @@ static void can_hardware_init_tx(void);
 
 void can_hardware_init(void) {
 	can_hardware_init_module();
+	can_hardware_init_nvic();
 	can_hardware_filter_init();
 	can_hardware_init_tx();
+	can_port.can_send = can_send_impl;
 	can_hardware_start();
 }
 
@@ -52,6 +55,12 @@ static void can_hardware_init_module(void) {
 	if(HAL_CAN_Init(&can_port.can_module) != HAL_OK){
 		Error_Handler();
 	}
+}
+
+static void can_hardware_init_nvic(void){
+    /* CAN interrupt Init */
+    HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
 }
 
 static void can_hardware_start(void){
@@ -97,11 +106,18 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
   }
 }
 
-void can_send(CAN_hw* p_hw, uint8_t* buff){
+static void can_send_impl(CAN_hw* p_hw, uint8_t* buff){
 	HAL_CAN_AddTxMessage(&p_hw->can_module, &p_hw->can_tx, buff, &p_hw->tx_mailbox);
 }
 
 void can_receive(CAN_hw* p_hw, uint8_t* buff){
 	HAL_CAN_GetRxMessage(&p_hw->can_module, CAN_RX_FIFO0, &p_hw->can_rx, buff);
+}
+
+void USB_LP_CAN1_RX0_IRQHandler(void){
+	HAL_CAN_IRQHandler(&can_port.can_module);
+	if(can_port.receive_handle != NULL){
+		can_port.receive_handle(&can_port);
+	}
 }
 

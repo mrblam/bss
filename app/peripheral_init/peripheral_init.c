@@ -260,9 +260,9 @@ static ntc_act mux_switch_channel_interface[] = {mux_switch_channel1, mux_switch
 								mux_switch_channel11, mux_switch_channel12, mux_switch_channel13, mux_switch_channel14, mux_switch_channel15};
 
 void peripheral_init(Cabinet_app* p_ca){
-	ioe_init();
-	door_switch_init(p_ca);
-	cell_fan_init(p_ca);
+	//ioe_init();
+	//door_switch_init(p_ca);
+	//cell_fan_init(p_ca);
 	ntc_init(p_ca);
 }
 
@@ -281,10 +281,47 @@ static void cell_fan_init(Cabinet_app* p_ca){
 }
 
 static void ntc_init(Cabinet_app* p_ca){
+#if 0
+	p_ca->cabin[CAB1]->temp_ss->switch_channel = mux_switch_channel8;
+	p_ca->cabin[CAB2]->temp_ss->switch_channel = mux_switch_channel7;
+	p_ca->cabin[CAB3]->temp_ss->switch_channel = mux_switch_channel6;
+	p_ca->cabin[CAB4]->temp_ss->switch_channel = mux_switch_channel5;
+	p_ca->cabin[CAB5]->temp_ss->switch_channel = mux_switch_channel4;
+	p_ca->cabin[CAB6]->temp_ss->switch_channel = mux_switch_channel3;
+	p_ca->cabin[CAB7]->temp_ss->switch_channel = mux_switch_channel2;
+	p_ca->cabin[CAB8]->temp_ss->switch_channel = mux_switch_channel1;
+	p_ca->cabin[CAB9]->temp_ss->switch_channel = mux_switch_channel15;
+	p_ca->cabin[CAB10]->temp_ss->switch_channel = mux_switch_channel14;
+	p_ca->cabin[CAB11]->temp_ss->switch_channel = mux_switch_channel13;
+	p_ca->cabin[CAB12]->temp_ss->switch_channel = mux_switch_channel12;
+	p_ca->cabin[CAB13]->temp_ss->switch_channel = mux_switch_channel11;
+	p_ca->cabin[CAB14]->temp_ss->switch_channel = mux_switch_channel10;
+	p_ca->cabin[CAB15]->temp_ss->switch_channel = mux_switch_channel9;
+
+	ntc_set_lut(p_ca->cabin[CAB2]->temp_ss, ntc_lookups);
+#endif
+	p_ca->cabin[CAB1]->temp_ss->switch_channel = mux_switch_channel8;
+	p_ca->cabin[CAB2]->temp_ss->switch_channel = mux_switch_channel7;
+	p_ca->cabin[CAB3]->temp_ss->switch_channel = mux_switch_channel6;
+	p_ca->cabin[CAB4]->temp_ss->switch_channel = mux_switch_channel5;
+	p_ca->cabin[CAB5]->temp_ss->switch_channel = mux_switch_channel4;
+	p_ca->cabin[CAB6]->temp_ss->switch_channel = mux_switch_channel3;
+	p_ca->cabin[CAB7]->temp_ss->switch_channel = mux_switch_channel2;
+	p_ca->cabin[CAB8]->temp_ss->switch_channel = mux_switch_channel1;
+	p_ca->cabin[CAB9]->temp_ss->switch_channel = mux_switch_channel15;
+	p_ca->cabin[CAB10]->temp_ss->switch_channel = mux_switch_channel14;
+	p_ca->cabin[CAB11]->temp_ss->switch_channel = mux_switch_channel13;
+	p_ca->cabin[CAB12]->temp_ss->switch_channel = mux_switch_channel12;
+	p_ca->cabin[CAB13]->temp_ss->switch_channel = mux_switch_channel11;
+	p_ca->cabin[CAB14]->temp_ss->switch_channel = mux_switch_channel10;
+	p_ca->cabin[CAB15]->temp_ss->switch_channel = mux_switch_channel9;
+	ntc_set_lut(p_ca->cabin[CAB2]->temp_ss, ntc_lookups);
+#if 0
 	for(uint8_t cab_id = CAB1; cab_id < CAB15; cab_id++){
 		p_ca->cabin[cab_id]->temp_ss->switch_channel = mux_switch_channel_interface[cab_id];
 		ntc_set_lut(p_ca->cabin[cab_id]->temp_ss, ntc_lookups);
 	}
+#endif
 }
 
 static void node_id1_switch_on(__attribute__((unused)) CAN_master* p_cm){

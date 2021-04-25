@@ -22,7 +22,9 @@ NTC* ntc_construct(void){
 
 static void ntc_update_impedance_handle(NTC* p_ntc){
 	adc_sensor_update_result((ADC_Sensor*)p_ntc);
-	p_ntc->impedance = NTC_RESISTOR*VREF/p_ntc->base.result - NTC_RESISTOR;
+	if(p_ntc->base.result){
+		p_ntc->impedance = NTC_RESISTOR*VREF/p_ntc->base.result - NTC_RESISTOR;
+	}
 }
 
 static int16_t ntc_get_temp_from_impedance(const uint16_t impedance,const uint16_t* const p_lut,

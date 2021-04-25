@@ -8,11 +8,16 @@
 
 ADC_hw	ntc;
 
+static void get_adc_handle_impl(ADC_hw* p_hw);
 static void adc_hw_init_module(void);
+static void adc_hw_init_nvic(void);
 
 void adc_hw_init(void){
 	adc_hw_init_module();
+	adc_hw_init_nvic();
 	ntc.adc_offset = 0;
+	ntc.get_adc_handle = get_adc_handle_impl;
+	HAL_ADC_Start_IT(&ntc.adc_module);
 }
 
 static void adc_hw_init_module(void){
@@ -40,8 +45,12 @@ static void adc_hw_init_module(void){
 	  {
 	    Error_Handler();
 	  }
+}
 
-	  HAL_ADC_Start_IT(&ntc.adc_module);
+static void adc_hw_init_nvic(void){
+    /* ADC1 interrupt Init */
+    HAL_NVIC_SetPriority(ADC1_2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
 }
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
@@ -60,16 +69,17 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     GPIO_InitStruct.Pin = GPIO_PIN_5;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    /* ADC1 interrupt Init */
-    HAL_NVIC_SetPriority(ADC1_2_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
   }
+}
+
+static void get_adc_handle_impl(ADC_hw* p_hw){
+	p_hw->adc_value = HAL_ADC_GetValue(&p_hw->adc_module);
 }
 
 void ADC1_2_IRQHandler(void){
 	HAL_ADC_IRQHandler(&ntc.adc_module);
-	ntc.adc_value = HAL_ADC_GetValue(&ntc.adc_module);
+	if (ntc.get_adc_handle != NULL){
+		ntc.get_adc_handle(&ntc);
+	}
 }
-
 
