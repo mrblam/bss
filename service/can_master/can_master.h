@@ -51,6 +51,8 @@ struct CO_SDO_SERVER_t{
 
 typedef struct CAN_master_t CAN_master;
 
+typedef void (*CAN_Master_Slave_Select)(const CAN_master*,const uint32_t);
+
 typedef enum CM_ASSIGN_STATE{
 	CM_ASSIGN_ST_START,
 	CM_ASSIGN_ST_WAIT_CONFIRM,
@@ -70,8 +72,8 @@ struct CAN_master_t{
 	uint16_t 		time_stamp;
 	CO_SDO_SERVER 	sdo_server;
 	CAN_Hw* p_hw;
-	void (*slave_select)(const CAN_master* p_cm,const uint32_t slave_id);
-	void (*slave_deselect)(const CAN_master* p_cm,const uint32_t slave_id);
+	CAN_Master_Slave_Select slave_select;
+	CAN_Master_Slave_Select slave_deselect;
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
 	void (*on_slave_assign_fail)(const CAN_master* const p_cm,uint32_t slave_id);
 };

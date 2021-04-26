@@ -19,6 +19,10 @@ void can_hardware_init(void) {
 	can_hardware_start();
 }
 
+void can_set_receive_handle(CAN_Hw* p_hw,void (*receive_handle)(CAN_Hw* p_hw)){
+	can_port.receive_handle=receive_handle;
+}
+
 static void can_hardware_filter_init(void){
 	CAN_FilterTypeDef  sFilterConfig;
 

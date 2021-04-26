@@ -23,5 +23,6 @@ extern CAN_Hw	can_port;
 void can_hardware_init(void);
 void can_send(CAN_Hw* p_hw, uint8_t* buff);
 void can_receive(CAN_Hw* p_hw, uint8_t* buff);
+void can_set_receive_handle(CAN_Hw* p_hw,void (*receive_handle)(CAN_Hw* p_hw));
 
 #endif /* BOARD_CAN_HARDWARE_H_ */

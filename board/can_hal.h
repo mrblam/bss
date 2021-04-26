@@ -13,5 +13,6 @@
 void can_hardware_init(void) WEAK;
 void can_send(CAN_Hw* p_hw, uint8_t* buff) WEAK;
 void can_receive(CAN_Hw* p_hw, uint8_t* buff) WEAK;
+void can_set_receive_handle(CAN_Hw* p_hw,void (*receive_handle)(CAN_Hw* p_hw)) WEAK;
 
 #endif /* BOARD_CAN_HAL_H_ */

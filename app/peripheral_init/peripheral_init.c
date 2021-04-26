@@ -7,6 +7,7 @@
 
 #include "peripheral_init.h"
 #include "cabinet_app.h"
+#include "cabinet_hw_hal.h"
 
 static const uint16_t ntc_lookups[] = {
 	    58747,//-10
@@ -122,6 +123,39 @@ static const uint16_t ntc_lookups[] = {
 	    700,//100
 };
 
+static void node_id1_sw_on( Switch* p_cm);
+static void node_id2_sw_on( Switch* p_cm);
+static void node_id3_sw_on( Switch* p_cm);
+static void node_id4_sw_on( Switch* p_cm);
+static void node_id5_sw_on( Switch* p_cm);
+static void node_id6_sw_on( Switch* p_cm);
+static void node_id7_sw_on( Switch* p_cm);
+static void node_id8_sw_on( Switch* p_cm);
+static void node_id9_sw_on( Switch* p_cm);
+static void node_id10_sw_on( Switch* p_cm);
+static void node_id11_sw_on( Switch* p_cm);
+static void node_id12_sw_on( Switch* p_cm);
+static void node_id13_sw_on( Switch* p_cm);
+static void node_id14_sw_on( Switch* p_cm);
+static void node_id15_sw_on( Switch* p_cm);
+
+static void node_id1_sw_off( Switch* p_cm);
+static void node_id2_sw_off( Switch* p_cm);
+static void node_id3_sw_off( Switch* p_cm);
+static void node_id4_sw_off( Switch* p_cm);
+static void node_id5_sw_off( Switch* p_cm);
+static void node_id6_sw_off( Switch* p_cm);
+static void node_id7_sw_off( Switch* p_cm);
+static void node_id8_sw_off( Switch* p_cm);
+static void node_id9_sw_off( Switch* p_cm);
+static void node_id10_sw_off( Switch* p_cm);
+static void node_id11_sw_off( Switch* p_cm);
+static void node_id12_sw_off( Switch* p_cm);
+static void node_id13_sw_off( Switch* p_cm);
+static void node_id14_sw_off( Switch* p_cm);
+static void node_id15_sw_off( Switch* p_cm);
+
+
 static void door1_switch_on( Switch* p_sw);
 static void door2_switch_on( Switch* p_sw);
 static void door3_switch_on( Switch* p_sw);
@@ -202,40 +236,6 @@ static void mux_switch_channel13( NTC* p_ntc);
 static void mux_switch_channel14( NTC* p_ntc);
 static void mux_switch_channel15( NTC* p_ntc);
 
-static void node_id1_switch_on( CAN_master* p_cm);
-static void node_id2_switch_on( CAN_master* p_cm);
-static void node_id3_switch_on( CAN_master* p_cm);
-static void node_id4_switch_on( CAN_master* p_cm);
-static void node_id5_switch_on( CAN_master* p_cm);
-static void node_id6_switch_on( CAN_master* p_cm);
-static void node_id7_switch_on( CAN_master* p_cm);
-static void node_id8_switch_on( CAN_master* p_cm);
-static void node_id9_switch_on( CAN_master* p_cm);
-static void node_id10_switch_on( CAN_master* p_cm);
-static void node_id11_switch_on( CAN_master* p_cm);
-static void node_id12_switch_on( CAN_master* p_cm);
-static void node_id13_switch_on( CAN_master* p_cm);
-static void node_id14_switch_on( CAN_master* p_cm);
-static void node_id15_switch_on( CAN_master* p_cm);
-
-static void node_id1_switch_off( CAN_master* p_cm);
-static void node_id2_switch_off( CAN_master* p_cm);
-static void node_id3_switch_off( CAN_master* p_cm);
-static void node_id4_switch_off( CAN_master* p_cm);
-static void node_id5_switch_off( CAN_master* p_cm);
-static void node_id6_switch_off( CAN_master* p_cm);
-static void node_id7_switch_off( CAN_master* p_cm);
-static void node_id8_switch_off( CAN_master* p_cm);
-static void node_id9_switch_off( CAN_master* p_cm);
-static void node_id10_switch_off( CAN_master* p_cm);
-static void node_id11_switch_off( CAN_master* p_cm);
-static void node_id12_switch_off( CAN_master* p_cm);
-static void node_id13_switch_off( CAN_master* p_cm);
-static void node_id14_switch_off( CAN_master* p_cm);
-static void node_id15_switch_off( CAN_master* p_cm);
-
-static void door_switch_init(Cabinet_App* p_ca);
-static void cell_fan_init(Cabinet_App* p_ca);
 static void ntc_init(Cabinet_App* p_ca);
 static void ntc_sensor_get_adc_value(NTC* p_ntc);
 
@@ -259,25 +259,57 @@ static ntc_act mux_switch_channel_interface[] = {mux_switch_channel1, mux_switch
 								mux_switch_channel6, mux_switch_channel7, mux_switch_channel8, mux_switch_channel9, mux_switch_channel10,
 								mux_switch_channel11, mux_switch_channel12, mux_switch_channel13, mux_switch_channel14, mux_switch_channel15};
 
+static sw_act node_set_high[]={
+		node_id1_sw_on,
+		node_id2_sw_on,
+		node_id3_sw_on,
+		node_id4_sw_on,
+		node_id5_sw_on,
+		node_id6_sw_on,
+		node_id7_sw_on,
+		node_id8_sw_on,
+		node_id9_sw_on,
+		node_id10_sw_on,
+		node_id11_sw_on,
+		node_id12_sw_on,
+		node_id13_sw_on,
+		node_id14_sw_on,
+		node_id15_sw_on
+};
+
+static sw_act node_set_low[]={
+		node_id1_sw_off,
+		node_id2_sw_off,
+		node_id3_sw_off,
+		node_id4_sw_off,
+		node_id5_sw_off,
+		node_id6_sw_off,
+		node_id7_sw_off,
+		node_id8_sw_off,
+		node_id9_sw_off,
+		node_id10_sw_off,
+		node_id11_sw_off,
+		node_id12_sw_off,
+		node_id13_sw_off,
+		node_id14_sw_off,
+		node_id15_sw_off
+};
+
+
 void peripheral_init(Cabinet_App* p_ca){
 	//ioe_init();
-	//door_switch_init(p_ca);
-	//cell_fan_init(p_ca);
-	ntc_init(p_ca);
-}
+	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
 
-static void door_switch_init(Cabinet_App* p_ca){
-	for(uint8_t cab_id = CAB1; cab_id < CAB15; cab_id++){
+		p_ca->bss.cabs[cab_id].node_id_sw->sw_on=node_set_high[cab_id];
+		p_ca->bss.cabs[cab_id].node_id_sw->sw_off=node_set_low[cab_id];
+
 		p_ca->bss.cabs[cab_id].door->solenoid->sw_on = door_interface[cab_id];
 		p_ca->bss.cabs[cab_id].door->io_state->get_io_state = ios_interface[cab_id];
-	}
-}
 
-static void cell_fan_init(Cabinet_App* p_ca){
-	for(uint8_t cab_id = CAB1; cab_id < CAB15; cab_id++){
 		p_ca->bss.cabs[cab_id].cell_fan->sw_on = cell_fan_on_interface[cab_id];
 		p_ca->bss.cabs[cab_id].cell_fan->sw_off = cell_fan_off_interface[cab_id];
 	}
+	//ntc_init(p_ca);
 }
 
 static void ntc_init(Cabinet_App* p_ca){
@@ -325,157 +357,158 @@ static void ntc_init(Cabinet_App* p_ca){
 }
 
 /* Used Node_ID 6-10 to config Node_ID pin 1,2,3,5,6 */
-static void node_id1_switch_on( CAN_master* p_cm){
+static void node_id1_sw_on(Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_6, GPIO_PIN_SET);
+	HAL_NODE_ID1_HIGH;
 }
 
-static void node_id2_switch_on( CAN_master* p_cm){
+static void node_id2_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_7, GPIO_PIN_SET);
+	HAL_NODE_ID2_HIGH;
 }
 
-static void node_id3_switch_on( CAN_master* p_cm){
+static void node_id3_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_8, GPIO_PIN_SET);
+	HAL_NODE_ID3_HIGH;
 }
 
-static void node_id4_switch_on( CAN_master* p_cm){
+static void node_id4_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_4, GPIO_PIN_SET);
+	HAL_NODE_ID4_HIGH;
 }
 
-static void node_id5_switch_on( CAN_master* p_cm){
+static void node_id5_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_9, GPIO_PIN_SET);
+	HAL_NODE_ID5_HIGH;
 }
 
-static void node_id6_switch_on( CAN_master* p_cm){
+static void node_id6_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_10, GPIO_PIN_SET);
+	HAL_NODE_ID6_HIGH;
 }
 
-static void node_id7_switch_on( CAN_master* p_cm){
+static void node_id7_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_7, GPIO_PIN_SET);
+	HAL_NODE_ID7_HIGH;
 }
 
-static void node_id8_switch_on( CAN_master* p_cm){
+static void node_id8_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_8, GPIO_PIN_SET);
+	HAL_NODE_ID8_HIGH;
 }
 
-static void node_id9_switch_on( CAN_master* p_cm){
+static void node_id9_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_9, GPIO_PIN_SET);
+	HAL_NODE_ID9_HIGH;
 }
 
-static void node_id10_switch_on( CAN_master* p_cm){
+static void node_id10_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_10, GPIO_PIN_SET);
+	HAL_NODE_ID10_HIGH;
 }
 
-static void node_id11_switch_on( CAN_master* p_cm){
+static void node_id11_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_11, GPIO_PIN_SET);
+	HAL_NODE_ID11_HIGH;
 }
 
-static void node_id12_switch_on( CAN_master* p_cm){
+static void node_id12_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_12, GPIO_PIN_SET);
+	HAL_NODE_ID12_HIGH;
 }
 
-static void node_id13_switch_on( CAN_master* p_cm){
+static void node_id13_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_13, GPIO_PIN_SET);
+	HAL_NODE_ID13_HIGH;
 }
 
-static void node_id14_switch_on( CAN_master* p_cm){
+static void node_id14_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_14, GPIO_PIN_SET);
+	HAL_NODE_ID14_HIGH;
 }
 
-static void node_id15_switch_on( CAN_master* p_cm){
+static void node_id15_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_15, GPIO_PIN_SET);
+	HAL_NODE_ID15_HIGH;
 }
 
-/*--------------------------------------------------------------------------------*/
-/* Used Node_ID 6-10 to config Node_ID pin 1,2,3,5,6 */
-static void node_id1_switch_off( CAN_master* p_cm){
+
+static void node_id1_sw_off(Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_6, GPIO_PIN_RESET);
+	HAL_NODE_ID1_LOW;
 }
 
-static void node_id2_switch_off( CAN_master* p_cm){
+static void node_id2_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_7, GPIO_PIN_RESET);
+	HAL_NODE_ID2_LOW;
 }
 
-static void node_id3_switch_off( CAN_master* p_cm){
+static void node_id3_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_8, GPIO_PIN_RESET);
+	HAL_NODE_ID3_LOW;
 }
 
-static void node_id4_switch_off( CAN_master* p_cm){
+static void node_id4_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_4, GPIO_PIN_RESET);
+	HAL_NODE_ID4_LOW;
 }
 
-static void node_id5_switch_off( CAN_master* p_cm){
+static void node_id5_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_9, GPIO_PIN_RESET);
+	HAL_NODE_ID5_LOW;
 }
 
-static void node_id6_switch_off( CAN_master* p_cm){
+static void node_id6_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_10, GPIO_PIN_RESET);
+	HAL_NODE_ID6_LOW;
 }
 
-static void node_id7_switch_off( CAN_master* p_cm){
+static void node_id7_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_7, GPIO_PIN_RESET);
+	HAL_NODE_ID7_LOW;
 }
 
-static void node_id8_switch_off( CAN_master* p_cm){
+static void node_id8_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_8, GPIO_PIN_RESET);
+	HAL_NODE_ID8_LOW;
 }
 
-static void node_id9_switch_off( CAN_master* p_cm){
+static void node_id9_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_9, GPIO_PIN_RESET);
+	HAL_NODE_ID9_LOW;
 }
 
-static void node_id10_switch_off( CAN_master* p_cm){
+static void node_id10_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_10, GPIO_PIN_RESET);
+	HAL_NODE_ID10_LOW;
 }
 
-static void node_id11_switch_off( CAN_master* p_cm){
+static void node_id11_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_11, GPIO_PIN_RESET);
+	HAL_NODE_ID11_LOW;
 }
 
-static void node_id12_switch_off( CAN_master* p_cm){
+static void node_id12_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_12, GPIO_PIN_RESET);
+	HAL_NODE_ID12_LOW;
 }
 
-static void node_id13_switch_off( CAN_master* p_cm){
+static void node_id13_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_13, GPIO_PIN_RESET);
+	HAL_NODE_ID13_LOW;
 }
 
-static void node_id14_switch_off( CAN_master* p_cm){
+static void node_id14_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_14, GPIO_PIN_RESET);
+	HAL_NODE_ID14_LOW;
 }
 
-static void node_id15_switch_off( CAN_master* p_cm){
+static void node_id15_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_15, GPIO_PIN_RESET);
+	HAL_NODE_ID15_LOW;
 }
+
+
 
 /*--------------------------------------------------------------------------------*/
 

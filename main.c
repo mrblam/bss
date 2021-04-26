@@ -14,6 +14,7 @@
 
 #include "board.h"
 #include "cabinet_app.h"
+#include "app_config.h"
 
 BP* bp_test;
 static volatile uint8_t sync_counter = 20;
@@ -28,6 +29,7 @@ static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t i
 static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t id);
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id);
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id);
+static void can_receive_handle(CAN_Hw* p_hw);
 
 
 static Cabinet bss_cabinets[CABINET_CELL_NUM];
@@ -58,6 +60,8 @@ void cab_app_init(Cabinet_App* p_ca){
 
 	p_ca->ioe_cfan =&cell_fan;
 	p_ca->ioe_sol = &solenoid;
+	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
+	peripheral_init(p_ca);
 }
 
 
@@ -72,6 +76,11 @@ int main (void){
 	__enable_irq();
 	while(1){
 	};
+}
+
+static void can_receive_handle(CAN_Hw* p_hw){
+
+	uint32_t cob_id=p_hw->can_rx.StdId;
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void){
