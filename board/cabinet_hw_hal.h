@@ -47,6 +47,8 @@
 #define HAL_NODE_ID14_LOW								NODE_ID14_LOW
 #define HAL_NODE_ID15_LOW								NODE_ID15_LOW
 
+#define HAL_DOOR_GET_STATE(id)							DOOR_GET_STATE(id)
+
 
 void cabinet_hw_init(void) WEAK;
 

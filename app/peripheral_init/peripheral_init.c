@@ -774,31 +774,13 @@ static void cell_fan15_switch_off( Switch* p_sw){
 /*--------------------------------------------------------------------------------*/
 
 static DOOR_STATE door1_get_state( IO_State* p_io){
-	(void)p_io;
-	uint32_t cnt = 0;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_1) == GPIO_PIN_RESET){
-		while(cnt < 2000000) cnt++;
-		cnt = 0;
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_1) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	(void) p_io;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(0);
 }
 
 static DOOR_STATE door2_get_state( IO_State* p_io){
 	(void)p_io;
-	uint32_t cnt = 0;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_2) == GPIO_PIN_SET){
-		while(cnt < 2000000) cnt++;
-		cnt = 0;
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_2) == GPIO_PIN_SET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(1);
 }
 
 DOOR_STATE door3_get_state( IO_State* p_io){
