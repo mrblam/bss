@@ -11,6 +11,6 @@
 #include "board.h"
 #include "cabinet_app.h"
 
-void peripheral_init(Cabinet_app* p_ca);
+void peripheral_init(Cabinet_App* p_ca);
 
 #endif /* APP_PERIPHERAL_INIT_PERIPHERAL_INIT_H_ */
