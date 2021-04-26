@@ -18,6 +18,7 @@ CAN_master* can_master_construct(void) {
 
 void can_master_init(CAN_master *p_cm, CO_Slave **slaves,
 		const uint32_t slave_num, CAN_Hw *p_hw) {
+	p_cm->node_id_scan_cobid=CAN_NODE_ID_ASSIGN_COBID;
 	p_cm->slaves = slaves;
 	p_cm->p_hw = p_hw;
 	p_cm->sdo_server.state = SDO_ST_IDLE;
@@ -70,15 +71,10 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 			p_cm->sdo_server.state = SDO_ST_FAIL;
 		}
 
-		CO_memcpy(p_cm->sdo_server.rx_data_buff, p_cm->p_hw->rx_data + 4, dlc);
-		if (dlc <= 4) {
-			p_cm->sdo_server.state = SDO_ST_SUCCESS;
-		} else {
-			p_cm->p_hw->tx_data[0] = SDO_CS_SEGMENT_READ;
-			can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
-			p_cm->sdo_server.buff_offset += dlc;
-		}
-
+		p_cm->sdo_server.buff_offset=0;
+		p_cm->sdo_server.object_data_len=CO_getUint32(p_cm->p_hw->rx_data+4);
+		p_cm->p_hw->tx_data[0]=SDO_CS_SEGMENT_READ;
+		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 		break;
 	case SDO_CS_SEGMENT_WRITE:
 		CO_memcpy(p_cm->sdo_server.rx_data_buff + p_cm->sdo_server.buff_offset,
@@ -90,9 +86,15 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 	case SDO_CS_FINISH_WRITE:
 		CO_memcpy(p_cm->sdo_server.rx_data_buff + p_cm->sdo_server.buff_offset,
 				p_cm->p_hw->tx_data + 1, dlc);
-		p_cm->sdo_server.state = SDO_ST_SUCCESS;
+		p_cm->sdo_server.buff_offset += dlc;
+		if(p_cm->sdo_server.buff_offset != p_cm->sdo_server.object_data_len){
+			p_cm->sdo_server.state=SDO_ST_FAIL;
+		}else{
+			p_cm->sdo_server.state = SDO_ST_SUCCESS;
+		}
 		break;
 	case SDO_CS_ABORT:
+		p_cm->sdo_server.state=SDO_ST_FAIL;
 		break;
 	}
 }
@@ -115,22 +117,19 @@ void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave){
 	p_cm->assign_state=CM_ASSIGN_ST_AUTHORIZING;
 	can_master_read_slave_sn(p_cm, slave->node_id-p_cm->slave_start_node_id);
 }
+
 void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id) {
 	p_cm->sdo_server.tx_address = 0x580 + p_cm->slaves[cab_id]->node_id;
-	p_cm->sdo_server.object_mux = 0x333;
+	p_cm->sdo_server.rx_address = 0x600 + p_cm->slaves[cab_id]->node_id;
+	p_cm->sdo_server.object_mux = SLAVE_SERIAL_NUMBER_OBJECT_INDEX;
 	p_cm->sdo_server.buff_offset = 0;
 	p_cm->sdo_server.rx_data_buff = (uint8_t*) p_cm->slaves[cab_id]->sn;
-	p_cm->p_hw->tx_data[0] = SDO_CS_INIT_READ;
 	p_cm->p_hw->can_tx.StdId = p_cm->sdo_server.tx_address;
-	p_cm->p_hw->can_tx.DLC=4;
-	p_cm->p_hw->tx_data[1] = (uint8_t) ((p_cm->sdo_server.object_mux
-			& 0x00ffffff) >> 16);
-	p_cm->p_hw->tx_data[2] = (uint8_t) ((p_cm->sdo_server.object_mux
-			& 0x0000ffff) >> 8);
-	p_cm->p_hw->tx_data[3] =
-			(uint8_t) (p_cm->sdo_server.object_mux & 0x000000ff);
-
+	p_cm->p_hw->can_tx.DLC=8;
+	CO_memcpy(p_cm->p_hw->tx_data,(uint8_t*)&p_cm->sdo_server.object_mux, 4);
+	p_cm->p_hw->tx_data[0] = SDO_CS_INIT_READ;
 	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
+	p_cm->sdo_server.state=SDO_ST_SENT;
 }
 
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp){

@@ -51,7 +51,6 @@ void cab_app_init(Cabinet_App* p_ca){
 
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
 	can_master_init((CAN_master*)p_ca,&(bp_slaves[0]),CABINET_CELL_NUM,&can_port);
-	p_ca->base.node_id_scan_cobid=TSDO_ID;
 	p_ca->base.slave_select=can_master_slave_select_impl;
 	p_ca->base.slave_deselect=can_master_slave_deselect_impl;
 	p_ca->base.on_slave_assign_fail=bp_assign_id_fail_handle;

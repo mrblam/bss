@@ -14,6 +14,9 @@
 #include "CO.h"
 #include "can_hal.h"
 
+#define CAN_NODE_ID_ASSIGN_COBID						0x70
+#define SLAVE_SERIAL_NUMBER_OBJECT_INDEX								0x2101
+
 #define SDO_RX_BUFFER_SIZE                 (32UL)
 typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 
@@ -43,6 +46,7 @@ struct CO_SDO_SERVER_t{
         uint8_t* rx_data_buff;
         uint8_t* tx_data_buff;
         uint32_t buff_offset;
+        uint32_t object_data_len;
 };
 
 typedef struct CAN_master_t CAN_master;
