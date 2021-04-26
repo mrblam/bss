@@ -56,8 +56,8 @@ void cab_app_init(Cabinet_App* p_ca){
 	p_ca->base.on_slave_assign_fail=bp_assign_id_fail_handle;
 	p_ca->base.on_slave_assign_success=bp_assign_id_success_handle;
 
-	p_ca->ioe_cfan = ioe_construct();
-	p_ca->ioe_sol = ioe_construct();
+	p_ca->ioe_cfan =&cell_fan;
+	p_ca->ioe_sol = &solenoid;
 }
 
 
@@ -82,6 +82,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 	can_master_update_id_assign_process((CAN_master*)&selex_bss_app,sys_timestamp);
 }
 
+#if 0
 void USART1_IRQHandler(void){
 	HAL_CHECK_COM_IRQ_REQUEST(&power_sys_port.uart_module);
 
@@ -111,6 +112,8 @@ void USART1_IRQHandler(void){
 
 	uart_receives(&power_sys_port, &s);
 }
+
+#endif
 
 void HAL_HMI_PROCESS_DATA_IRQ(void){
 	CHECK_TIM_IRQ_REQUEST(&hmi_timer);
@@ -176,3 +179,4 @@ static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t
 	/* return battery to user */
 	cab_app_delivery_bp(&selex_bss_app, id);
 }
+

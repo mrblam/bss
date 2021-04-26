@@ -8,7 +8,9 @@
 
 typedef struct UART_hw_t UART_hw;
 struct UART_hw_t{
-	UART_HandleTypeDef uart_module;
+	UART_HandleTypeDef 	uart_module;
+	void				(*receive_handle)(UART_hw* p_hw);
+	void				(*uart_send)(UART_hw* p_hw);
 };
 
 extern UART_hw sim_port;

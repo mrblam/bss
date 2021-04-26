@@ -14,6 +14,8 @@ struct CAN_Hw_t{
 	uint32_t			tx_mailbox;
 	uint8_t				tx_data[8];
 	uint8_t				rx_data[8];
+	void 				(*can_send)(CAN_Hw* p_hw);
+	void				(*receive_handle)(CAN_Hw* p_hw);
 };
 
 extern CAN_Hw	can_port;

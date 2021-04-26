@@ -15,14 +15,19 @@
 typedef struct IOE_t IOE;
 struct IOE_t{
 	IOE_Hw* hw;
+	uint8_t address;
 	uint8_t channel;
-	uint8_t p0_data;
-	uint8_t p1_data;
+	uint8_t port_data[2];
 };
 
-IOE* ioe_construct(void);
+extern IOE solenoid;
+extern IOE cell_fan;
 
 
-
+void ioe_init(void);
+void ioe_set_channel(IOE* p_ioe, uint8_t channel);
+void ioe_clear_channel(IOE* p_ioe, uint8_t channel);
+void ioe_set_all(IOE* p_ioe);
+void ioe_clear_all(IOE* p_ioe);
 
 #endif /* COMPONENT_IOE_IOE_H_ */

@@ -9,23 +9,6 @@
 
 static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff);
 
-Cabinet* cab_cell_construct(void){
-	Cabinet* p_cc = (Cabinet*)malloc(sizeof(Cabinet));
-	while(p_cc == NULL);
-
-	p_cc->bp = bp_construct();
-	p_cc->state = CAB_CELL_ST_INACTIVE;
-	p_cc->node_id = 1;
-	p_cc->temp = 25;
-	p_cc->bp = bp_construct();
-	p_cc->cell_fan = sw_construct();
-	p_cc->charger = sw_construct();
-	p_cc->door = door_construct();
-	p_cc->node_id_sw=sw_construct();
-	p_cc->data_serialize = cab_cell_data_serialze_impl;
-	return p_cc;
-}
-
 void cab_cell_update_state(Cabinet* p_cab){
 
 	switch(p_cab->bp->con_state){
@@ -43,8 +26,8 @@ void cab_cell_update_state(Cabinet* p_cab){
 	}
 }
 
-uint8_t cab_cell_get_slave_id(Cabinet* p_cc){
-	return 1;
+uint8_t cab_cell_get_node_id(Cabinet* p_cc){
+	return p_cc->node_id;
 }
 
 void cab_cell_open_door(Cabinet* p_cc){
@@ -53,7 +36,7 @@ void cab_cell_open_door(Cabinet* p_cc){
 
 void cab_cell_update_door_state(Cabinet* p_cc){
 	IO_STATE old_state=p_cc->door->io_state->state;
-	IO_STATE new_state=p_cc->door->io_state->io_get_state(p_cc->door->io_state);
+	IO_STATE new_state=p_cc->door->io_state->get_io_state(p_cc->door->io_state);
 
 	if(old_state != new_state){
 		p_cc->door->io_state->state=new_state;

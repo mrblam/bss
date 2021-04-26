@@ -91,7 +91,7 @@ void cab_app_process_bss_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char
 
 void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char* token){
 	token = strtok(NULL, ",");
-	uint8_t id = string_to_long(token);
+	uint8_t id = string_to_long(token) + 1;
 	token = strtok(NULL, ",");
 	char* obj = token;
 	token = strtok(NULL, ",");
@@ -123,62 +123,3 @@ void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char
 		break;
 	}
 }
-
-
-#if 0
-void node_id_pin_active(uint8_t cab_id){
-	switch(cab_id){
-	case CAB1:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
-		break;
-	case CAB2:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
-		break;
-	case CAB3:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-		break;
-	case CAB4:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-		break;
-	case CAB5:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
-		break;
-	case CAB6:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
-		break;
-	case CAB7:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-		break;
-	default:
-		break;
-	}
-}
-
-void node_id_pin_deactive(uint8_t cab_id){
-	switch(cab_id){
-	case CAB1:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
-		break;
-	case CAB2:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
-		break;
-	case CAB3:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-		break;
-	case CAB4:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-		break;
-	case CAB5:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
-		break;
-	case CAB6:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-		break;
-	case CAB7:
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
-		break;
-	default:
-		break;
-	}
-}
-#endif

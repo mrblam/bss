@@ -13,7 +13,8 @@
 #include "switch.h"
 
 typedef enum DOOR_STATE{
-	DOOR_ST_WORK,
+	DOOR_ST_CLOSE,
+	DOOR_ST_OPEN,
 	DOOR_ST_FAIL
 } DOOR_STATE;
 
@@ -26,16 +27,16 @@ struct Cabinet_Door_t{
 
 Cabinet_Door* door_construct(void);
 
+static inline DOOR_STATE cab_door_get_working_state(Cabinet_Door* p_door){
+	return p_door->state;
+}
+
 static inline void cab_door_open(Cabinet_Door* p_door){
-	p_door->solenoid->sw_on(p_door->solenoid);
+	sw_on(p_door->solenoid);
 }
 
 static inline IO_STATE cab_door_get_door_state(Cabinet_Door* p_door){
-	return p_door->io_state->io_get_state(p_door->io_state);
-}
-
-static inline DOOR_STATE cab_door_get_working_state(Cabinet_Door* p_door){
-	return p_door->state;
+	return io_get_state(p_door->io_state);
 }
 
 #endif /* COMPONENT_CABINET_DOOR_CABINET_DOOR_H_ */

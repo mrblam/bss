@@ -11,6 +11,7 @@
 #define SYSTICK_FREQ_Hz     (100UL)
 
 #include "stm32f1xx_hal.h"
+#include "core.h"
 
 void core_hw_init(void);
 
