@@ -45,6 +45,8 @@ struct CO_SDO_SERVER_t{
         uint32_t object_mux;
         uint8_t* rx_data_buff;
         uint8_t* tx_data_buff;
+        uint8_t tx_msg_data[8];
+        uint8_t rx_msg_data[8];
         uint32_t buff_offset;
         uint32_t object_data_len;
 };

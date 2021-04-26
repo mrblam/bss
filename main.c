@@ -81,6 +81,9 @@ int main (void){
 static void can_receive_handle(CAN_Hw* p_hw){
 
 	uint32_t cob_id=p_hw->can_rx.StdId;
+	if(cob_id==selex_bss_app.base.sdo_server.rx_address){
+		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data,8);
+	}
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void){
