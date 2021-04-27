@@ -9,6 +9,10 @@
 
 static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff);
 
+void cabinet_init(Cabinet* p_cc){
+	p_cc->data_serialize=cab_cell_data_serialze_impl;
+}
+
 void cab_cell_update_state(Cabinet* p_cab){
 
 	switch(p_cab->bp->con_state){
@@ -31,15 +35,15 @@ uint8_t cab_cell_get_node_id(Cabinet* p_cc){
 }
 
 void cab_cell_open_door(Cabinet* p_cc){
-	cab_door_open(p_cc->door);
+	cab_door_open(&p_cc->door);
 }
 
 void cab_cell_update_door_state(Cabinet* p_cc){
-	IO_STATE old_state=p_cc->door->io_state->state;
-	IO_STATE new_state=p_cc->door->io_state->get_io_state(p_cc->door->io_state);
+	IO_STATE old_state=p_cc->door.io_state.state;
+	IO_STATE new_state=p_cc->door.io_state.get_io_state(&p_cc->door.io_state);
 
 	if(old_state != new_state){
-		p_cc->door->io_state->state=new_state;
+		p_cc->door.io_state.state=new_state;
 		if((old_state==IO_ST_OFF) && (new_state==IO_ST_ON)){
 			if(p_cc->on_door_close!=NULL){
 				p_cc->on_door_close(p_cc);
@@ -57,19 +61,19 @@ int32_t cab_cell_get_temp(Cabinet* p_cc){
 }
 
 void cab_cell_fan_turn_on(Cabinet* p_cc){
-	sw_on(p_cc->cell_fan);
+	sw_on(&p_cc->cell_fan);
 }
 
 void cab_cell_fan_turn_off(Cabinet* p_cc){
-	sw_off(p_cc->cell_fan);
+	sw_off(&p_cc->cell_fan);
 }
 
 void cab_cell_active_charger(Cabinet* p_cc){
-	sw_on(p_cc->charger);
+	sw_on(&p_cc->charger);
 }
 
 void cab_cell_deactive_charger(Cabinet* p_cc){
-	sw_off(p_cc->charger);
+	sw_off(&p_cc->charger);
 }
 
 static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
@@ -81,9 +85,9 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cc->state,buff);
     *buff++=',';
-	buff+=long_to_string(p_cc->door->state,buff);
+	buff+=long_to_string(p_cc->door.state,buff);
     *buff++=',';
-	buff+=long_to_string(p_cc->cell_fan->state,buff);
+	buff+=long_to_string(p_cc->cell_fan.state,buff);
     *buff++=',';
 	buff+=long_to_string(p_cc->temp,buff);
     *buff++=',';

@@ -37,6 +37,7 @@ typedef enum CO_SLAVE_NET_STATE{
 }CO_SLAVE_NET_STATE;
 
 struct CO_Slave_t{
+	uint8_t is_active;
 	uint32_t node_id;
 	uint32_t sdo_server_address;
 	uint8_t sn[32];

@@ -33,16 +33,16 @@ struct Cabinet_t{
 	uint8_t			cab_id;
 	uint8_t			node_id;
 	BP*				bp;
-	Cabinet_Door*		door;
-	Switch*			cell_fan;
-	Switch*			charger;
-	Switch*			node_id_sw;
+	Cabinet_Door		door;
+	Switch			cell_fan;
+	Switch			charger;
+	Switch			node_id_sw;
 	NTC*			temp_ss;
 	int32_t			temp;
 	void			(*data_serialize)(Cabinet* p_cc, char* buff);
 	void (*on_door_close)(Cabinet* p_cab);
 };
-
+void cabinet_init(Cabinet* p_cc);
 void cab_cell_set_state(Cabinet* p_cc);
 CABINET_STATE cab_cell_get_state(Cabinet* p_cc);
 void cab_cell_update_state(Cabinet* p_cab);

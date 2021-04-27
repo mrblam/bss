@@ -15,7 +15,7 @@
 #include "can_hal.h"
 
 #define CAN_NODE_ID_ASSIGN_COBID						0x70
-#define SLAVE_SERIAL_NUMBER_OBJECT_INDEX								0x2101
+#define SLAVE_SERIAL_NUMBER_OBJECT_INDEX				0x2101
 
 #define SDO_RX_BUFFER_SIZE                 (32UL)
 typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
@@ -49,6 +49,7 @@ struct CO_SDO_SERVER_t{
         uint8_t rx_msg_data[8];
         uint32_t buff_offset;
         uint32_t object_data_len;
+        uint8_t is_new_msg;
 };
 
 typedef struct CAN_master_t CAN_master;
@@ -57,12 +58,15 @@ typedef void (*CAN_Master_Slave_Select)(const CAN_master*,const uint32_t);
 
 typedef enum CM_ASSIGN_STATE{
 	CM_ASSIGN_ST_START,
+	CM_ASSIGN_ST_SLAVE_SELECT,
+	CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM,
 	CM_ASSIGN_ST_WAIT_CONFIRM,
 	CM_ASSIGN_ST_AUTHORIZING,
 	CM_ASSIGN_ST_DONE
 } CM_ASSIGN_STATE;
 
 struct CAN_master_t{
+	uint8_t is_active;
 	uint32_t slave_num;
 	uint32_t slave_start_node_id;
 	uint32_t node_id_scan_cobid;
