@@ -313,25 +313,6 @@ void peripheral_init(Cabinet_App* p_ca){
 }
 
 static void ntc_init(Cabinet_App* p_ca){
-#if 0
-	p_ca->cabin[CAB1]->temp_ss->switch_channel = mux_switch_channel8;
-	p_ca->cabin[CAB2]->temp_ss->switch_channel = mux_switch_channel7;
-	p_ca->cabin[CAB3]->temp_ss->switch_channel = mux_switch_channel6;
-	p_ca->cabin[CAB4]->temp_ss->switch_channel = mux_switch_channel5;
-	p_ca->cabin[CAB5]->temp_ss->switch_channel = mux_switch_channel4;
-	p_ca->cabin[CAB6]->temp_ss->switch_channel = mux_switch_channel3;
-	p_ca->cabin[CAB7]->temp_ss->switch_channel = mux_switch_channel2;
-	p_ca->cabin[CAB8]->temp_ss->switch_channel = mux_switch_channel1;
-	p_ca->cabin[CAB9]->temp_ss->switch_channel = mux_switch_channel15;
-	p_ca->cabin[CAB10]->temp_ss->switch_channel = mux_switch_channel14;
-	p_ca->cabin[CAB11]->temp_ss->switch_channel = mux_switch_channel13;
-	p_ca->cabin[CAB12]->temp_ss->switch_channel = mux_switch_channel12;
-	p_ca->cabin[CAB13]->temp_ss->switch_channel = mux_switch_channel11;
-	p_ca->cabin[CAB14]->temp_ss->switch_channel = mux_switch_channel10;
-	p_ca->cabin[CAB15]->temp_ss->switch_channel = mux_switch_channel9;
-
-	ntc_set_lut(p_ca->cabin[CAB2]->temp_ss, ntc_lookups);
-#endif
 	p_ca->bss.cabs[CAB1].temp_ss->switch_channel = mux_switch_channel8;
 	p_ca->bss.cabs[CAB2].temp_ss->switch_channel = mux_switch_channel7;
 	p_ca->bss.cabs[CAB3].temp_ss->switch_channel = mux_switch_channel6;
@@ -867,85 +848,85 @@ static DOOR_STATE door15_get_state( IO_State* p_io){
 
 static void door1_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB1);
+	door1_sw_on();
 }
 
 static void door2_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB2);
+	door2_sw_on();
 }
 
 static void door3_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB3);
+	door3_sw_on();
 }
 
 /* This door is fail */
 static void door4_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB4);
+	door4_sw_on();
 }
 
 static void door5_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB5);
+	door5_sw_on();
 }
 
 static void door6_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB6);
+	door6_sw_on();
 }
 
 /* This door is fail */
 static void door7_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB7);
+	door7_sw_on();
 }
 
 /* This door is fail */
 static void door8_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB8);
+	door8_sw_on();
 }
 
 /* This door is fail */
 static void door9_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB9);
+	door9_sw_on();
 }
 
 /* This door is fail */
 static void door10_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB10);
+	door10_sw_on();
 }
 
 /* This door is fail */
 static void door11_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB11);
+	door11_sw_on();
 }
 
 /* This door is fail */
 static void door12_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB12);
+	door12_sw_on();
 }
 
 /* This door is fail */
 static void door13_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB13);
+	door13_sw_on();
 }
 
 /* This door is fail */
 static void door14_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB14);
+	door14_sw_on();
 }
 
 /* This door is fail */
 static void door15_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(CAB15);
+	door15_sw_on();
 }

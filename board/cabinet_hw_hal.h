@@ -47,6 +47,41 @@
 #define HAL_NODE_ID14_LOW								NODE_ID14_LOW
 #define HAL_NODE_ID15_LOW								NODE_ID15_LOW
 
+
+void door1_sw_on(void)WEAK;
+void door2_sw_on(void)WEAK;
+void door3_sw_on(void)WEAK;
+void door4_sw_on(void)WEAK;
+void door5_sw_on(void)WEAK;
+void door6_sw_on(void)WEAK;
+void door7_sw_on(void)WEAK;
+void door8_sw_on(void)WEAK;
+void door9_sw_on(void)WEAK;
+void door10_sw_on(void)WEAK;
+void door11_sw_on(void)WEAK;
+void door12_sw_on(void)WEAK;
+void door13_sw_on(void)WEAK;
+void door14_sw_on(void)WEAK;
+void door15_sw_on(void)WEAK;
+
+void door1_update_state(void)WEAK;
+void door2_update_state(void)WEAK;
+void door3_update_state(void)WEAK;
+void door4_update_state(void)WEAK;
+void door5_update_state(void)WEAK;
+void door6_update_state(void)WEAK;
+void door7_update_state(void)WEAK;
+void door8_update_state(void)WEAK;
+void door9_update_state(void)WEAK;
+void door10_update_state(void)WEAK;
+void door11_update_state(void)WEAK;
+void door12_update_state(void)WEAK;
+void door13_update_state(void)WEAK;
+void door14_update_state(void)WEAK;
+void door15_update_state(void)WEAK;
+
+
+
 #define HAL_DOOR_GET_STATE(id)							DOOR_GET_STATE(id)
 
 void door_switch_on(uint8_t id) WEAK;
