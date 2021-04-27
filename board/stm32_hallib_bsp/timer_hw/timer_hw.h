@@ -12,6 +12,7 @@
 #include "stdlib.h"
 #include "stm32f1xx_hal.h"
 #include "core.h"
+#include "cabinet_hw.h"
 
 extern TIM_HandleTypeDef hmi_timer;
 

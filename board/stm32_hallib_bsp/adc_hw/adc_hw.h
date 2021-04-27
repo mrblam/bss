@@ -12,6 +12,7 @@
 #include "stdlib.h"
 #include "stm32f1xx_hal.h"
 #include "core.h"
+#include "interrupt_hw.h"
 
 #define ADC_PORT		ADC1
 #define ADC_CHANNEL		ADC_CHANNEL_5

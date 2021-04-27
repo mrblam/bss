@@ -18,7 +18,6 @@ SRCS+=component/adc_sensor/adc_sensor.c \
 	component/cabinet_door/cabinet_door.c \
 	component/io_state/io_state.c \
 	component/ioe/ioe.c \
-	component/mux/mux.c \
 	component/ntc/ntc.c \
 	component/switch/switch.c 
 SRCS+=service/linked_list/linked_list.c  service/can_master/can_master.c
@@ -36,7 +35,6 @@ INCLUDES+=component/adc_sensor \
 	component/cabinet_door \
 	component/io_state \
 	component/ioe \
-	component/mux \
 	component/ntc \
 	component/switch
 INCLUDES+=service/linked_list service/can_master

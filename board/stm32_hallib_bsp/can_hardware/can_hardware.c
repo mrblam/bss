@@ -20,6 +20,7 @@ void can_hardware_init(void) {
 }
 
 void can_set_receive_handle(CAN_Hw* p_hw,void (*receive_handle)(CAN_Hw* p_hw)){
+	(void)p_hw;
 	can_port.receive_handle=receive_handle;
 }
 
@@ -41,7 +42,7 @@ static void can_hardware_filter_init(void){
 
 static void can_hardware_init_module(void) {
 	__HAL_RCC_CAN1_CLK_ENABLE();
-
+	/* CAN Baudrate 500kHz */
 	can_port.can_module.Instance = CAN1;
 	can_port.can_module.Init.Prescaler = 3;
 	can_port.can_module.Init.Mode = CAN_MODE_NORMAL;
@@ -61,7 +62,7 @@ static void can_hardware_init_module(void) {
 
 static void can_hardware_init_nvic(void){
     /* CAN interrupt Init */
-    HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USB_LP_CAN1_RX0_IRQn, CAN_IRQN_PRIORITY, 0);
     HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn);
 }
 
@@ -112,14 +113,11 @@ static void can_send_impl(CAN_Hw* p_hw){
 	HAL_CAN_AddTxMessage(&p_hw->can_module, &p_hw->can_tx, p_hw->tx_data, &p_hw->tx_mailbox);
 }
 
-void can_receive(CAN_Hw* p_hw, uint8_t* buff){
-	HAL_CAN_GetRxMessage(&p_hw->can_module, CAN_RX_FIFO0, &p_hw->can_rx, buff);
-}
-
 void USB_LP_CAN1_RX0_IRQHandler(void){
-	HAL_CAN_IRQHandler(&can_port.can_module);
+	HAL_CAN_GetRxMessage(&can_port.can_module, CAN_RX_FIFO0, &can_port.can_rx, can_port.rx_data);
 	if(can_port.receive_handle != NULL){
 		can_port.receive_handle(&can_port);
 	}
+	HAL_CAN_IRQHandler(&can_port.can_module);
 }
 

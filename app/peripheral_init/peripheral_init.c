@@ -513,6 +513,7 @@ static void node_id15_sw_off( Switch* p_cm){
 /*--------------------------------------------------------------------------------*/
 
 static void mux_switch_channel1( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -520,6 +521,7 @@ static void mux_switch_channel1( NTC* p_ntc){
 }
 
 static void mux_switch_channel2( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -527,6 +529,7 @@ static void mux_switch_channel2( NTC* p_ntc){
 }
 
 static void mux_switch_channel3( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -534,6 +537,7 @@ static void mux_switch_channel3( NTC* p_ntc){
 }
 
 static void mux_switch_channel4( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -541,6 +545,7 @@ static void mux_switch_channel4( NTC* p_ntc){
 }
 
 static void mux_switch_channel5( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
@@ -548,6 +553,7 @@ static void mux_switch_channel5( NTC* p_ntc){
 }
 
 static void mux_switch_channel6( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
@@ -555,6 +561,7 @@ static void mux_switch_channel6( NTC* p_ntc){
 }
 
 static void mux_switch_channel7( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
@@ -562,6 +569,7 @@ static void mux_switch_channel7( NTC* p_ntc){
 }
 
 static void mux_switch_channel8( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
@@ -569,6 +577,7 @@ static void mux_switch_channel8( NTC* p_ntc){
 }
 
 static void mux_switch_channel9( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -576,6 +585,7 @@ static void mux_switch_channel9( NTC* p_ntc){
 }
 
 static void mux_switch_channel10( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -583,6 +593,7 @@ static void mux_switch_channel10( NTC* p_ntc){
 }
 
 static void mux_switch_channel11( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -590,6 +601,7 @@ static void mux_switch_channel11( NTC* p_ntc){
 }
 
 static void mux_switch_channel12( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
@@ -597,6 +609,7 @@ static void mux_switch_channel12( NTC* p_ntc){
 }
 
 static void mux_switch_channel13( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
@@ -604,6 +617,7 @@ static void mux_switch_channel13( NTC* p_ntc){
 }
 
 static void mux_switch_channel14( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
@@ -611,6 +625,7 @@ static void mux_switch_channel14( NTC* p_ntc){
 }
 
 static void mux_switch_channel15( NTC* p_ntc){
+	(void)p_ntc;
 	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
@@ -775,355 +790,162 @@ static void cell_fan15_switch_off( Switch* p_sw){
 
 static DOOR_STATE door1_get_state( IO_State* p_io){
 	(void) p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(0);
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB1);
 }
 
 static DOOR_STATE door2_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(1);
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB2);
 }
 
 DOOR_STATE door3_get_state( IO_State* p_io){
 	(void)p_io;
-	uint32_t cnt = 0;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_3) == GPIO_PIN_RESET){
-		while(cnt < 2000000) cnt++;
-		cnt = 0;
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_3) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB3);
 }
 
 static DOOR_STATE door4_get_state( IO_State* p_io){
 	(void)p_io;
-	uint32_t cnt = 0;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_4) == GPIO_PIN_RESET){
-		while(cnt < 2000000) cnt++;
-		cnt = 0;
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_4) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB4);
 }
 
 static DOOR_STATE door5_get_state( IO_State* p_io){
 	(void)p_io;
-	uint32_t cnt = 0;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_5) == GPIO_PIN_RESET){
-		while(cnt < 2000000) cnt++;
-		cnt = 0;
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_5) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB5);
 }
 
 static DOOR_STATE door6_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_6) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_6) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB6);
 }
 
 static DOOR_STATE door7_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_7) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_7) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB7);
 }
 
 static DOOR_STATE door8_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_8) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_8) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB8);
 }
 
 static DOOR_STATE door9_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_9) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_9) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB9);
 }
 
 static DOOR_STATE door10_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_10) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_10) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB10);
 }
 
 static DOOR_STATE door11_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_11) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_11) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB11);
 }
 
 static DOOR_STATE door12_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_12) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_12) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB12);
 }
 
 static DOOR_STATE door13_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_13) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_13) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB13);
 }
 
 static DOOR_STATE door14_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_14) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_14) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB14);
 }
 
 static DOOR_STATE door15_get_state( IO_State* p_io){
 	(void)p_io;
-	if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_15) ==  GPIO_PIN_RESET){
-		HAL_Delay(100);
-		if(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_15) == GPIO_PIN_RESET){
-			return DOOR_ST_CLOSE;
-		}
-	}
-	else return DOOR_ST_OPEN;
-	return 0;
+	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB15);
 }
 
 /*--------------------------------------------------------------------------------*/
 
 static void door1_switch_on( Switch* p_sw){
 	(void)p_sw;
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_1) == GPIO_PIN_RESET){
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_1, GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_1, GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+	door_sw_on(CAB1);
 }
 
 static void door2_switch_on( Switch* p_sw){
 	(void)p_sw;
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_2) == GPIO_PIN_SET){
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_2, GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_2, GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+	door_sw_on(CAB2);
 }
 
 static void door3_switch_on( Switch* p_sw){
 	(void)p_sw;
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_3) == GPIO_PIN_RESET){
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_3, GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_3, GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+	door_sw_on(CAB3);
 }
 
 /* This door is fail */
 static void door4_switch_on( Switch* p_sw){
 	(void)p_sw;
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_4) == GPIO_PIN_RESET){
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_4, GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_4, GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+	door_sw_on(CAB4);
 }
 
 static void door5_switch_on( Switch* p_sw){
 	(void)p_sw;
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_4) == GPIO_PIN_RESET){
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_4, GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_4, GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+	door_sw_on(CAB5);
 }
 
 static void door6_switch_on( Switch* p_sw){
 	(void)p_sw;
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_5) == GPIO_PIN_RESET){
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_5, GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_5, GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+	door_sw_on(CAB6);
 }
 
 /* This door is fail */
 static void door7_switch_on( Switch* p_sw){
 	(void)p_sw;
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_7) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB7);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		ioe_clear_channel(&solenoid, CAB7);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+	door_sw_on(CAB7);
 }
 
 /* This door is fail */
 static void door8_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_8) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB8);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB8);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB8);
 }
 
 /* This door is fail */
 static void door9_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_9) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB9);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB9);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB9);
 }
 
 /* This door is fail */
 static void door10_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_10) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB10);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB10);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB10);
 }
 
 /* This door is fail */
 static void door11_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_11) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB11);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB11);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB11);
 }
 
 /* This door is fail */
 static void door12_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_12) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB12);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB12);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB12);
 }
 
 /* This door is fail */
 static void door13_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_13) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB13);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB13);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB13);
 }
 
 /* This door is fail */
 static void door14_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_14) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB14);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB14);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB14);
 }
 
 /* This door is fail */
 static void door15_switch_on( Switch* p_sw){
 	(void)p_sw;
-	while(HAL_GPIO_ReadPin(DOOR_ST_PORT5_16, DOOR_ST_15) == GPIO_PIN_RESET){
-		ioe_set_channel(&solenoid, CAB15);
-		HAL_Delay(500);
-		ioe_clear_channel(&solenoid, CAB15);
-		HAL_Delay(500);
-	}
+	door_sw_on(CAB15);
 }

@@ -10,9 +10,13 @@
 
 #include "stm32f1xx_hal.h"
 #include "gpio_hw.h"
+#include "interrupt_hw.h"
+#include "app_config.h"
 
-#define HW_SW_ON                           GPIO_PIN_SET
-#define HW_SW_OFF                          GPIO_PIN_RESET
+#define IO_SCAN_TIMER				TIM3
+
+#define HW_SW_ON                    GPIO_PIN_SET
+#define HW_SW_OFF                   GPIO_PIN_RESET
 
 #define NODE_ID1_HIGH				HAL_GPIO_WritePin(CELL_NODE_ID_PORT,CELL_NODE_ID_1,GPIO_PIN_SET)
 #define NODE_ID2_HIGH				HAL_GPIO_WritePin(CELL_NODE_ID_PORT,CELL_NODE_ID_2,GPIO_PIN_SET)
@@ -51,6 +55,12 @@
 #define CAB1_FAN_SW(sw)             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,sw);
 
 extern uint32_t door_state;
+extern uint8_t cab_temp[CABINET_CELL_NUM];
+extern TIM_HandleTypeDef io_scan_timer;
+
+typedef void (*door_hw_act)(uint8_t id);
+door_hw_act door_sw_on;
+
 void cabinet_hw_init(void);
 
 

@@ -11,14 +11,9 @@ include $(PROJ_ROOT)/gcc.mk
 
 
 SRCS+=board/board.c
-<<<<<<< HEAD
 SRCS+=app/cabinet_app/cabinet_app.c 
-
-=======
 SRCS+=app/cabinet_app/cabinet_app.c \
-	app/can_master/can_master.c \
 	app/peripheral_init/peripheral_init.c
->>>>>>> dev-peripheral-control
 SRCS+=component/adc_sensor/adc_sensor.c \
 	component/bp_data/bp_data.c \
 	component/bss_data/bss_data.c \
@@ -29,7 +24,8 @@ SRCS+=component/adc_sensor/adc_sensor.c \
 	component/mux/mux.c \
 	component/ntc/ntc.c \
 	component/switch/switch.c 
-SRCS+=service/linked_list/linked_list.c  service/can_master/can_master.c
+SRCS+=service/linked_list/linked_list.c \
+ 	service/can_master/can_master.c
 SRCS+=util/string/string_util.c
 	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
@@ -37,11 +33,7 @@ BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 #INCLUDES:=. app_config board service component util app
 INCLUDES+=app/cabinet_app \
-<<<<<<< HEAD
-=======
-	app/can_master \
 	app/peripheral_init
->>>>>>> dev-peripheral-control
 INCLUDES+=app_config
 INCLUDES+=board
 INCLUDES+=component/adc_sensor \
@@ -54,7 +46,8 @@ INCLUDES+=component/adc_sensor \
 	component/mux \
 	component/ntc \
 	component/switch
-INCLUDES+=service/linked_list service/can_master
+INCLUDES+=service/linked_list \
+	 service/can_master
 INCLUDES+= util/string
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 

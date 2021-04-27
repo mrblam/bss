@@ -24,17 +24,16 @@
 /* HMI_MSG_process IRQ */
 #define HMI_PROCESS_DATA_IRQ			TIM2_IRQHandler
 #define CHECK_TIM_IRQ_REQUEST			HAL_TIM_IRQHandler
-#define MSG_PROCESS_IRQ_PRIORITY		0
 
 /* HMI Send Command IRQ */
 #define GET_HMI_COMMAND_IRQ				USART1_IRQHandler
 #define CHECK_COM_IRQ_REQUEST			HAL_UART_IRQHandler
-#define GET_HMI_CMD_IRQ_PRIORITY		2
 
-/* CAN IRQ */
-#define CAN_IRQN_PRIORITY		        1
-
-/* ADC_NTC IRQ */
+/* IRQ_Priority */
+#define GET_HMI_CMD_IRQ_PRIORITY		0
+#define MSG_PROCESS_IRQ_PRIORITY		1
+#define CAN_IRQN_PRIORITY		        2
 #define ADC_IRQN_PRIORITY				3
+#define IO_SCAN_TIM_PRIORITY			4
 
 #endif /* BOARD_STM32_BSP_INTERRUPT_HW_H_ */

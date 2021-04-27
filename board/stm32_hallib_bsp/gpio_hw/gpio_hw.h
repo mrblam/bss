@@ -8,7 +8,10 @@
 #ifndef BOARD_STM32_HALLIB_BSP_GPIO_HW_GPIO_HW_H_
 #define BOARD_STM32_HALLIB_BSP_GPIO_HW_GPIO_HW_H_
 
+#include "stdlib.h"
+#include "stdint.h"
 #include "stm32f1xx_hal.h"
+#include "app_config.h"
 
 /* Node ID Pins */
 #define CELL_NODE_ID_PORT		GPIOC
@@ -58,5 +61,8 @@
 #define DOOR_ST_16				GPIO_PIN_15
 
 void gpio_hw_init(void);
+
+typedef void 	(*mux_act)(uint8_t id);
+mux_act			mux_sw_channel;
 
 #endif /* BOARD_STM32_HALLIB_BSP_GPIO_HW_GPIO_HW_H_ */

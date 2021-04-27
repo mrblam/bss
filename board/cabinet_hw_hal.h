@@ -49,7 +49,7 @@
 
 #define HAL_DOOR_GET_STATE(id)							DOOR_GET_STATE(id)
 
-
+void door_switch_on(uint8_t id) WEAK;
 void cabinet_hw_init(void) WEAK;
 
 #endif /* BOARD_CABINET_HW_HAL_H_ */
