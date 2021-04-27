@@ -51,9 +51,6 @@
 #define NODE_ID15_LOW				HAL_GPIO_WritePin(CELL_NODE_ID_PORT,CELL_NODE_ID_15,GPIO_PIN_RESET)
 
 #define DOOR_GET_STATE(id)			(door_state&(1<<(id)))
-
-#define CAB1_FAN_SW(sw)             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,sw);
-
 extern uint32_t door_state;
 extern uint8_t cab_temp[CABINET_CELL_NUM];
 extern TIM_HandleTypeDef io_scan_timer;
