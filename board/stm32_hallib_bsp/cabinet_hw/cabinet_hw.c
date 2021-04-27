@@ -137,6 +137,7 @@ void door1_sw_on(void){
 	}
 }
 
+
 void door2_sw_on(void){
 	uint32_t cnt = 0;
 	while(HAL_GPIO_ReadPin(DOOR_ST_PORT1_4, DOOR_ST_2) == GPIO_PIN_SET){

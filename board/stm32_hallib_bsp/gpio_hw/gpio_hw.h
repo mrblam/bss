@@ -32,6 +32,22 @@
 #define CELL_NODE_ID_15			GPIO_PIN_14
 #define CELL_NODE_ID_16			GPIO_PIN_15
 
+/* Door Switch Pins */
+#define DOOR_SW_PORT			CELL_NODE_ID_PORT
+#define DOOR_SW_1				CELL_NODE_ID_6
+#define DOOR_SW_2				CELL_NODE_ID_7
+#define DOOR_SW_3				CELL_NODE_ID_8
+#define DOOR_SW_4				CELL_NODE_ID_9
+#define DOOR_SW_5				CELL_NODE_ID_10
+
+/* Cell Fan Switch Pins */
+#define CELL_FAN_SW_PORT		CELL_NODE_ID_PORT
+#define CELL_FAN_SW_1			CELL_NODE_ID_11
+#define CELL_FAN_SW_2			CELL_NODE_ID_12
+#define CELL_FAN_SW_3			CELL_NODE_ID_13
+#define CELL_FAN_SW_4			CELL_NODE_ID_14
+#define CELL_FAN_SW_5			CELL_NODE_ID_15
+
 /* MUX Pins */
 #define MUX_PORT_S0				GPIOD
 #define MUX_PORT_S123			GPIOA
