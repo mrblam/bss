@@ -55,6 +55,43 @@ static uint16_t door_state_pins[]={
 		DOOR_ST_15
 };
 
+static GPIO_TypeDef* door_sw_ports[]={
+		DOOR_ST_PORT1_4,
+		DOOR_ST_PORT1_4,
+		DOOR_ST_PORT1_4,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16,
+		DOOR_ST_PORT5_16
+};
+
+static uint16_t door_sw_pins[]={
+		DOOR_ST_1,
+		DOOR_ST_2,
+		DOOR_ST_3,
+		DOOR_ST_4,
+		DOOR_ST_5,
+		DOOR_ST_6,
+		DOOR_ST_7,
+		DOOR_ST_8,
+		DOOR_ST_9,
+		DOOR_ST_10,
+		DOOR_ST_11,
+		DOOR_ST_12,
+		DOOR_ST_13,
+		DOOR_ST_14,
+		DOOR_ST_15
+};
+
+
 void cabinet_hw_init(void){
 	cabinet_io_scan_timer_init();
 	cabinet_io_scan_timer_init_nvic();
@@ -85,6 +122,18 @@ static void door_update_state(uint16_t id){
 		else stable_cnt = 0;
 	}
 	UPDATE_DOOR_STATE(id);
+}
+
+void door_sw_on(uint16_t id){
+	uint32_t cnt = 0;
+	while(HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]) == GPIO_PIN_RESET){
+		HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_SET);
+		while(cnt < 100000) cnt++;
+		cnt = 0;
+		HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_RESET);
+		while(cnt < 100000) cnt++;
+		cnt = 0;
+	}
 }
 
 /* -------------------------------------------------------------------------------------------------- */

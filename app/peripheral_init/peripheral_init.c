@@ -848,85 +848,85 @@ static DOOR_STATE door15_get_state( IO_State* p_io){
 
 static void door1_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door1_sw_on();
+	door_sw_on(0);
 }
 
 static void door2_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door2_sw_on();
+	door_sw_on(1);
 }
 
 static void door3_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door3_sw_on();
+	door_sw_on(2);
 }
 
 /* This door is fail */
 static void door4_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door4_sw_on();
+	door_sw_on(3);
 }
 
 static void door5_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door5_sw_on();
+	door_sw_on(4);
 }
 
 static void door6_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door6_sw_on();
+	door_sw_on(5);
 }
 
 /* This door is fail */
 static void door7_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door7_sw_on();
+	door_sw_on(6);
 }
 
 /* This door is fail */
 static void door8_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door8_sw_on();
+	door_sw_on(7);
 }
 
 /* This door is fail */
 static void door9_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door9_sw_on();
+	door_sw_on(8);
 }
 
 /* This door is fail */
 static void door10_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door10_sw_on();
+	door_sw_on(9);
 }
 
 /* This door is fail */
 static void door11_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door11_sw_on();
+	door_sw_on(10);
 }
 
 /* This door is fail */
 static void door12_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door12_sw_on();
+	door_sw_on(11);
 }
 
 /* This door is fail */
 static void door13_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door13_sw_on();
+	door_sw_on(12);
 }
 
 /* This door is fail */
 static void door14_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door14_sw_on();
+	door_sw_on(13);
 }
 
 /* This door is fail */
 static void door15_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door15_sw_on();
+	door_sw_on(14);
 }

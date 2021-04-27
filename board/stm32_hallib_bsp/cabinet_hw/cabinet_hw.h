@@ -51,9 +51,6 @@
 #define NODE_ID15_LOW				HAL_GPIO_WritePin(CELL_NODE_ID_PORT,CELL_NODE_ID_15,GPIO_PIN_RESET)
 
 #define DOOR_GET_STATE(id)			(door_state&(1<<(id)))
-
-#define CAB1_FAN_SW(sw)             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,sw);
-
 extern uint32_t door_state;
 extern uint8_t cab_temp[CABINET_CELL_NUM];
 extern TIM_HandleTypeDef io_scan_timer;
@@ -64,38 +61,6 @@ door_hw_act door_sw_on;
 */
 void cabinet_hw_init(void);
 
-void door1_sw_on(void);
-void door2_sw_on(void);
-void door3_sw_on(void);
-void door4_sw_on(void);
-void door5_sw_on(void);
-void door6_sw_on(void);
-void door7_sw_on(void);
-void door8_sw_on(void);
-void door9_sw_on(void);
-void door10_sw_on(void);
-void door11_sw_on(void);
-void door12_sw_on(void);
-void door13_sw_on(void);
-void door14_sw_on(void);
-void door15_sw_on(void);
-
-void door1_update_state(void);
-void door2_update_state(void);
-void door3_update_state(void);
-void door4_update_state(void);
-void door5_update_state(void);
-void door6_update_state(void);
-void door7_update_state(void);
-void door8_update_state(void);
-void door9_update_state(void);
-void door10_update_state(void);
-void door11_update_state(void);
-void door12_update_state(void);
-void door13_update_state(void);
-void door14_update_state(void);
-void door15_update_state(void);
-
-
+void door_sw_on(uint16_t id);
 
 #endif /* BOARD_STM32_HALLIB_BSP_CABINET_HW_CABINET_HW_H_ */
