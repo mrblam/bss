@@ -337,20 +337,19 @@ static void ntc_init(Cabinet_App* p_ca){
 #endif
 }
 
-/* Used Node_ID 6-10 to config Node_ID pin 1,2,3,5,6 */
 static void node_id1_sw_on(Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID6_HIGH;
+	HAL_NODE_ID1_HIGH;
 }
 
 static void node_id2_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID7_HIGH;
+	HAL_NODE_ID2_HIGH;
 }
 
 static void node_id3_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID8_HIGH;
+	HAL_NODE_ID3_HIGH;
 }
 
 static void node_id4_sw_on( Switch* p_cm){
@@ -360,12 +359,12 @@ static void node_id4_sw_on( Switch* p_cm){
 
 static void node_id5_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID9_HIGH;
+	HAL_NODE_ID5_HIGH;
 }
 
 static void node_id6_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID10_HIGH;
+	HAL_NODE_ID6_HIGH;
 }
 
 static void node_id7_sw_on( Switch* p_cm){
@@ -416,17 +415,17 @@ static void node_id15_sw_on( Switch* p_cm){
 
 static void node_id1_sw_off(Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID6_LOW;
+	HAL_NODE_ID1_LOW;
 }
 
 static void node_id2_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID7_LOW;
+	HAL_NODE_ID2_LOW;
 }
 
 static void node_id3_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID8_LOW;
+	HAL_NODE_ID3_LOW;
 }
 
 static void node_id4_sw_off( Switch* p_cm){
@@ -436,12 +435,12 @@ static void node_id4_sw_off( Switch* p_cm){
 
 static void node_id5_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID9_LOW;
+	HAL_NODE_ID5_LOW;
 }
 
 static void node_id6_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID10_LOW;
+	HAL_NODE_ID6_LOW;
 }
 
 static void node_id7_sw_off( Switch* p_cm){
@@ -614,7 +613,7 @@ static void mux_switch_channel15( NTC* p_ntc){
 }
 
 /*--------------------------------------------------------------------------------*/
-/* Used Node_ID 11-15 to config Cell_fan pin 1,2,3,5,6 */
+
 static void cell_fan1_switch_on( Switch* p_sw){
 	(void)p_sw;
 	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_11, GPIO_PIN_SET);
