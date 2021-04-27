@@ -26,12 +26,22 @@ void can_master_init(CAN_master *p_cm, CO_Slave **slaves,
 	p_cm->slave_num = slave_num;
 }
 
-void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
+static void co_send_sync(CAN_master* p_cm){
+	p_cm->p_hw->can_tx.DLC=0;
+	p_cm->p_hw->can_tx.StdId=0x80;
+	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
+}
 
+void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 
 	if (p_cm->sdo_server.is_new_msg==1) {
 		can_master_process_sdo(p_cm, timestamp);
 		p_cm->sdo_server.is_new_msg=0;
+	}
+
+	if(p_cm->pdo_sync_timestamp>=timestamp){
+		co_send_sync(p_cm);
+		p_cm->pdo_sync_timestamp+=500;
 	}
 }
 

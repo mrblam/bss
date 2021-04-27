@@ -17,6 +17,7 @@
 #define CAN_NODE_ID_ASSIGN_COBID						0x70
 #define SLAVE_SERIAL_NUMBER_OBJECT_INDEX				0x2101
 
+#define SLAVE_RPDO1							0x200
 #define SDO_RX_BUFFER_SIZE                 (32UL)
 typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 
@@ -28,6 +29,7 @@ typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 #define SDO_CS_SEGMENT_WRITE            5
 #define SDO_CS_FINISH_WRITE             6
 #define SDO_CS_ABORT                    7
+
 
 typedef enum SDO_STATE_t{
         SDO_ST_IDLE=        0,
@@ -50,6 +52,12 @@ struct CO_SDO_SERVER_t{
         uint32_t buff_offset;
         uint32_t object_data_len;
         uint8_t is_new_msg;
+};
+
+typedef struct CO_ReadPDO_t CO_ReadPDO;
+struct CO_ReadPDO_t{
+	uint32_t cob_id;
+    uint8_t is_new_msg;
 };
 
 typedef struct CAN_master_t CAN_master;
@@ -77,6 +85,7 @@ struct CAN_master_t{
 	CO_Slave* authorizing_slave;
 	uint16_t 		time_stamp;
 	CO_SDO_SERVER 	sdo_server;
+	uint32_t pdo_sync_timestamp;
 	CAN_Hw* p_hw;
 	CAN_Master_Slave_Select slave_select;
 	CAN_Master_Slave_Select slave_deselect;
