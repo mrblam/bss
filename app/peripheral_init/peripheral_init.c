@@ -300,14 +300,14 @@ void peripheral_init(Cabinet_App* p_ca){
 	//ioe_init();
 	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
 
-		p_ca->bss.cabs[cab_id].node_id_sw->sw_on=node_set_high[cab_id];
-		p_ca->bss.cabs[cab_id].node_id_sw->sw_off=node_set_low[cab_id];
+		p_ca->bss.cabs[cab_id].node_id_sw.sw_on=node_set_high[cab_id];
+		p_ca->bss.cabs[cab_id].node_id_sw.sw_off=node_set_low[cab_id];
 
-		p_ca->bss.cabs[cab_id].door->solenoid->sw_on = door_interface[cab_id];
-		p_ca->bss.cabs[cab_id].door->io_state->get_io_state = ios_interface[cab_id];
+		p_ca->bss.cabs[cab_id].door.solenoid.sw_on = door_interface[cab_id];
+		p_ca->bss.cabs[cab_id].door.io_state.get_io_state = ios_interface[cab_id];
 
-		p_ca->bss.cabs[cab_id].cell_fan->sw_on = cell_fan_on_interface[cab_id];
-		p_ca->bss.cabs[cab_id].cell_fan->sw_off = cell_fan_off_interface[cab_id];
+		p_ca->bss.cabs[cab_id].cell_fan.sw_on = cell_fan_on_interface[cab_id];
+		p_ca->bss.cabs[cab_id].cell_fan.sw_off = cell_fan_off_interface[cab_id];
 	}
 	//ntc_init(p_ca);
 }

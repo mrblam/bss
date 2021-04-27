@@ -21,22 +21,20 @@ typedef enum DOOR_STATE{
 typedef struct Cabinet_Door_t Cabinet_Door;
 struct Cabinet_Door_t{
 	DOOR_STATE	state;
-	IO_State* 	io_state;
-	Switch*		solenoid;
+	IO_State 	io_state;
+	Switch		solenoid;
 };
-
-Cabinet_Door* door_construct(void);
 
 static inline DOOR_STATE cab_door_get_working_state(Cabinet_Door* p_door){
 	return p_door->state;
 }
 
 static inline void cab_door_open(Cabinet_Door* p_door){
-	sw_on(p_door->solenoid);
+	sw_on(&p_door->solenoid);
 }
 
 static inline IO_STATE cab_door_get_door_state(Cabinet_Door* p_door){
-	return io_get_state(p_door->io_state);
+	return io_get_state(&p_door->io_state);
 }
 
 #endif /* COMPONENT_CABINET_DOOR_CABINET_DOOR_H_ */

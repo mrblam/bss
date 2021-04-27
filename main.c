@@ -15,10 +15,8 @@
 #include "board.h"
 #include "cabinet_app.h"
 #include "app_config.h"
+#include "peripheral_init.h"
 
-BP* bp_test;
-static volatile uint8_t sync_counter = 20;
-static volatile uint8_t cab_id = 0;
 char buff[50];
 char s;
 uint8_t idx, cnt, i, char_state, get_cmd_done;
@@ -38,30 +36,39 @@ static uint32_t sys_timestamp=0;
 static uint32_t sys_tick_ms=0;
 
 void cab_app_init(Cabinet_App* p_ca){
+	p_ca->bss.cab_num=CABINET_CELL_NUM;
 	p_ca->state = CABIN_ST_SETUP;
 	p_ca->bss.cabs=&bss_cabinets[0];
+	peripheral_init(p_ca);
 	for(int i=0;i<CABINET_CELL_NUM;i++){
+		bss_cabinets[i].state=CAB_CELL_ST_INACTIVE;
 	        bss_cabinets[i].cab_id=i;
 	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
 	        while(bss_cabinets[i].bp==NULL);
 	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
-	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_DISCONNECT;
+	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
 	        bp_slaves[i]->node_id=CABINET_START_NODE_ID+i;
 	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
+	        bp_slaves[i]->is_active=0;
+	        cabinet_init(&bss_cabinets[i]);
+	        sw_off(&bss_cabinets[i].node_id_sw);
 	}
 
+	bss_cabinets[2].state=CAB_CELL_ST_EMPTY;
+	bp_slaves[2]->is_active=1;
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
 	can_master_init((CAN_master*)p_ca,&(bp_slaves[0]),CABINET_CELL_NUM,&can_port);
+	p_ca->base.assign_state=CM_ASSIGN_ST_DONE;
 	p_ca->base.slave_select=can_master_slave_select_impl;
 	p_ca->base.slave_deselect=can_master_slave_deselect_impl;
 	p_ca->base.on_slave_assign_fail=bp_assign_id_fail_handle;
 	p_ca->base.on_slave_assign_success=bp_assign_id_success_handle;
+	p_ca->base.sdo_server.rx_address=0x600+3;
 
 	p_ca->ioe_cfan =&cell_fan;
 	p_ca->ioe_sol = &solenoid;
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
-	peripheral_init(p_ca);
 }
 
 
@@ -74,6 +81,7 @@ int main (void){
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
 	__enable_irq();
+	sw_on(&selex_bss_app.bss.cabs[2].node_id_sw);
 	while(1){
 	};
 }
@@ -81,8 +89,26 @@ int main (void){
 static void can_receive_handle(CAN_Hw* p_hw){
 
 	uint32_t cob_id=p_hw->can_rx.StdId;
+
+	/* if assign request message */
+	if (cob_id == selex_bss_app.base.node_id_scan_cobid) {
+		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_DONE) {
+			can_master_start_assign_next_slave((CAN_master*)&selex_bss_app);
+		} else if(selex_bss_app.base.assign_state==CM_ASSIGN_ST_SLAVE_SELECT){
+			selex_bss_app.base.assign_state=CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;
+		} else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM) {
+			/* slave confirm assign id success*/
+			if (p_hw->rx_data[0] == selex_bss_app.base.assigning_slave->node_id) {
+				/* finish assign for current slave and move to next slave */
+
+				cm_start_authorize_slave((CAN_master*)&selex_bss_app, selex_bss_app.base.assigning_slave);
+			}
+		}
+	}
+
 	if(cob_id==selex_bss_app.base.sdo_server.rx_address){
 		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data,8);
+		selex_bss_app.base.sdo_server.is_new_msg=1;
 	}
 }
 
@@ -129,7 +155,7 @@ void USART1_IRQHandler(void){
 
 void HAL_HMI_PROCESS_DATA_IRQ(void){
 	CHECK_TIM_IRQ_REQUEST(&hmi_timer);
-
+#if 0
 	if(sync_counter < 20){
 		sync_counter++;
 	}
@@ -164,6 +190,7 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 		cab_app_decode_cmd_hmi(&selex_bss_app, buff);
 		get_cmd_done = 0;
 	}
+#endif
 }
 
 static void cabinet_door_close_event_handle(Cabinet* p_cab){
@@ -172,12 +199,12 @@ static void cabinet_door_close_event_handle(Cabinet* p_cab){
 
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){
 	(void)p_cm;
-	sw_on(selex_bss_app.bss.cabs[id].node_id_sw);
+	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
 }
 
 static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t id){
 	(void)p_cm;
-	sw_off(selex_bss_app.bss.cabs[id].node_id_sw);
+	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
 }
 
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id){

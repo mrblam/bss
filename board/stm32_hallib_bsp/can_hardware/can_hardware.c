@@ -19,8 +19,13 @@ void can_hardware_init(void) {
 	can_hardware_start();
 }
 
+void can_send(CAN_Hw* p_hw, uint8_t* buff){
+
+	HAL_CAN_AddTxMessage(&p_hw->can_module, &p_hw->can_tx,buff, &p_hw->tx_mailbox);
+}
+
 void can_set_receive_handle(CAN_Hw* p_hw,void (*receive_handle)(CAN_Hw* p_hw)){
-	can_port.receive_handle=receive_handle;
+	p_hw->receive_handle=receive_handle;
 }
 
 static void can_hardware_filter_init(void){
@@ -117,9 +122,10 @@ void can_receive(CAN_Hw* p_hw, uint8_t* buff){
 }
 
 void USB_LP_CAN1_RX0_IRQHandler(void){
-	HAL_CAN_IRQHandler(&can_port.can_module);
+	HAL_CAN_GetRxMessage(&can_port.can_module, CAN_RX_FIFO0, &can_port.can_rx,can_port.rx_data);
 	if(can_port.receive_handle != NULL){
 		can_port.receive_handle(&can_port);
 	}
+	HAL_CAN_IRQHandler(&can_port.can_module);
 }
 
