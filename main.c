@@ -41,7 +41,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	p_ca->bss.cabs=&bss_cabinets[0];
 	peripheral_init(p_ca);
 	for(int i=0;i<CABINET_CELL_NUM;i++){
-		bss_cabinets[i].state=CAB_CELL_ST_INACTIVE;
+			bss_cabinets[i].state=CAB_CELL_ST_INACTIVE;
 	        bss_cabinets[i].cab_id=i;
 	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
@@ -77,6 +77,7 @@ int main (void){
 	board_init();
 	cab_app_init(&selex_bss_app);
 	cab_app_set_state(&selex_bss_app, CABIN_ST_STANDBY);
+	bss_update_cabinets_state(&selex_bss_app.bss);
 	uart_receives(&power_sys_port, &s);
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
@@ -154,8 +155,9 @@ void USART1_IRQHandler(void){
 #endif
 
 void HAL_HMI_PROCESS_DATA_IRQ(void){
-	CHECK_TIM_IRQ_REQUEST(&hmi_timer);
 #if 0
+	static uint32_t sync_counter=0;
+	static uint8_t cab_id=0;
 	if(sync_counter < 20){
 		sync_counter++;
 	}
@@ -163,7 +165,7 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 		switch(sync_counter){
 		case 20:
 			if(cab_id < CABINET_CELL_NUM){
-				cab_app_sync_cab_data_hmi(&selex_bss_app, cab_id);
+				cab_app_sync_cab_data_hmi(&selex_bss_app, 2);
 				cab_id++;
 			}
 			else sync_counter = 21;
@@ -177,7 +179,7 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 			*/
 			break;
 		case 22:
-			cab_app_sync_bss_data_hmi(&selex_bss_app);
+			//cab_app_sync_bss_data_hmi(&selex_bss_app);
 			sync_counter = 20;
 			cab_id = 0;
 			break;
@@ -191,9 +193,11 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 		get_cmd_done = 0;
 	}
 #endif
+	CHECK_TIM_IRQ_REQUEST(&hmi_timer);
 }
 
 static void cabinet_door_close_event_handle(Cabinet* p_cab){
+	if(selex_bss_app.state==CABIN_ST_SETUP) return;
 	can_master_slave_select((CAN_master*)&selex_bss_app, p_cab->cab_id);
 }
 
@@ -209,7 +213,7 @@ static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t
 
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id){
 
-
+	can_master_slave_deselect_impl(p_cm, id);
 }
 
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id){
