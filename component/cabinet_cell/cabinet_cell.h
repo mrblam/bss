@@ -31,7 +31,6 @@ typedef enum CABINET_STATE{
 struct Cabinet_t{
 	CABINET_STATE 	state;
 	uint8_t			cab_id;
-	uint8_t			node_id;
 	BP*				bp;
 	Cabinet_Door		door;
 	Switch			cell_fan;

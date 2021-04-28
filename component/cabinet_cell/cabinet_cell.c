@@ -30,10 +30,6 @@ void cab_cell_update_state(Cabinet* p_cab){
 	}
 }
 
-uint8_t cab_cell_get_node_id(Cabinet* p_cc){
-	return p_cc->node_id;
-}
-
 void cab_cell_open_door(Cabinet* p_cc){
 	cab_door_open(&p_cc->door);
 }
