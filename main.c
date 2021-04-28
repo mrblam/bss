@@ -121,7 +121,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 	can_master_update_id_assign_process((CAN_master*)&selex_bss_app,sys_timestamp);
 }
 
-#if 0
 void USART1_IRQHandler(void){
 	HAL_CHECK_COM_IRQ_REQUEST(&power_sys_port.uart_module);
 
@@ -152,8 +151,6 @@ void USART1_IRQHandler(void){
 	uart_receives(&power_sys_port, &s);
 }
 
-#endif
-
 void HAL_HMI_PROCESS_DATA_IRQ(void){
 	static uint32_t sync_counter=0;
 	static uint8_t cab_id=0;
@@ -167,8 +164,8 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 		return;
 	}
 
-	cab_app_sync_cab_data_hmi(&selex_bss_app,cab_id);
 	cab_app_sync_bp_data_hmi(&selex_bss_app, cab_id);
+	cab_app_sync_cab_data_hmi(&selex_bss_app,cab_id);
 	cab_id++;
 	if(cab_id>=selex_bss_app.bss.cab_num){
 		cab_id=0;
@@ -203,7 +200,8 @@ static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t
 
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id){
 
-	can_master_slave_deselect_impl(p_cm, id);
+	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
+	cab_app_active_charge(&selex_bss_app,id);
 }
 
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id){

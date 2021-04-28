@@ -9,10 +9,13 @@
 #include "uart_hw_hal.h"
 
 static char tx_buff[50];
-const char* test_str="dddddddddddddddddddddddddddd";
 
-void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
-	cab_cell_active_charger(&p_ca->bss.cabs[cab_id]);
+
+void cab_app_active_charge(Cabinet_App* p_ca,uint8_t cab_id){
+	p_ca->bss.cabs[cab_id].bp->charge_sw_state=3;
+	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
+			p_ca->bss.cabs[cab_id].bp->base.node_id,
+			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state,4,0);
 }
 
 void cab_app_deactive_charge(Cabinet_App* p_ca, CABIN_ID cab_id){
@@ -91,7 +94,7 @@ void cab_app_process_bss_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char
 
 void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char* token){
 	token = strtok(NULL, ",");
-	uint8_t id = string_to_long(token) + 1;
+	uint8_t id = string_to_long(token);
 	token = strtok(NULL, ",");
 	char* obj = token;
 	token = strtok(NULL, ",");

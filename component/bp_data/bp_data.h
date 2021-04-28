@@ -25,6 +25,7 @@ struct BP_t{
     CO_Slave base;
 	BP_STATE 	state;
 	uint32_t inactive_time;
+	uint32_t charge_sw_state;
 	uint8_t 	pos;
 	uint8_t 	soc;
 	uint8_t 	soh;
