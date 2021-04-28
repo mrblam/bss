@@ -55,10 +55,10 @@ void cab_app_init(Cabinet_App* p_ca){
 	        sw_off(&bss_cabinets[i].node_id_sw);
 	}
 
-	bss_cabinets[2].state=CAB_CELL_ST_EMPTY;
-	bp_slaves[2]->is_active=1;
+	bss_cabinets[CAB2].state=CAB_CELL_ST_EMPTY;
+	bp_slaves[CAB2]->is_active=1;
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
-	can_master_init((CAN_master*)p_ca,&(bp_slaves[0]),CABINET_CELL_NUM,&can_port);
+	can_master_init((CAN_master*)p_ca,bp_slaves,CABINET_CELL_NUM,&can_port);
 	p_ca->base.assign_state=CM_ASSIGN_ST_DONE;
 	p_ca->base.slave_select=can_master_slave_select_impl;
 	p_ca->base.slave_deselect=can_master_slave_deselect_impl;
@@ -82,7 +82,7 @@ int main (void){
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
 	__enable_irq();
-	sw_on(&selex_bss_app.bss.cabs[2].node_id_sw);
+	sw_on(&selex_bss_app.bss.cabs[CAB2].node_id_sw);
 	while(1){
 	};
 }

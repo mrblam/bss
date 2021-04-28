@@ -164,7 +164,8 @@ void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timesta
 			can_master_start_assign_next_slave(p_cm);
 			p_cm->sdo_server.state=SDO_ST_IDLE;
 		}else if(p_cm->sdo_server.state==SDO_ST_SUCCESS){
-			p_cm->on_slave_assign_success(p_cm,p_cm->assigning_slave->node_id);
+			p_cm->on_slave_assign_success(p_cm,p_cm->assigning_slave->node_id-
+					p_cm->slave_start_node_id);
 			p_cm->assigning_slave->con_state=CO_SLAVE_CON_ST_CONNECTED;
 			can_master_slave_select(p_cm,
 					p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
