@@ -47,9 +47,20 @@
 #define HAL_NODE_ID14_LOW								NODE_ID14_LOW
 #define HAL_NODE_ID15_LOW								NODE_ID15_LOW
 
+#define HAL_CELL_FAN_1_HIGH								CELL_FAN_1_HIGH
+#define HAL_CELL_FAN_2_HIGH								CELL_FAN_1_HIGH
+#define HAL_CELL_FAN_3_HIGH								CELL_FAN_1_HIGH
+#define HAL_CELL_FAN_4_HIGH								CELL_FAN_1_HIGH
+#define HAL_CELL_FAN_5_HIGH								CELL_FAN_1_HIGH
+
+#define HAL_CELL_FAN_1_LOW								CELL_FAN_1_LOW
+#define HAL_CELL_FAN_2_LOW								CELL_FAN_1_LOW
+#define HAL_CELL_FAN_3_LOW								CELL_FAN_1_LOW
+#define HAL_CELL_FAN_4_LOW								CELL_FAN_1_LOW
+#define HAL_CELL_FAN_5_LOW								CELL_FAN_1_LOW
+
 #define HAL_DOOR_GET_STATE(id)		DOOR_GET_STATE(id)
 
-void door_switch_on(uint8_t id) WEAK;
 void door_sw_on(uint16_t id) WEAK;
 void cabinet_hw_init(void) WEAK;
 

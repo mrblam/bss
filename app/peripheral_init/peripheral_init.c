@@ -155,7 +155,6 @@ static void node_id13_sw_off( Switch* p_cm);
 static void node_id14_sw_off( Switch* p_cm);
 static void node_id15_sw_off( Switch* p_cm);
 
-
 static void door1_switch_on( Switch* p_sw);
 static void door2_switch_on( Switch* p_sw);
 static void door3_switch_on( Switch* p_sw);
@@ -412,7 +411,6 @@ static void node_id15_sw_on( Switch* p_cm){
 	HAL_NODE_ID15_HIGH;
 }
 
-
 static void node_id1_sw_off(Switch* p_cm){
 	(void)p_cm;
 	HAL_NODE_ID1_LOW;
@@ -487,8 +485,6 @@ static void node_id15_sw_off( Switch* p_cm){
 	(void)p_cm;
 	HAL_NODE_ID15_LOW;
 }
-
-
 
 /*--------------------------------------------------------------------------------*/
 
@@ -616,27 +612,27 @@ static void mux_switch_channel15( NTC* p_ntc){
 
 static void cell_fan1_switch_on( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_11, GPIO_PIN_SET);
+	CELL_FAN_1_HIGH;
 }
 
 static void cell_fan2_switch_on( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_12, GPIO_PIN_SET);
+	CELL_FAN_2_HIGH;
 }
 
 static void cell_fan3_switch_on( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_13, GPIO_PIN_SET);
+	CELL_FAN_3_HIGH;
 }
 
 static void cell_fan4_switch_on( Switch* p_sw){
 	(void)p_sw;
-	ioe_set_channel(&cell_fan, CAB4);
+	CELL_FAN_4_HIGH;
 }
 
 static void cell_fan5_switch_on( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_14, GPIO_PIN_SET);
+	CELL_FAN_5_HIGH;
 }
 
 static void cell_fan6_switch_on( Switch* p_sw){
@@ -693,27 +689,27 @@ static void cell_fan15_switch_on( Switch* p_sw){
 
 static void cell_fan1_switch_off( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_11, GPIO_PIN_RESET);
+	CELL_FAN_1_LOW;
 }
 
 static void cell_fan2_switch_off( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_12, GPIO_PIN_RESET);
+	CELL_FAN_1_LOW;
 }
 
 static void cell_fan3_switch_off( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_13, GPIO_PIN_RESET);
+	CELL_FAN_1_LOW;
 }
 
 static void cell_fan4_switch_off( Switch* p_sw){
 	(void)p_sw;
-	ioe_clear_channel(&cell_fan, CAB4);
+	CELL_FAN_1_LOW;
 }
 
 static void cell_fan5_switch_off( Switch* p_sw){
 	(void)p_sw;
-	HAL_GPIO_WritePin(CELL_NODE_ID_PORT, CELL_NODE_ID_14, GPIO_PIN_RESET);
+	CELL_FAN_1_LOW;
 }
 
 static void cell_fan6_switch_off( Switch* p_sw){
@@ -860,7 +856,6 @@ static void door3_switch_on( Switch* p_sw){
 	door_sw_on(2);
 }
 
-/* This door is fail */
 static void door4_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(3);
@@ -876,55 +871,46 @@ static void door6_switch_on( Switch* p_sw){
 	door_sw_on(5);
 }
 
-/* This door is fail */
 static void door7_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(6);
 }
 
-/* This door is fail */
 static void door8_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(7);
 }
 
-/* This door is fail */
 static void door9_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(8);
 }
 
-/* This door is fail */
 static void door10_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(9);
 }
 
-/* This door is fail */
 static void door11_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(10);
 }
 
-/* This door is fail */
 static void door12_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(11);
 }
 
-/* This door is fail */
 static void door13_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(12);
 }
 
-/* This door is fail */
 static void door14_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(13);
 }
 
-/* This door is fail */
 static void door15_switch_on( Switch* p_sw){
 	(void)p_sw;
 	door_sw_on(14);
