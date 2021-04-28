@@ -12,9 +12,9 @@
 #include "stdint.h"
 
 typedef enum IO_STATE{
-	IO_ST_ON,
-	IO_ST_OFF,
-	IO_ST_FAIL
+	IO_ST_ON=0,
+	IO_ST_OFF=1,
+	IO_ST_FAIL=2
 } IO_STATE;
 
 typedef struct IO_State_t IO_State;

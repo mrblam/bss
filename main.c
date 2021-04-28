@@ -47,16 +47,14 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
 	        while(bss_cabinets[i].bp==NULL);
 	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
-	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
+	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_DISCONNECT;
 	        bp_slaves[i]->node_id=CABINET_START_NODE_ID+i;
 	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
-	        bp_slaves[i]->is_active=0;
 	        cabinet_init(&bss_cabinets[i]);
 	        sw_off(&bss_cabinets[i].node_id_sw);
 	}
 
 	bss_cabinets[CAB2].state=CAB_CELL_ST_EMPTY;
-	bp_slaves[CAB2]->is_active=1;
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
 	can_master_init((CAN_master*)p_ca,bp_slaves,CABINET_CELL_NUM,&can_port);
 	p_ca->base.assign_state=CM_ASSIGN_ST_DONE;
@@ -82,7 +80,6 @@ int main (void){
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
 	__enable_irq();
-	sw_on(&selex_bss_app.bss.cabs[CAB2].node_id_sw);
 	while(1){
 	};
 }
@@ -155,50 +152,32 @@ void USART1_IRQHandler(void){
 #endif
 
 void HAL_HMI_PROCESS_DATA_IRQ(void){
-#if 0
 	static uint32_t sync_counter=0;
 	static uint8_t cab_id=0;
-	if(sync_counter < 20){
-		sync_counter++;
-	}
-	else{
-		switch(sync_counter){
-		case 20:
-			if(cab_id < CABINET_CELL_NUM){
-				cab_app_sync_cab_data_hmi(&selex_bss_app, 2);
-				cab_id++;
-			}
-			else sync_counter = 21;
-			break;
-		case 21:
-			/*
-			if(cab_list_walk_down(selex_bss_app.bss.empty_cabs)){
-				cab_app_sync_bp_data_hmi(&selex_bss_app, selex_bss_app.bss.empty_cabs->p_temp->data->bp);
-			}
-			else sync_counter = 22;
-			*/
-			break;
-		case 22:
-			//cab_app_sync_bss_data_hmi(&selex_bss_app);
-			sync_counter = 20;
-			cab_id = 0;
-			break;
-		default:
-			break;
-		}
-	}
-
 	if(get_cmd_done == 1){
 		cab_app_decode_cmd_hmi(&selex_bss_app, buff);
 		get_cmd_done = 0;
 	}
-#endif
+
+	if(sync_counter < 20){
+		sync_counter++;
+		return;
+	}
+
+	cab_app_sync_cab_data_hmi(&selex_bss_app,1);
+	cab_id++;
+	if(cab_id>=selex_bss_app.bss.cab_num){
+		cab_id=0;
+	}
+	sync_counter=0;
+
 	CHECK_TIM_IRQ_REQUEST(&hmi_timer);
 }
 
 static void cabinet_door_close_event_handle(Cabinet* p_cab){
 	if(selex_bss_app.state==CABIN_ST_SETUP) return;
-	can_master_slave_select((CAN_master*)&selex_bss_app, p_cab->cab_id);
+	p_cab->bp->base.con_state=CO_SLAVE_CON_ST_ASSIGNING;
+	sw_on(&p_cab->node_id_sw);
 }
 
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){

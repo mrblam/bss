@@ -62,7 +62,7 @@
 #define CELL_FAN_4_LOW				NODE_ID14_LOW
 #define CELL_FAN_5_LOW				NODE_ID15_LOW
 
-#define DOOR_GET_STATE(id)			(door_state&(1<<(id)))
+#define DOOR_GET_STATE(id)			((door_state&(1<<(id)))>>(id))
 extern uint32_t door_state;
 extern uint8_t cab_temp[CABINET_CELL_NUM];
 extern TIM_HandleTypeDef io_scan_timer;

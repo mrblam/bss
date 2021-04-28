@@ -30,7 +30,6 @@ typedef enum BP_CONNECT_STATE_t{
 
 struct BP_t{
         CO_Slave base;
-	char 	serial_number[32];
 	BP_STATE 	state;
 	BP_CONNECT_STATE con_state;
 	uint32_t inactive_time;

@@ -18,7 +18,7 @@ BP* bp_construct(void){
 	p_bp->state = BP_ST_IDLE;
 
     char* sn=(char*)default_serial_number;
-    char* sn_buff=p_bp->serial_number;
+    char* sn_buff=(char*)p_bp->base.sn;
     while(*sn){
             *sn_buff++=*sn++;
     }
@@ -100,8 +100,8 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){
     *buff++=',';
     buff+=long_to_string(p_bp->pos, buff);
     *buff++=',';
-    for(uint8_t i = 0; *(p_bp->serial_number + i) != '\0'; i++){
-    	*buff++= *(p_bp->serial_number + i);
+    for(uint8_t i = 0; *(p_bp->base.sn + i) != '\0'; i++){
+    	*buff++= *(p_bp->base.sn + i);
     }
     *buff++=',';
 	buff+=long_to_string(p_bp->vol,buff);

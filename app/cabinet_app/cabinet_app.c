@@ -8,6 +8,9 @@
 #include "cabinet_app.h"
 #include "uart_hw_hal.h"
 
+static char tx_buff[50];
+const char* test_str="dddddddddddddddddddddddddddd";
+
 void cab_app_active_charge(Cabinet_App* p_ca,CABIN_ID cab_id){
 	cab_cell_active_charger(&p_ca->bss.cabs[cab_id]);
 }
@@ -34,24 +37,19 @@ void cab_app_update_tilt_ss(Cabinet_App* p_ca){
 }
 
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
-	char buff[50];
-
-	bss_data_serialize(&p_ca->bss, buff);
-	uart_sends(&power_sys_port, (uint8_t*)buff);
+	bss_data_serialize(&p_ca->bss, tx_buff);
+	uart_sends(&power_sys_port, (uint8_t*)tx_buff);
 }
 
 void cab_app_sync_bp_data_hmi(__attribute__((unused)) Cabinet_App* p_ca, BP* p_bp){
-	char buff[50];
-
-	bp_data_serialize(p_bp, buff);
-	uart_sends(&power_sys_port, (uint8_t*)buff);
+	bp_data_serialize(p_bp, tx_buff);
+	uart_sends(&power_sys_port, (uint8_t*)tx_buff);
 }
 
 void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){
-	char buff[50];
 
-	cab_cell_data_serialize(&p_ca->bss.cabs[cab_id], buff);
-	uart_sends(&power_sys_port, (uint8_t*)buff);
+	cab_cell_data_serialize(&p_ca->bss.cabs[cab_id], tx_buff);
+	uart_sends(&power_sys_port, (uint8_t*)tx_buff);
 }
 
 void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff){

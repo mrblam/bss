@@ -44,6 +44,7 @@ void cab_cell_update_door_state(Cabinet* p_cc){
 
 	if(old_state != new_state){
 		p_cc->door.io_state.state=new_state;
+		p_cc->door.state=(DOOR_STATE)new_state;
 		if((old_state==IO_ST_OFF) && (new_state==IO_ST_ON)){
 			if(p_cc->on_door_close!=NULL){
 				p_cc->on_door_close(p_cc);
@@ -77,6 +78,7 @@ void cab_cell_deactive_charger(Cabinet* p_cc){
 }
 
 static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
+
 	*buff++=':';
 	*buff++='R';
 	*buff++='C';
@@ -91,12 +93,13 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cc->temp,buff);
     *buff++=',';
-    if(p_cc->bp){
-        for(uint8_t i = 0; *(p_cc->bp->serial_number + i) != '\0'; i++){
-        	*buff++= *(p_cc->bp->serial_number + i);
+    if(p_cc->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED){
+        for(uint8_t i = 0; *(p_cc->bp->base.sn + i) != '\0'; i++){
+        	*buff++= *(p_cc->bp->base.sn+i);
         }
     }
     else *buff++='0';
     *buff++='*';
+    *buff++='\n';
     *buff++='\0';
 }
