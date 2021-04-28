@@ -118,5 +118,6 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_bp->cycle,buff);
     *buff++='*';
+    *buff++='\n';
     *buff++='\0';
 }

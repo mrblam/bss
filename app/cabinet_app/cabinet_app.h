@@ -50,7 +50,7 @@ void cab_app_stream_data_hmi(Cabinet_App* p_ca);
 void cab_app_stream_data_sim(Cabinet_App* p_ca);
 void cab_app_send_warning_msg(Cabinet_App* p_ca);
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca);
-void cab_app_sync_bp_data_hmi(__attribute__((unused)) Cabinet_App* p_ca, BP* p_bp);
+void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff);
 void cab_app_process_cab_cmd_hmi(Cabinet_App* p_ca, char* token);

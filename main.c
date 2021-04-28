@@ -44,7 +44,8 @@ void cab_app_init(Cabinet_App* p_ca){
 	for(int i=0;i<CABINET_CELL_NUM;i++){
 			bss_cabinets[i].state=CAB_CELL_ST_INACTIVE;
 	        bss_cabinets[i].cab_id=i;
-	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
+	        bss_cabinets[i].bp=bp_construct();
+	        bss_cabinets[i].bp->pos=i;
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
 	        bss_cabinets[i].on_door_open=cabinet_door_open_event_handle;
 	        while(bss_cabinets[i].bp==NULL);
@@ -166,7 +167,8 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 		return;
 	}
 
-	cab_app_sync_cab_data_hmi(&selex_bss_app,1);
+	cab_app_sync_cab_data_hmi(&selex_bss_app,cab_id);
+	cab_app_sync_bp_data_hmi(&selex_bss_app, cab_id);
 	cab_id++;
 	if(cab_id>=selex_bss_app.bss.cab_num){
 		cab_id=0;
