@@ -14,18 +14,18 @@ void cabinet_init(Cabinet* p_cc){
 }
 
 void cab_cell_update_state(Cabinet* p_cab){
-
-	switch(p_cab->bp->con_state){
-	case BP_CON_ST_DISCONNECTED:
+	switch(p_cab->bp->base.con_state){
+	case CO_SLAVE_CON_ST_DISCONNECT:
 		p_cab->state=CAB_CELL_ST_EMPTY;
 		break;
-	case BP_CON_ST_AUTHORIZING:
+	case CO_SLAVE_CON_ST_ASSIGNING:
+		p_cab->state=CAB_CELL_ST_BP_ID_ASSIGN;
+		break;
+	case CO_SLAVE_CON_ST_AUTHORIZING:
 		p_cab->state=CAB_CELL_ST_BP_ID_AUTHORIZE;
 		break;
-	case BP_CON_ST_AUTHORIZED:
-		if(p_cab->state==CAB_CELL_ST_BP_ID_AUTHORIZE){
-			p_cab->state=CAB_CELL_ST_ST_STANDBY;
-		}
+	case CO_SLAVE_CON_ST_CONNECTED:
+		p_cab->state=CAB_CELL_ST_ST_STANDBY;
 		break;
 	}
 }
@@ -48,6 +48,10 @@ void cab_cell_update_door_state(Cabinet* p_cc){
 		if((old_state==IO_ST_OFF) && (new_state==IO_ST_ON)){
 			if(p_cc->on_door_close!=NULL){
 				p_cc->on_door_close(p_cc);
+			}
+		}else if((old_state==IO_ST_ON)&&(new_state==IO_ST_OFF)){
+			if(p_cc->on_door_open!=NULL){
+				p_cc->on_door_open(p_cc);
 			}
 		}
 	}
@@ -98,7 +102,9 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
         	*buff++= *(p_cc->bp->base.sn+i);
         }
     }
-    else *buff++='0';
+    else{
+    	*buff++='0';
+    }
     *buff++='*';
     *buff++='\n';
     *buff++='\0';

@@ -23,6 +23,7 @@ uint8_t idx, cnt, i, char_state, get_cmd_done;
 
 Cabinet_App selex_bss_app;
 static void cabinet_door_close_event_handle(Cabinet* p_cab);
+static void cabinet_door_open_event_handle(Cabinet* p_cab);
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id);
 static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t id);
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id);
@@ -45,6 +46,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bss_cabinets[i].cab_id=i;
 	        bss_cabinets[i].bp=(BP*)malloc(sizeof(BP));
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
+	        bss_cabinets[i].on_door_open=cabinet_door_open_event_handle;
 	        while(bss_cabinets[i].bp==NULL);
 	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
 	        bp_slaves[i]->con_state=CO_SLAVE_CON_ST_DISCONNECT;
@@ -178,6 +180,13 @@ static void cabinet_door_close_event_handle(Cabinet* p_cab){
 	if(selex_bss_app.state==CABIN_ST_SETUP) return;
 	p_cab->bp->base.con_state=CO_SLAVE_CON_ST_ASSIGNING;
 	sw_on(&p_cab->node_id_sw);
+}
+
+static void cabinet_door_open_event_handle(Cabinet* p_cab){
+	if(selex_bss_app.state==CABIN_ST_SETUP) return;
+	p_cab->bp->base.con_state=CO_SLAVE_CON_ST_DISCONNECT;
+	sw_off(&p_cab->node_id_sw);
+
 }
 
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){

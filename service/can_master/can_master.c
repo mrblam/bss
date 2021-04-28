@@ -151,7 +151,7 @@ void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timesta
 		p_cm->p_hw->tx_data[0] = p_cm->assigning_slave->node_id;
 		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 		p_cm->assign_state = CM_ASSIGN_ST_WAIT_CONFIRM;
-		p_cm->assign_timeout = timestamp + 50000;
+		p_cm->assign_timeout = timestamp + 1000;
 		break;
 	case CM_ASSIGN_ST_WAIT_CONFIRM:
 		if (p_cm->assign_timeout < timestamp) {

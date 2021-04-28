@@ -21,17 +21,9 @@ typedef enum BP_STATE{
 	BP_ST_CHARGING = 2
 } BP_STATE;
 
-typedef enum BP_CONNECT_STATE_t{
-
-        BP_CON_ST_DISCONNECTED=0,
-        BP_CON_ST_AUTHORIZING,
-        BP_CON_ST_AUTHORIZED
-}BP_CONNECT_STATE;
-
 struct BP_t{
-        CO_Slave base;
+    CO_Slave base;
 	BP_STATE 	state;
-	BP_CONNECT_STATE con_state;
 	uint32_t inactive_time;
 	uint8_t 	pos;
 	uint8_t 	soc;
@@ -69,12 +61,12 @@ uint16_t bp_get_temp(BP* p_bp);
 void bp_set_cycle(BP* p_bp, uint32_t cycle);
 uint32_t bp_get_cycle(BP* p_bp);
 
-static inline BP_CONNECT_STATE bp_get_con_state(const BP* const p_bp){
-        return p_bp->con_state;
+static inline CO_SLAVE_NET_STATE bp_get_con_state(const BP* const p_bp){
+        return p_bp->base.con_state;
 }
 
-static inline void bp_set_con_state(BP* p_bp,const BP_CONNECT_STATE state){
-        p_bp->con_state=state;
+static inline void bp_set_con_state(BP* p_bp,const CO_SLAVE_NET_STATE state){
+        p_bp->base.con_state=state;
 }
 
 static inline void bp_reset_inactive_counter(BP* p_bp){
