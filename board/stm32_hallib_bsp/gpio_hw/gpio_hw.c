@@ -7,33 +7,9 @@
 
 #include "gpio_hw.h"
 
-mux_act			mux_sw_channel;
-
 static void gpio_node_id_pin_init(void);
 static void gpio_mux_pin_init(void);
-static void gpio_mux_pin_config(void);
 static void gpio_door_st_pin_init(void);
-
-static void mux_sw_channel0(uint8_t id);
-static void mux_sw_channel1(uint8_t id);
-static void mux_sw_channel2(uint8_t id);
-static void mux_sw_channel3(uint8_t id);
-static void mux_sw_channel4(uint8_t id);
-static void mux_sw_channel5(uint8_t id);
-static void mux_sw_channel6(uint8_t id);
-static void mux_sw_channel7(uint8_t id);
-static void mux_sw_channel8(uint8_t id);
-static void mux_sw_channel9(uint8_t id);
-static void mux_sw_channel10(uint8_t id);
-static void mux_sw_channel11(uint8_t id);
-static void mux_sw_channel12(uint8_t id);
-static void mux_sw_channel13(uint8_t id);
-static void mux_sw_channel14(uint8_t id);
-
-static mux_act mux_sw_channel_interface[] = {
-		mux_sw_channel7, mux_sw_channel6, mux_sw_channel5, mux_sw_channel4, mux_sw_channel3,
-		mux_sw_channel2, mux_sw_channel1, mux_sw_channel0, mux_sw_channel14, mux_sw_channel13,
-		mux_sw_channel12, mux_sw_channel11, mux_sw_channel10, mux_sw_channel9, mux_sw_channel8};
 
 void gpio_hw_init(void){
 	gpio_node_id_pin_init();
@@ -92,12 +68,6 @@ static void gpio_mux_pin_init(void){
 	  HAL_GPIO_Init(MUX_PORT_S0, &GPIO_InitStruct);
 }
 
-static void gpio_mux_pin_config(void){
-	for(uint8_t id = CAB1; id < CAB15; id++){
-		mux_sw_channel = mux_sw_channel_interface[id];
-	}
-}
-
 static void gpio_door_st_pin_init(void){
 	  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -124,123 +94,9 @@ static void gpio_door_st_pin_init(void){
 
 /* -------------------------------------------------------------------------- */
 
-static void mux_sw_channel0(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
+void mux_sw_channel(uint8_t channel){
+	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, channel<<0);
+	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, channel<<1);
+	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, channel<<2);
+	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, channel<<3);
 }
-
-static void mux_sw_channel1(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_sw_channel2(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_sw_channel3(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_sw_channel4(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_sw_channel5(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_sw_channel6(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_sw_channel7(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_sw_channel8(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_sw_channel9(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_sw_channel10(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_sw_channel11(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_sw_channel12(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_sw_channel13(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_sw_channel14(uint8_t id){
-	(void)id;
-	HAL_GPIO_WritePin(MUX_PORT_S0, MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, MUX_S3, GPIO_PIN_SET);
-}
-

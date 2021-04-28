@@ -11,11 +11,14 @@
 TIM_HandleTypeDef io_scan_timer;
 
 uint32_t door_state;
+uint8_t cab_temp[CABINET_CELL_NUM];
+
 static void cabinet_io_scan_timer_init(void);
 static void cabinet_io_scan_timer_init_nvic(void);
 static void cabinet_door_scan_state(void);
 static void cabinet_io_scan_timer_init_nvic(void);
 static void door_update_state(uint16_t id);
+static void ntc_update_temp(uint16_t id);
 
 #define UPDATE_DOOR_STATE(id)	door_state &= ~(1<<(id)); door_state|= (cur_state<<(id))
 
@@ -85,6 +88,7 @@ void TIM3_IRQHandler(void){
 static void cabinet_door_scan_state(void){
 	for(uint16_t i=0;i<15;i++){
 		door_update_state(i);
+		ntc_update_temp(i);
 	}
 }
 
@@ -113,6 +117,15 @@ void door_sw_on(uint16_t id){
 		while(cnt < 100000) cnt++;
 		cnt = 0;
 	}
+}
+
+static void ntc_update_temp(uint16_t id){
+	if(id < 9){
+		mux_sw_channel(8-id);
+	}
+	else mux_sw_channel(24-id);
+	HAL_ADC_Start_IT(&ntc.adc_module);
+	cab_temp[id] = &ntc.adc_value;
 }
 
 /* -------------------------------------------------------------------------------------------------- */

@@ -12,6 +12,7 @@
 #include "gpio_hw.h"
 #include "interrupt_hw.h"
 #include "app_config.h"
+#include "adc_hw.h"
 
 #define IO_SCAN_TIMER				TIM3
 

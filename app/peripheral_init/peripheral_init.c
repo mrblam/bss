@@ -219,22 +219,6 @@ static void cell_fan13_switch_off( Switch* p_sw);
 static void cell_fan14_switch_off( Switch* p_sw);
 static void cell_fan15_switch_off( Switch* p_sw);
 
-static void mux_switch_channel1( NTC* p_ntc);
-static void mux_switch_channel2( NTC* p_ntc);
-static void mux_switch_channel3( NTC* p_ntc);
-static void mux_switch_channel4( NTC* p_ntc);
-static void mux_switch_channel5( NTC* p_ntc);
-static void mux_switch_channel6( NTC* p_ntc);
-static void mux_switch_channel7( NTC* p_ntc);
-static void mux_switch_channel8( NTC* p_ntc);
-static void mux_switch_channel9( NTC* p_ntc);
-static void mux_switch_channel10( NTC* p_ntc);
-static void mux_switch_channel11( NTC* p_ntc);
-static void mux_switch_channel12( NTC* p_ntc);
-static void mux_switch_channel13( NTC* p_ntc);
-static void mux_switch_channel14( NTC* p_ntc);
-static void mux_switch_channel15( NTC* p_ntc);
-
 static void ntc_init(Cabinet_App* p_ca);
 static void ntc_sensor_get_adc_value(NTC* p_ntc);
 
@@ -253,10 +237,6 @@ static sw_act cell_fan_on_interface[] = {cell_fan1_switch_on, cell_fan2_switch_o
 static sw_act cell_fan_off_interface[] = {cell_fan1_switch_off, cell_fan2_switch_off, cell_fan3_switch_off, cell_fan4_switch_off, cell_fan5_switch_off,
 								cell_fan6_switch_off, cell_fan7_switch_off, cell_fan8_switch_off, cell_fan9_switch_off, cell_fan10_switch_off,
 								cell_fan11_switch_off, cell_fan12_switch_off, cell_fan13_switch_off, cell_fan14_switch_off, cell_fan15_switch_off};
-
-static ntc_act mux_switch_channel_interface[] = {mux_switch_channel1, mux_switch_channel2, mux_switch_channel3, mux_switch_channel4, mux_switch_channel5,
-								mux_switch_channel6, mux_switch_channel7, mux_switch_channel8, mux_switch_channel9, mux_switch_channel10,
-								mux_switch_channel11, mux_switch_channel12, mux_switch_channel13, mux_switch_channel14, mux_switch_channel15};
 
 static sw_act node_set_high[]={
 		node_id1_sw_on,
@@ -312,28 +292,10 @@ void peripheral_init(Cabinet_App* p_ca){
 }
 
 static void ntc_init(Cabinet_App* p_ca){
-	p_ca->bss.cabs[CAB1].temp_ss->switch_channel = mux_switch_channel8;
-	p_ca->bss.cabs[CAB2].temp_ss->switch_channel = mux_switch_channel7;
-	p_ca->bss.cabs[CAB3].temp_ss->switch_channel = mux_switch_channel6;
-	p_ca->bss.cabs[CAB4].temp_ss->switch_channel = mux_switch_channel5;
-	p_ca->bss.cabs[CAB5].temp_ss->switch_channel = mux_switch_channel4;
-	p_ca->bss.cabs[CAB6].temp_ss->switch_channel = mux_switch_channel3;
-	p_ca->bss.cabs[CAB7].temp_ss->switch_channel = mux_switch_channel2;
-	p_ca->bss.cabs[CAB8].temp_ss->switch_channel = mux_switch_channel1;
-	p_ca->bss.cabs[CAB9].temp_ss->switch_channel = mux_switch_channel15;
-	p_ca->bss.cabs[CAB10].temp_ss->switch_channel = mux_switch_channel14;
-	p_ca->bss.cabs[CAB11].temp_ss->switch_channel = mux_switch_channel13;
-	p_ca->bss.cabs[CAB12].temp_ss->switch_channel = mux_switch_channel12;
-	p_ca->bss.cabs[CAB13].temp_ss->switch_channel = mux_switch_channel11;
-	p_ca->bss.cabs[CAB14].temp_ss->switch_channel = mux_switch_channel10;
-	p_ca->bss.cabs[CAB15].temp_ss->switch_channel = mux_switch_channel9;
-	ntc_set_lut(p_ca->bss.cabs[CAB2].temp_ss, ntc_lookups);
-#if 0
 	for(uint8_t cab_id = CAB1; cab_id < CAB15; cab_id++){
-		p_ca->cabin[cab_id]->temp_ss->switch_channel = mux_switch_channel_interface[cab_id];
-		ntc_set_lut(p_ca->cabin[cab_id]->temp_ss, ntc_lookups);
+		p_ca->bss.cabs[cab_id].temp_ss->base.hw->adc_value = cab_temp[cab_id];
+		ntc_set_lut(p_ca->bss.cabs[cab_id].temp_ss, ntc_lookups);
 	}
-#endif
 }
 
 static void node_id1_sw_on(Switch* p_cm){
@@ -484,128 +446,6 @@ static void node_id14_sw_off( Switch* p_cm){
 static void node_id15_sw_off( Switch* p_cm){
 	(void)p_cm;
 	HAL_NODE_ID15_LOW;
-}
-
-/*--------------------------------------------------------------------------------*/
-
-static void mux_switch_channel1( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel2( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel3( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel4( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel5( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel6( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel7( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel8( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_RESET);
-}
-
-static void mux_switch_channel9( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_switch_channel10( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_switch_channel11( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_switch_channel12( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_switch_channel13( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_switch_channel14( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
-}
-
-static void mux_switch_channel15( NTC* p_ntc){
-	(void)p_ntc;
-	HAL_GPIO_WritePin(MUX_PORT_S0, 		MUX_S0, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S1, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S2, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(MUX_PORT_S123, 	MUX_S3, GPIO_PIN_SET);
 }
 
 /*--------------------------------------------------------------------------------*/

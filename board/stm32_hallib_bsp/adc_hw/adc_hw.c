@@ -27,7 +27,7 @@ static void adc_hw_init_module(void){
 	  /* Common config */
 	  ntc.adc_module.Instance = ADC_PORT;
 	  ntc.adc_module.Init.ScanConvMode = ADC_SCAN_DISABLE;
-	  ntc.adc_module.Init.ContinuousConvMode = ENABLE;
+	  ntc.adc_module.Init.ContinuousConvMode = DISABLE;
 	  ntc.adc_module.Init.DiscontinuousConvMode = DISABLE;
 	  ntc.adc_module.Init.ExternalTrigConv = ADC_SOFTWARE_START;
 	  ntc.adc_module.Init.DataAlign = ADC_DATAALIGN_RIGHT;
@@ -70,14 +70,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 }
 
 static void get_adc_handle_impl(ADC_hw* p_hw){
-#if 0
-	if(cab_id < CAB15){
-		mux_sw_channel(cab_id);
-		cab_id++;
-	}
-	else cab_id = CAB1;
 	p_hw->adc_value = HAL_ADC_GetValue(&p_hw->adc_module);
-#endif
 }
 
 void ADC1_2_IRQHandler(void){

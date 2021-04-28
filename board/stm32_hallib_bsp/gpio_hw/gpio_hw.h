@@ -78,7 +78,6 @@
 
 void gpio_hw_init(void);
 
-typedef void 	(*mux_act)(uint8_t id);
-extern mux_act			mux_sw_channel;
+void mux_sw_channel(uint8_t channel);
 
 #endif /* BOARD_STM32_HALLIB_BSP_GPIO_HW_GPIO_HW_H_ */
