@@ -56,6 +56,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	        cabinet_init(&bss_cabinets[i]);
 	        sw_off(&bss_cabinets[i].node_id_sw);
 	}
+	sw_on(&bss_cabinets[1].door.solenoid);
 
 	bss_cabinets[CAB2].state=CAB_CELL_ST_EMPTY;
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
@@ -152,17 +153,19 @@ void USART1_IRQHandler(void){
 }
 
 void HAL_HMI_PROCESS_DATA_IRQ(void){
-	static uint32_t sync_counter=0;
+	//static uint32_t sync_counter=0;
 	static uint8_t cab_id=0;
 	if(get_cmd_done == 1){
 		cab_app_decode_cmd_hmi(&selex_bss_app, buff);
 		get_cmd_done = 0;
 	}
-
-	if(sync_counter < 20){
+#if 0
+	if(sync_counter < 10){
 		sync_counter++;
+		CHECK_TIM_IRQ_REQUEST(&hmi_timer);
 		return;
 	}
+#endif
 
 	cab_app_sync_bp_data_hmi(&selex_bss_app, cab_id);
 	cab_app_sync_cab_data_hmi(&selex_bss_app,cab_id);
@@ -170,7 +173,7 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 	if(cab_id>=selex_bss_app.bss.cab_num){
 		cab_id=0;
 	}
-	sync_counter=0;
+	//sync_counter=0;
 
 	CHECK_TIM_IRQ_REQUEST(&hmi_timer);
 }

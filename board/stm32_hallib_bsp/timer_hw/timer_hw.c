@@ -26,7 +26,7 @@ static void hmi_process_data_timer_init(void){
 	hmi_timer.Instance = HMI_TIMER;
 	hmi_timer.Init.Prescaler = 3599;
 	hmi_timer.Init.CounterMode = TIM_COUNTERMODE_UP;
-	hmi_timer.Init.Period = 9999;
+	hmi_timer.Init.Period = 6999;
 	hmi_timer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	hmi_timer.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_Base_Init(&hmi_timer) != HAL_OK){
