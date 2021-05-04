@@ -57,15 +57,11 @@ void cab_app_init(Cabinet_App* p_ca){
 	        sw_off(&bss_cabinets[i].node_id_sw);
 	}
 
-	bp_slaves[0]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
+	bp_slaves[1]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
 	bp_slaves[2]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
 	bp_slaves[3]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
+	bp_slaves[4]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
 	bp_slaves[5]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
-
-	bss_cabinets[0].state=CAB_CELL_ST_EMPTY;
-	bss_cabinets[2].state=CAB_CELL_ST_EMPTY;
-	bss_cabinets[3].state=CAB_CELL_ST_EMPTY;
-	bss_cabinets[5].state=CAB_CELL_ST_EMPTY;
 
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
 	can_master_init((CAN_master*)p_ca,bp_slaves,CABINET_CELL_NUM,&can_port);
@@ -91,6 +87,8 @@ int main (void){
 	uart_receives(&power_sys_port, &s);
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
+
+	bss_update_cabinets_state(&selex_bss_app.bss);
 	__enable_irq();
 	while(1){
 	};
@@ -212,7 +210,7 @@ static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t
 }
 
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id){
-
+	(void)p_cm;
 	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
 	cab_app_active_charge(&selex_bss_app,id);
 }
@@ -222,5 +220,6 @@ static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t
 	(void)p_cm;
 	/* return battery to user */
 	cab_app_delivery_bp(&selex_bss_app, id);
+	cab_cell_update_state(&selex_bss_app.bss.cabs[i]);
 }
 
