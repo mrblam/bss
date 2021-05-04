@@ -56,9 +56,17 @@ void cab_app_init(Cabinet_App* p_ca){
 	        cabinet_init(&bss_cabinets[i]);
 	        sw_off(&bss_cabinets[i].node_id_sw);
 	}
-	sw_on(&bss_cabinets[1].door.solenoid);
 
-	bss_cabinets[CAB2].state=CAB_CELL_ST_EMPTY;
+	bp_slaves[0]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
+	bp_slaves[2]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
+	bp_slaves[3]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
+	bp_slaves[5]->con_state=CO_SLAVE_CON_ST_ASSIGNING;
+
+	bss_cabinets[0].state=CAB_CELL_ST_EMPTY;
+	bss_cabinets[2].state=CAB_CELL_ST_EMPTY;
+	bss_cabinets[3].state=CAB_CELL_ST_EMPTY;
+	bss_cabinets[5].state=CAB_CELL_ST_EMPTY;
+
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
 	can_master_init((CAN_master*)p_ca,bp_slaves,CABINET_CELL_NUM,&can_port);
 	p_ca->base.assign_state=CM_ASSIGN_ST_DONE;

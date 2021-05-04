@@ -44,6 +44,10 @@ void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
 	uart_sends(&power_sys_port, (uint8_t*)tx_buff);
 }
 
+void cab_app_start_id_assign_process(Cabinet_App* p_ca){
+	can_master_start_assign_next_slave((CAN_master*)p_ca);
+}
+
 void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){
 	if(p_ca->bss.cabs[cab_id].bp->base.con_state!=CO_SLAVE_CON_ST_CONNECTED) return;
 
