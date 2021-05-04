@@ -102,7 +102,7 @@ static void can_receive_handle(CAN_Hw* p_hw){
 
 	/* if assign request message */
 	if (cob_id == selex_bss_app.base.node_id_scan_cobid) {
-		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_DONE) {
+		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST) {
 			can_master_start_assign_next_slave((CAN_master*)&selex_bss_app);
 		} else if(selex_bss_app.base.assign_state==CM_ASSIGN_ST_SLAVE_SELECT){
 			selex_bss_app.base.assign_state=CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;

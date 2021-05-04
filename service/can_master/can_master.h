@@ -66,6 +66,7 @@ typedef struct CAN_master_t CAN_master;
 typedef void (*CAN_Master_Slave_Select)(const CAN_master*,const uint32_t);
 
 typedef enum CM_ASSIGN_STATE{
+        CM_ASSIGN_ST_WAIT_REQUEST,
 	CM_ASSIGN_ST_START,
 	CM_ASSIGN_ST_SLAVE_SELECT,
 	CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM,
