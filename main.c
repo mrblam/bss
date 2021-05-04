@@ -191,7 +191,7 @@ void HAL_HMI_PROCESS_DATA_IRQ(void){
 static void cabinet_door_close_event_handle(Cabinet* p_cab){
 	if(selex_bss_app.state==CABIN_ST_SETUP) return;
 	bp_set_con_state(p_cab->bp,CO_SLAVE_CON_ST_ASSIGNING);
-	sw_on(&p_cab->node_id_sw);
+	can_master_start_assign_next_slave((CAN_master*)&selex_bss_app, sys_timestamp);
 }
 
 static void cabinet_door_open_event_handle(Cabinet* p_cab){
