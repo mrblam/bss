@@ -193,8 +193,10 @@ static void cabinet_door_close_event_handle(Cabinet* p_cab){
 }
 
 static void cabinet_door_open_event_handle(Cabinet* p_cab){
+	/* ignore event during setup process*/
 	if(selex_bss_app.state==CABIN_ST_SETUP) return;
 	p_cab->bp->base.con_state=CO_SLAVE_CON_ST_DISCONNECT;
+	cab_cell_update_state(p_cab);
 	sw_off(&p_cab->node_id_sw);
 
 }
