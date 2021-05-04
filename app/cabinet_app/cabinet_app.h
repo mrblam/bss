@@ -56,7 +56,7 @@ void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff);
 void cab_app_process_cab_cmd_hmi(Cabinet_App* p_ca, char* token);
 void capp_on_cabinet_door_close(Cabinet_App* p_app,Cabinet* p_cab);
 void cab_app_active_charge(Cabinet_App* p_ca,uint8_t cab_id);
-void cab_app_start_id_assign_process(Cabinet_App* p_ca);
+void cab_app_start_id_assign_process(Cabinet_App* p_ca,const uint32_t timestamp);
 
 static inline void cab_app_set_state(Cabinet_App* p_ca, CABIN_STATE state){
 	p_ca->state = state;

@@ -89,9 +89,7 @@ int main (void){
 	uart_receives(&power_sys_port, &s);
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
-
 	__enable_irq();
-	can_master_slave_deselect((CAN_master*)&selex_bss_app, 0);
 	while(1){
 	};
 }
@@ -103,7 +101,11 @@ static void can_receive_handle(CAN_Hw* p_hw){
 	/* if assign request message */
 	if (cob_id == selex_bss_app.base.node_id_scan_cobid) {
 		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST) {
-			can_master_start_assign_next_slave((CAN_master*)&selex_bss_app);
+			selex_bss_app.base.p_hw->can_tx.StdId = selex_bss_app.base.node_id_scan_cobid;
+			selex_bss_app.base.p_hw->can_tx.DLC = 0;
+			can_send(selex_bss_app.base.p_hw, selex_bss_app.base.p_hw->tx_data);
+			selex_bss_app.base.assign_state=CM_ASSIGN_ST_START;
+			//can_master_start_assign_next_slave((CAN_master*)&selex_bss_app,sys_timestamp);
 		} else if(selex_bss_app.base.assign_state==CM_ASSIGN_ST_SLAVE_SELECT){
 			selex_bss_app.base.assign_state=CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;
 		} else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM) {

@@ -98,7 +98,7 @@ struct CAN_master_t{
 void can_master_init(CAN_master* p_cm,CO_Slave** slaves,
 		const uint32_t slave_num,CAN_Hw* p_hw);
 void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
-void can_master_start_assign_next_slave(CAN_master* p_cm);
+void can_master_start_assign_next_slave(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id);
 void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave);

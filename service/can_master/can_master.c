@@ -147,7 +147,7 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 	}
 }
 
-void can_master_start_assign_next_slave(CAN_master *p_cm) {
+void can_master_start_assign_next_slave(CAN_master *p_cm,const uint32_t timestamp) {
 	p_cm->assigning_slave = can_master_get_assign_request_slave(p_cm);
 	if (p_cm->assigning_slave == NULL) {
 		p_cm->assign_state = CM_ASSIGN_ST_DONE;
@@ -157,10 +157,15 @@ void can_master_start_assign_next_slave(CAN_master *p_cm) {
 	for (int i = 0; i < 32; i++) {
 		p_cm->assigning_slave->sn[i] = 0;
 	}
-	p_cm->assign_state = CM_ASSIGN_ST_START;
+	p_cm->assign_timeout=timestamp+4000;
+	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
+	can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id-
+			p_cm->slave_start_node_id);
+	/*
 	p_cm->p_hw->can_tx.StdId = p_cm->node_id_scan_cobid;
 	p_cm->p_hw->can_tx.DLC = 0;
 	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
+	*/
 }
 
 void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave) {
@@ -242,7 +247,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 			co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_DISCONNECT);
 			p_cm->on_slave_assign_fail(p_cm,
 			                p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
-			can_master_start_assign_next_slave(p_cm);
+			can_master_start_assign_next_slave(p_cm,timestamp);
 		}
 
 	        break;
@@ -263,7 +268,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 		if (p_cm->assign_timeout < timestamp) {
 		        co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_DISCONNECT);
 			p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id);
-			can_master_start_assign_next_slave(p_cm);
+			can_master_start_assign_next_slave(p_cm,timestamp);
 		}
 		break;
 	case CM_ASSIGN_ST_AUTHORIZING:
@@ -273,7 +278,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 		        co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_DISCONNECT);
 			p_cm->on_slave_assign_fail(p_cm,
 					p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
-			can_master_start_assign_next_slave(p_cm);
+			can_master_start_assign_next_slave(p_cm,timestamp);
 			p_cm->sdo_server.state = SDO_ST_IDLE;
 		} else if (p_cm->sdo_server.state == SDO_ST_SUCCESS) {
 			p_cm->on_slave_assign_success(p_cm,
@@ -281,7 +286,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 			co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_CONNECTED);
 			can_master_slave_deselect(p_cm,
 					p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
-			can_master_start_assign_next_slave(p_cm);
+			can_master_start_assign_next_slave(p_cm,timestamp);
 			p_cm->sdo_server.state = SDO_ST_IDLE;
 		}
 		break;
@@ -292,7 +297,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 			co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_DISCONNECT);
 			p_cm->on_slave_assign_fail(p_cm,
 			                p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
-			can_master_start_assign_next_slave(p_cm);
+			can_master_start_assign_next_slave(p_cm,timestamp);
 		}
 		break;
 	}
