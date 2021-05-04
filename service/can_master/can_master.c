@@ -280,7 +280,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 		break;
 	case CM_ASSIGN_ST_SLAVE_SELECT:
 	        if (p_cm->assign_timeout < timestamp) {
-			co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_CONNECTED);
+			co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_DISCONNECT);
 			p_cm->on_slave_assign_fail(p_cm,
 			                p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
 			can_master_start_assign_next_slave(p_cm);

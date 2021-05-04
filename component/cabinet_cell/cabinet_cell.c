@@ -35,17 +35,17 @@ void cab_cell_open_door(Cabinet* p_cc){
 }
 
 void cab_cell_update_door_state(Cabinet* p_cc){
-	IO_STATE old_state=p_cc->door.io_state.state;
-	IO_STATE new_state=p_cc->door.io_state.get_io_state(&p_cc->door.io_state);
+
+	DOOR_STATE old_state=p_cc->door.state;
+	DOOR_STATE new_state=(DOOR_STATE)p_cc->door.io_state.get_io_state(&p_cc->door.io_state);
 
 	if(old_state != new_state){
-		p_cc->door.io_state.state=new_state;
-		p_cc->door.state=(DOOR_STATE)new_state;
-		if((old_state==IO_ST_OFF) && (new_state==IO_ST_ON)){
+		p_cc->door.state=new_state;
+		if((old_state==DOOR_ST_OPEN) && (new_state==DOOR_ST_CLOSE)){
 			if(p_cc->on_door_close!=NULL){
 				p_cc->on_door_close(p_cc);
 			}
-		}else if((old_state==IO_ST_ON)&&(new_state==IO_ST_OFF)){
+		}else if((old_state==DOOR_ST_CLOSE)&&(new_state==DOOR_ST_OPEN)){
 			if(p_cc->on_door_open!=NULL){
 				p_cc->on_door_open(p_cc);
 			}

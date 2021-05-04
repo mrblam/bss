@@ -59,8 +59,10 @@ void cab_app_init(Cabinet_App* p_ca){
 
 	co_slave_set_con_state(bp_slaves[0], CO_SLAVE_CON_ST_ASSIGNING);
 	co_slave_set_con_state(bp_slaves[1], CO_SLAVE_CON_ST_ASSIGNING);
-	co_slave_set_con_state(bp_slaves[2], CO_SLAVE_CON_ST_ASSIGNING);
+	co_slave_set_con_state(bp_slaves[2], CO_SLAVE_CON_ST_CONNECTED);
 	co_slave_set_con_state(bp_slaves[3], CO_SLAVE_CON_ST_CONNECTED);
+	bss_cabinets[3].bp->soc=70;
+	bss_cabinets[2].bp->soc=100;
 
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
 	can_master_init((CAN_master*)p_ca,bp_slaves,CABINET_CELL_NUM,&can_port);
@@ -78,15 +80,16 @@ void cab_app_init(Cabinet_App* p_ca){
 
 
 int main (void){
+
 	__disable_irq();
 	board_init();
 	cab_app_init(&selex_bss_app);
+	bss_update_cabinets_state(&selex_bss_app.bss);
 	cab_app_set_state(&selex_bss_app, CABIN_ST_STANDBY);
 	uart_receives(&power_sys_port, &s);
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
 
-	bss_update_cabinets_state(&selex_bss_app.bss);
 	__enable_irq();
 	can_master_slave_deselect((CAN_master*)&selex_bss_app, 0);
 	while(1){
@@ -192,9 +195,9 @@ static void cabinet_door_close_event_handle(Cabinet* p_cab){
 static void cabinet_door_open_event_handle(Cabinet* p_cab){
 	/* ignore event during setup process*/
 	if(selex_bss_app.state==CABIN_ST_SETUP) return;
-	//bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
-	//cab_cell_update_state(p_cab);
-	//sw_off(&p_cab->node_id_sw);
+	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
+	cab_cell_update_state(p_cab);
+	sw_off(&p_cab->node_id_sw);
 
 }
 

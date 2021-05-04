@@ -81,7 +81,7 @@ void TIM3_IRQHandler(void){
 }
 
 static void cabinet_door_scan_state(void){
-	for(uint16_t i=0;i<15;i++){
+	for(uint16_t i=0;i<CABINET_CELL_NUM;i++){
 		door_update_state(i);
 	}
 }
@@ -91,12 +91,14 @@ static void door_update_state(uint16_t id){
 	uint8_t cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
 	uint16_t stable_cnt = 0;
 	while(stable_cnt < 1000){
-		pre_state = cur_state;
-		cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
 		if(cur_state == pre_state){
 			stable_cnt++;
 		}
-		else stable_cnt = 0;
+		else{
+		        pre_state = cur_state;
+		        stable_cnt = 0;
+		}
+		cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
 	}
 	door_state[id]=cur_state;
 }
