@@ -46,8 +46,13 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bss_cabinets[i].cab_id=i;
 	        bss_cabinets[i].bp=bp_construct();
 	        bss_cabinets[i].bp->pos=i;
+	        bss_cabinets[i].bp->soc=90;
+	        bss_cabinets[i].bp->soc=100;
+	        bss_cabinets[i].bp->cycle=8;
+	        bss_cabinets[i].bp->temp=26;
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
 	        bss_cabinets[i].on_door_open=cabinet_door_open_event_handle;
+	        bss_cabinets[i].is_changed=1;
 	        while(bss_cabinets[i].bp==NULL);
 	        bp_slaves[i]=(CO_Slave*)(bss_cabinets[i].bp);
 	        co_slave_set_con_state(bp_slaves[i],CO_SLAVE_CON_ST_DISCONNECT);
@@ -57,12 +62,8 @@ void cab_app_init(Cabinet_App* p_ca){
 	        sw_off(&bss_cabinets[i].node_id_sw);
 	}
 
-	co_slave_set_con_state(bp_slaves[0], CO_SLAVE_CON_ST_ASSIGNING);
-	co_slave_set_con_state(bp_slaves[1], CO_SLAVE_CON_ST_ASSIGNING);
-	co_slave_set_con_state(bp_slaves[2], CO_SLAVE_CON_ST_CONNECTED);
-	co_slave_set_con_state(bp_slaves[3], CO_SLAVE_CON_ST_CONNECTED);
-	bss_cabinets[3].bp->soc=70;
-	bss_cabinets[2].bp->soc=100;
+	co_slave_set_con_state(bp_slaves[1], CO_SLAVE_CON_ST_CONNECTED);
+	bss_cabinets[1].bp->soc=100;
 
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
 	can_master_init((CAN_master*)p_ca,bp_slaves,CABINET_CELL_NUM,&can_port);
@@ -164,27 +165,31 @@ void USART1_IRQHandler(void){
 }
 
 void HAL_HMI_PROCESS_DATA_IRQ(void){
+        static uint8_t cab_id=0;
+        static uint32_t alive_heartbeat_counter=0;
+
 	//static uint32_t sync_counter=0;
-	static uint8_t cab_id=0;
 	if(get_cmd_done == 1){
 		cab_app_decode_cmd_hmi(&selex_bss_app, buff);
 		get_cmd_done = 0;
 	}
-#if 0
-	if(sync_counter < 10){
-		sync_counter++;
-		CHECK_TIM_IRQ_REQUEST(&hmi_timer);
-		return;
-	}
-#endif
-
-	cab_app_sync_bp_data_hmi(&selex_bss_app, cab_id);
-	cab_app_sync_cab_data_hmi(&selex_bss_app,cab_id);
 	cab_id++;
 	if(cab_id>=selex_bss_app.bss.cab_num){
 		cab_id=0;
 	}
-	//sync_counter=0;
+	for(uint8_t i=0;i<selex_bss_app.bss.cab_num;i++){
+	        if(selex_bss_app.bss.cabs[i].is_changed==1){
+	               cab_app_sync_bp_data_hmi(&selex_bss_app, i);
+	               cab_app_sync_cab_data_hmi(&selex_bss_app, i);
+	               selex_bss_app.bss.cabs[i].is_changed=0;
+	               alive_heartbeat_counter=0;
+	        }
+	}
+	alive_heartbeat_counter++;
+	if(alive_heartbeat_counter>10){
+               cab_app_sync_cab_data_hmi(&selex_bss_app, 0);
+               alive_heartbeat_counter=0;
+	}
 
 	CHECK_TIM_IRQ_REQUEST(&hmi_timer);
 }

@@ -14,19 +14,25 @@ void cabinet_init(Cabinet* p_cc){
 }
 
 void cab_cell_update_state(Cabinet* p_cab){
+        CABINET_STATE old_state=p_cab->state;
+        CABINET_STATE new_state=CAB_CELL_ST_EMPTY;
 	switch(p_cab->bp->base.con_state){
 	case CO_SLAVE_CON_ST_DISCONNECT:
-		p_cab->state=CAB_CELL_ST_EMPTY;
+		new_state=CAB_CELL_ST_EMPTY;
 		break;
 	case CO_SLAVE_CON_ST_ASSIGNING:
-		p_cab->state=CAB_CELL_ST_BP_ID_ASSIGN;
+		new_state=CAB_CELL_ST_BP_ID_ASSIGN;
 		break;
 	case CO_SLAVE_CON_ST_AUTHORIZING:
-		p_cab->state=CAB_CELL_ST_BP_ID_AUTHORIZE;
+		new_state=CAB_CELL_ST_BP_ID_AUTHORIZE;
 		break;
 	case CO_SLAVE_CON_ST_CONNECTED:
-		p_cab->state=CAB_CELL_ST_ST_STANDBY;
+		new_state=CAB_CELL_ST_ST_STANDBY;
 		break;
+	}
+	if(new_state!=old_state){
+	        p_cab->state=new_state;
+	        p_cab->is_changed=1;
 	}
 }
 

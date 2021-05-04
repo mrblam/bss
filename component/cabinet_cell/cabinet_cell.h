@@ -38,6 +38,7 @@ struct Cabinet_t{
 	Switch			node_id_sw;
 	NTC*			temp_ss;
 	int32_t			temp;
+	uint8_t is_changed;
 	void (*data_serialize)(Cabinet* p_cc, char* buff);
 	void (*on_door_close)(Cabinet* p_cab);
 	void (*on_door_open)(Cabinet* p_cab);

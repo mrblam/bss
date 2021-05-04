@@ -104,15 +104,10 @@ static void door_update_state(uint16_t id){
 }
 
 void door_sw_on(uint16_t id){
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]) == GPIO_PIN_RESET){
-		HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+        uint32_t cnt=0;
+	HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_SET);
+	while(cnt < 900000) cnt++;
+	HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_RESET);
 }
 
 /* -------------------------------------------------------------------------------------------------- */
