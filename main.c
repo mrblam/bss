@@ -90,6 +90,7 @@ int main (void){
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
 	__enable_irq();
+	can_master_start_assign_next_slave((CAN_master*)&selex_bss_app, sys_timestamp);
 	while(1){
 	};
 }
