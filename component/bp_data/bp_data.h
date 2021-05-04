@@ -67,7 +67,7 @@ static inline CO_SLAVE_NET_STATE bp_get_con_state(const BP* const p_bp){
 }
 
 static inline void bp_set_con_state(BP* p_bp,const CO_SLAVE_NET_STATE state){
-        p_bp->base.con_state=state;
+        co_slave_set_con_state((CO_Slave*) p_bp, state);
 }
 
 static inline void bp_reset_inactive_counter(BP* p_bp){

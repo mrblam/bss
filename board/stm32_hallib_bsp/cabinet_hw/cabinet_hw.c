@@ -92,7 +92,7 @@ static void door_update_state(uint16_t id){
 	uint8_t pre_state = (door_state & (1<<id));
 	uint8_t cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
 	uint16_t stable_cnt = 0;
-	while(stable_cnt < 100){
+	while(stable_cnt < 1000){
 		pre_state = cur_state;
 		cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
 		if(cur_state == pre_state){
