@@ -59,7 +59,7 @@
 #define HAL_CELL_FAN_4_LOW								CELL_FAN_1_LOW
 #define HAL_CELL_FAN_5_LOW								CELL_FAN_1_LOW
 
-#define HAL_DOOR_GET_STATE(id)		DOOR_GET_STATE(id)
+#define HAL_DOOR_GET_STATE(id)		door_state[id]
 
 void door_sw_on(uint16_t id) WEAK;
 void cabinet_hw_init(void) WEAK;
