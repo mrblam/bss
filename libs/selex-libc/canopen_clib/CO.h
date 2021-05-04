@@ -171,6 +171,10 @@ struct CO_t{
         CO_Error_Handle error_handle;
 };
 
+static inline void co_slave_set_con_state(CO_Slave* p_sl, CO_SLAVE_NET_STATE state){
+        p_sl->con_state=state;
+}
+
 void co_send_boost_msg(CO* p_co);
 
 static LIB_OPTIMIZE_ATTR uint32_t co_get_last_error(const CO* p_dev){

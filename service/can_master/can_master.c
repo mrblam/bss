@@ -165,7 +165,7 @@ void can_master_start_assign_next_slave(CAN_master *p_cm) {
 
 void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave) {
 
-	slave->con_state = CO_SLAVE_CON_ST_AUTHORIZING;
+        co_slave_set_con_state(slave, CO_SLAVE_CON_ST_AUTHORIZING);
 	p_cm->assign_state = CM_ASSIGN_ST_AUTHORIZING;
 	can_master_read_slave_sn(p_cm, slave->node_id - p_cm->slave_start_node_id);
 }
@@ -248,11 +248,11 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 		p_cm->p_hw->tx_data[0] = p_cm->assigning_slave->node_id;
 		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 		p_cm->assign_state = CM_ASSIGN_ST_WAIT_CONFIRM;
-		p_cm->assign_timeout = timestamp + 1000;
+		p_cm->assign_timeout = timestamp + 4000;
 		break;
 	case CM_ASSIGN_ST_WAIT_CONFIRM:
 		if (p_cm->assign_timeout < timestamp) {
-			p_cm->assigning_slave->con_state = CO_SLAVE_CON_ST_DISCONNECT;
+		        co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_DISCONNECT);
 			p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id);
 			can_master_start_assign_next_slave(p_cm);
 		}
@@ -261,7 +261,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 		can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id-
 				p_cm->slave_start_node_id);
 		if (p_cm->sdo_server.state == SDO_ST_FAIL) {
-			p_cm->assigning_slave->con_state = CO_SLAVE_CON_ST_DISCONNECT;
+		        co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_DISCONNECT);
 			p_cm->on_slave_assign_fail(p_cm,
 					p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 			can_master_start_assign_next_slave(p_cm);
@@ -269,7 +269,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 		} else if (p_cm->sdo_server.state == SDO_ST_SUCCESS) {
 			p_cm->on_slave_assign_success(p_cm,
 					p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
-			p_cm->assigning_slave->con_state = CO_SLAVE_CON_ST_CONNECTED;
+			co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_CONNECTED);
 			can_master_slave_deselect(p_cm,
 					p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 			can_master_start_assign_next_slave(p_cm);
@@ -279,6 +279,12 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 	case CM_ASSIGN_ST_DONE:
 		break;
 	case CM_ASSIGN_ST_SLAVE_SELECT:
+	        if (p_cm->assign_timeout < timestamp) {
+			co_slave_set_con_state(p_cm->assigning_slave,CO_SLAVE_CON_ST_CONNECTED);
+			p_cm->on_slave_assign_fail(p_cm,
+			                p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
+			can_master_start_assign_next_slave(p_cm);
+		}
 		break;
 	}
 

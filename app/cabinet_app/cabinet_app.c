@@ -46,6 +46,10 @@ void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
 
 void cab_app_start_id_assign_process(Cabinet_App* p_ca){
 	can_master_start_assign_next_slave((CAN_master*)p_ca);
+	if(p_ca->base.assigning_slave!=NULL){
+	        can_master_slave_deselect((CAN_master*)p_ca,
+	                        p_ca->base.assigning_slave->node_id-p_ca->base.slave_start_node_id);
+	}
 }
 
 void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){
