@@ -13,7 +13,7 @@
 #include "switch.h"
 
 typedef enum DOOR_STATE{
-	DOOR_ST_CLOSE,
+	DOOR_ST_CLOSE=0,
 	DOOR_ST_OPEN,
 	DOOR_ST_FAIL
 } DOOR_STATE;

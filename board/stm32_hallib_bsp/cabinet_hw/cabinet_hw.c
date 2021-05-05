@@ -10,8 +10,7 @@
 
 TIM_HandleTypeDef io_scan_timer;
 
-uint32_t door_state;
-uint8_t cab_temp[CABINET_CELL_NUM];
+volatile uint8_t door_state[CABINET_CELL_NUM]={0};
 
 static void cabinet_io_scan_timer_init(void);
 static void cabinet_io_scan_timer_init_nvic(void);
@@ -19,8 +18,6 @@ static void cabinet_door_scan_state(void);
 static void cabinet_io_scan_timer_init_nvic(void);
 static void door_update_state(uint16_t id);
 static void ntc_update_temp(uint16_t id);
-
-#define UPDATE_DOOR_STATE(id)	door_state &= ~(1<<(id)); door_state|= (cur_state<<(id))
 
 static GPIO_TypeDef* door_state_ports[]={
 		DOOR_ST_PORT1_4,
@@ -86,39 +83,36 @@ void TIM3_IRQHandler(void){
 }
 
 static void cabinet_door_scan_state(void){
-	for(uint16_t i=0;i<15;i++){
+	for(uint16_t i=0;i<CABINET_CELL_NUM;i++){
 		door_update_state(i);
 		ntc_update_temp(i);
 	}
 }
 
 static void door_update_state(uint16_t id){
-	uint8_t pre_state = (door_state & (1<<id));
+	uint8_t pre_state = door_state[id];
 	uint8_t cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
 	uint16_t stable_cnt = 0;
-	while(stable_cnt < 100){
-		pre_state = cur_state;
-		cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
+	while(stable_cnt < 1000){
 		if(cur_state == pre_state){
 			stable_cnt++;
 		}
-		else stable_cnt = 0;
+		else{
+		        pre_state = cur_state;
+		        stable_cnt = 0;
+		}
+		cur_state = HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]);
 	}
-	UPDATE_DOOR_STATE(id);
+	door_state[id]=cur_state;
 }
 
 void door_sw_on(uint16_t id){
-	uint32_t cnt = 0;
-	while(HAL_GPIO_ReadPin(door_state_ports[id], door_state_pins[id]) == GPIO_PIN_RESET){
-		HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_SET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-		HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_RESET);
-		while(cnt < 100000) cnt++;
-		cnt = 0;
-	}
+        uint32_t cnt=0;
+	HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_SET);
+	while(cnt < 900000) cnt++;
+	HAL_GPIO_WritePin(door_sw_ports[id],door_sw_pins[id], GPIO_PIN_RESET);
 }
-
+#if 0
 static void ntc_update_temp(uint16_t id){
 	if(id < 9){
 		mux_sw_channel(8-id);
@@ -127,7 +121,7 @@ static void ntc_update_temp(uint16_t id){
 	HAL_ADC_Start_IT(&ntc.adc_module);
 	cab_temp[id] = &ntc.adc_value;
 }
-
+#endif
 /* -------------------------------------------------------------------------------------------------- */
 /* Interrupt every 1ms */
 static void cabinet_io_scan_timer_init(void){

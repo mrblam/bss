@@ -42,7 +42,6 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 		/* read battery state and update to owner cabinet */
 		cab_cell_update_state(&p_bss->cabs[i]);
 	}
-
 	bss_update_io_state(p_bss);
 }
 

@@ -16,6 +16,7 @@
 
 #define CAN_NODE_ID_ASSIGN_COBID						0x70
 #define SLAVE_SERIAL_NUMBER_OBJECT_INDEX				0x2101
+#define BMS_MAINSWITCH_INDEX							0x2109
 
 #define SLAVE_RPDO1							0x200
 #define SDO_RX_BUFFER_SIZE                 (32UL)
@@ -65,6 +66,7 @@ typedef struct CAN_master_t CAN_master;
 typedef void (*CAN_Master_Slave_Select)(const CAN_master*,const uint32_t);
 
 typedef enum CM_ASSIGN_STATE{
+        CM_ASSIGN_ST_WAIT_REQUEST,
 	CM_ASSIGN_ST_START,
 	CM_ASSIGN_ST_SLAVE_SELECT,
 	CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM,
@@ -96,16 +98,25 @@ struct CAN_master_t{
 void can_master_init(CAN_master* p_cm,CO_Slave** slaves,
 		const uint32_t slave_num,CAN_Hw* p_hw);
 void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
-void can_master_start_assign_next_slave(CAN_master* p_cm);
+void can_master_start_assign_next_slave(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id);
 void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave);
 void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp);
+void co_sdo_read_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,uint8_t* rx_buff,const uint32_t timeout);
+void co_sdo_write_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,
+		uint8_t* tx_buff,const uint32_t len,const uint32_t timeout);
 
 static inline void can_master_slave_select(const CAN_master* p_cm,
 		const uint32_t id){
 	p_cm->slave_select(p_cm,id);
 }
+
+static inline void can_master_slave_deselect(const CAN_master* p_cm,
+		const uint32_t id){
+	p_cm->slave_deselect(p_cm,id);
+}
+
 
 static inline SDO_STATE sdo_server_get_state(const CO_SDO_SERVER* const p_svr){
         return p_svr->state;
