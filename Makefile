@@ -5,7 +5,7 @@
 
 export TARGET=bss_storage_control
 export PROJ_ROOT=.
-export BOARD_TYPE=stm32_hallib_bsp
+export BOARD_TYPE=stm32_rs485_bsp
 include $(PROJ_ROOT)/board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include $(PROJ_ROOT)/gcc.mk
 
