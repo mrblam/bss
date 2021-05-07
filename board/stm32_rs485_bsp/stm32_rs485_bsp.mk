@@ -27,6 +27,7 @@ BSP_SRCS=  \
 
 BSP_SRCS+=$(BOARD_TYPE).c  \
 	uart_hw/uart_hw.c \
+	max485_hw/max485_hw.c \
 	can_hardware/can_hardware.c \
 	adc_hw/adc_hw.c \
 	debug_io_hw/debug_io_hw.c \
@@ -64,7 +65,7 @@ AS_DEFS =
 C_DEFS =-DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB
 
 # C includes
-BSP_INCLUDES = . uart_hw \
+BSP_INCLUDES = . uart_hw  max485_hw \
 	can_hardware \
 	delay_hw \
 	core_hw \

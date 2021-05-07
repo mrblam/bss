@@ -10,4 +10,5 @@ void board_init(void){
 	cabinet_hw_init();
 	adc_hw_init();
 	ioe_hw_init();
+	max485_hw_init();
 }
