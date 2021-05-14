@@ -65,7 +65,8 @@ AS_DEFS =
 C_DEFS =-DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB
 
 # C includes
-BSP_INCLUDES = . uart_hw  max485_hw \
+BSP_INCLUDES = . uart_hw \
+	max485_hw \
 	can_hardware \
 	delay_hw \
 	core_hw \

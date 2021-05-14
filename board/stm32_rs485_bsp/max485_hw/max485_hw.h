@@ -12,9 +12,12 @@
 #include "stm32f1xx_hal.h"
 #include "core.h"
 
+#define EN_RS485_PIN 		GPIO_PIN_8
+#define EN_RS485_PORT 		GPIOA
 
-#define MAX485_SET_DIR_TX						HAL_GPIO_WritePin(GPIOA,GPIO_Pin_0,1)
-#define MAX485_SET_DIR_RX						HAL_GPIO_WritePin(GPIOA,GPIO_Pin_0,0)
+
+#define MAX485_SET_DIR_TX						HAL_GPIO_WritePin(EN_RS485_PORT, EN_RS485_PIN, GPIO_PIN_SET)
+#define MAX485_SET_DIR_RX						HAL_GPIO_WritePin(EN_RS485_PORT, EN_RS485_PIN, GPIO_PIN_RESET)
 
 
 struct Max485_Hw_t{

@@ -9,6 +9,7 @@
 typedef struct UART_hw_t UART_hw;
 struct UART_hw_t{
 	UART_HandleTypeDef 	uart_module;
+	uint8_t				rx_data;
 	void				(*receive_handle)(UART_hw* p_hw);
 	void				(*uart_send)(UART_hw* p_hw);
 };

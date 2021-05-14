@@ -144,6 +144,7 @@ char uart_receives(UART_hw* p_hw, char* s){
 #if 0
 void USART1_IRQHandler(void){
 	HAL_UART_IRQHandler(&power_sys_port.uart_module);
+	uart_receives(&power_sys_port, (char*)&power_sys_port.rx_data);
 	if(power_sys_port.receive_handle != NULL){
 		power_sys_port.receive_handle(&power_sys_port);
 	}
