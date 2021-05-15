@@ -36,12 +36,7 @@ static void rs485_master_send_sync(RS485_Master* p_485m){
 
 void rs485_master_process_switch_command(RS485_Master* p_485m, const uint8_t slave_id,
 		const SLAVE_OBJECTS obj, const SLAVE_OBJECT_STATE state, const uint32_t timestamp){
-#if 0
-	if(p_485m->timeout >= timestamp){
-		p_485m->state = RS485_MASTER_ST_FAIL;
-		return;
-	}
-#endif
+
 	switch(p_485m->state){
 	case RS485_MASTER_ST_IDLE:
 		p_485m->csv.id = slave_id;
@@ -50,7 +45,7 @@ void rs485_master_process_switch_command(RS485_Master* p_485m, const uint8_t sla
 		p_485m->set_transmit_mode(p_485m);
 		cabinet_485_hw.sends(&cabinet_485_hw, (char*)p_485m->tx_data);
 		p_485m->set_receive_mode(p_485m);
-		p_485m->timeout = timestamp + 10;
+		p_485m->timeout = timestamp + 200;
 		p_485m->state = RS485_MASTER_ST_WAIT_CONFIRM;
 		break;
 	case RS485_MASTER_ST_WAIT_CONFIRM:
@@ -58,17 +53,19 @@ void rs485_master_process_switch_command(RS485_Master* p_485m, const uint8_t sla
 			p_485m->parse_sync_msg_handle(p_485m);
 			p_485m->is_new_msg = 0;
 		}
+		if(p_485m->timeout < timestamp){
+			p_485m->state = RS485_MASTER_ST_FAIL;
+		}
 		break;
 	case RS485_MASTER_ST_SEND_SYNC:
 		rs485_master_sync_data_serialize(p_485m, p_485m->csv.id);
 		p_485m->set_transmit_mode(p_485m);
 		cabinet_485_hw.sends(&cabinet_485_hw, (char*)p_485m->tx_data);
 		p_485m->set_receive_mode(p_485m);
+		p_485m->timeout = timestamp + 200;
 		p_485m->state = RS485_MASTER_ST_WAIT_CONFIRM;
 		break;
 	case RS485_MASTER_ST_SUCCESS:
-		break;
-	case RS485_MASTER_ST_FAIL:
 		break;
 	default:
 		break;

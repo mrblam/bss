@@ -15,6 +15,8 @@ RS485_Master rs485m;
 Cabinet			cab1;
 static uint32_t sys_timestamp=0;
 static uint32_t sys_tick_ms=0;
+uint8_t cnt, cnt_delay;
+uint32_t time;
 
 static void rs485_parse_sync_msg_handle(RS485_Master* p_485m);
 
@@ -55,6 +57,7 @@ int main(void){
 	rs485m.parse_sync_msg_handle = rs485_parse_sync_msg_handle;
 
 	rs485m.state = RS485_MASTER_ST_IDLE;
+	//cnt = 1;
 	uart_receives(&power_sys_port, (char*)&power_sys_port.rx_data);
 	__enable_irq();
 
@@ -64,7 +67,48 @@ int main(void){
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void){
 	sys_timestamp+= sys_tick_ms;
-	rs485_master_process_switch_command(&rs485m, 0, 'D', 1, sys_timestamp);
+	if(cnt == 0){
+		rs485_master_process_switch_command(&rs485m, 3, 'D', 1, sys_timestamp);
+		if(rs485m.state == RS485_MASTER_ST_SUCCESS){
+			rs485m.state = RS485_MASTER_ST_IDLE;
+			for(uint8_t i = 0; i<32; i++){
+				rs485m.rx_data[i] = 0;
+				rs485m.tx_data[i] = 0;
+			}
+			rs485m.rx_index = 0;
+			cnt_delay = 1;
+			cnt = 2;
+			time = sys_timestamp + 1000;
+
+		}
+	}
+	else if(cnt == 1){
+		rs485_master_process_switch_command(&rs485m, 0, 'D', 1, sys_timestamp);
+		if(rs485m.state == RS485_MASTER_ST_SUCCESS){
+			rs485m.state = RS485_MASTER_ST_IDLE;
+			for(uint8_t i = 0; i<32; i++){
+				rs485m.rx_data[i] = 0;
+				rs485m.tx_data[i] = 0;
+			}
+			rs485m.rx_index = 0;
+			cnt_delay = 1;
+			cnt = 3;
+			time = sys_timestamp + 1000;
+
+		}
+	}
+	else if(cnt_delay == 1){
+		if(time < sys_timestamp){
+			if(cnt == 3) {
+				cnt = 0;
+				cnt_delay = 0;
+			}
+			else if(cnt == 2) {
+				cnt = 1;
+				cnt_delay = 0;
+			}
+		}
+	}
 }
 
 static void rs485_parse_sync_msg_handle(RS485_Master* p_485m){
@@ -72,26 +116,29 @@ static void rs485_parse_sync_msg_handle(RS485_Master* p_485m){
 		char* token = strtok((char*)p_485m->start_msg_index,",");
 		if(p_485m->csv.id == string_to_long(token)){
 			token = strtok(NULL, ",");
-			if(*token == 'W'){
-				token = strtok(NULL, ",");
-				if(*token == p_485m->csv.obj){
+				switch (*token){
+				case 'W':
+					token = strtok(NULL, ",");
+					if(*token == p_485m->csv.obj){
 					p_485m->state = RS485_MASTER_ST_SEND_SYNC;
+					break;
+				case 'R':
+					token = strtok(NULL, ",");
+					cab1.door.state = string_to_long(token);
+					token = strtok(NULL, ",");
+					cab1.cell_fan.state = string_to_long(token);
+					token = strtok(NULL, ",");
+					cab1.node_id_sw.state = string_to_long(token);
+					token = strtok(NULL, ",");
+					cab1.charger.state = string_to_long(token);
+					token = strtok(NULL, ",");
+					cab1.temp = string_to_long(token);
+					p_485m->state = RS485_MASTER_ST_SUCCESS;
+					break;
+				default:
+					break;
 				}
 			}
-			else if(*token == 'R'){
-				token = strtok(NULL, ",");
-				cab1.door.state = string_to_long(token);
-				token = strtok(NULL, ",");
-				cab1.cell_fan.state = string_to_long(token);
-				token = strtok(NULL, ",");
-				cab1.node_id_sw.state = string_to_long(token);
-				token = strtok(NULL, ",");
-				cab1.charger.state = string_to_long(token);
-				token = strtok(NULL, ",");
-				cab1.temp = string_to_long(token);
-				p_485m->state = RS485_MASTER_ST_SUCCESS;
-			}
-
 		}
 	}
 }
