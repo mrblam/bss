@@ -41,8 +41,10 @@ static void rs485_receive_handle_impl(UART_hw* p_hw){
 		rs485m.rx_index = 0;
 		return;
 	}
-	rs485m.rx_data[rs485m.rx_index] = p_hw->rx_data;
-	rs485m.rx_index++;
+	if(p_hw->rx_data != '\0'){
+		rs485m.rx_data[rs485m.rx_index] = p_hw->rx_data;
+		rs485m.rx_index++;
+	}
 }
 
 static void hmi_receive_handle_impl(UART_hw* p_hw){
@@ -65,6 +67,34 @@ static void door_switch_on1(Switch* p_sw){
 static void door_switch_on2(Switch* p_sw){
 	(void)p_sw;
 	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID2, SLAVE_DOOR, ACTIVE);
+	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+}
+
+static void node_id_switch_on1(Switch* p_sw){
+	(void)p_sw;
+	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID1, SLAVE_NODE_ID, ACTIVE);
+	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+}
+
+static void node_id_switch_off1(Switch* p_sw){
+	(void)p_sw;
+	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID1, SLAVE_NODE_ID, DEACTIVE);
+	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+}
+
+static void node_id_switch_on2(Switch* p_sw){
+	(void)p_sw;
+	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID2, SLAVE_NODE_ID, ACTIVE);
+	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+}
+
+static void node_id_switch_off2(Switch* p_sw){
+	(void)p_sw;
+	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID2, SLAVE_NODE_ID, DEACTIVE);
 	rs485m.state = RS485_MASTER_ST_SEND_CMD;
 	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
@@ -92,7 +122,15 @@ int main(void){
 
 	selex_bss_app.bss.cabs = &cabin[0];
 	selex_bss_app.bss.cabs[TEST_SLAVE_ID1].door.solenoid.sw_on = door_switch_on1;
+	selex_bss_app.bss.cabs[TEST_SLAVE_ID1].node_id_sw.sw_on = node_id_switch_on1;
+	selex_bss_app.bss.cabs[TEST_SLAVE_ID1].node_id_sw.sw_off = node_id_switch_off1;
+
+
 	selex_bss_app.bss.cabs[TEST_SLAVE_ID2].door.solenoid.sw_on = door_switch_on2;
+	selex_bss_app.bss.cabs[TEST_SLAVE_ID2].node_id_sw.sw_on = node_id_switch_on2;
+	selex_bss_app.bss.cabs[TEST_SLAVE_ID2].node_id_sw.sw_off = node_id_switch_off2;
+
+
 
 	__enable_irq();
 

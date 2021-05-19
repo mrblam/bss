@@ -170,21 +170,27 @@ void cab_app_parse_hmi_msg(Cabinet_App* p_ca){
 }
 
 static void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint8_t cab_id, const char obj, const uint8_t state){
-	if(state == 1){
-		switch(obj){
-		case 'D':
-			if(state == 1){
-				sw_on(&p_ca->bss.cabs[cab_id].door.solenoid);
-				p_ca->is_new_msg = 0;
-			}
-			break;
-		case 'F':
-			break;
-		case 'C':
-			break;
-		case 'S':
-			break;
+	switch(obj){
+	case 'D':
+		if(state == 1){
+			sw_on(&p_ca->bss.cabs[cab_id].door.solenoid);
+			p_ca->is_new_msg = 0;
 		}
+		break;
+	case 'N':
+		if(state == 1){
+			sw_on(&p_ca->bss.cabs[cab_id].node_id_sw);
+			p_ca->is_new_msg = 0;
+		}
+		else if(state == 0){
+			sw_off(&p_ca->bss.cabs[cab_id].node_id_sw);
+			p_ca->is_new_msg = 0;
+		}
+		break;
+	case 'C':
+		break;
+	case 'S':
+		break;
 	}
 }
 
