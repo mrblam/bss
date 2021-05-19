@@ -48,7 +48,7 @@ int main(void){
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
 
-	rs485_master_init(&rs485m, (RS485_Slave**)0, 1, &cabinet_485_hw);
+	rs485_master_init(&rs485m, 1, &cabinet_485_hw);
 	rs485m.p_hw->uart_module = power_sys_port.uart_module;
 	power_sys_port.receive_handle = uart_receive_handle_impl;
 	rs485m.set_transmit_mode = rs485_set_tx_mode;
@@ -59,6 +59,7 @@ int main(void){
 	rs485m.state = RS485_MASTER_ST_IDLE;
 	//cnt = 1;
 	uart_receives(&power_sys_port, (char*)&power_sys_port.rx_data);
+	rs485m.state = RS485_MASTER_ST_SEND_CMD;
 	__enable_irq();
 
 	while(1);
@@ -76,8 +77,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 				rs485m.tx_data[i] = 0;
 			}
 			rs485m.rx_index = 0;
-			cnt_delay = 1;
-			cnt = 2;
+			//cnt_delay = 1;
+			//cnt = 2;
 			time = sys_timestamp + 1000;
 
 		}
@@ -91,8 +92,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 				rs485m.tx_data[i] = 0;
 			}
 			rs485m.rx_index = 0;
-			cnt_delay = 1;
-			cnt = 3;
+			//cnt_delay = 1;
+			//cnt = 3;
 			time = sys_timestamp + 1000;
 
 		}

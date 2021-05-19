@@ -74,14 +74,14 @@ static uint16_t door_sw_pins[] = {
 void cabinet_hw_init(void){
 	cabinet_io_scan_timer_init();
 	cabinet_io_scan_timer_init_nvic();
-	gpio_hw_init();
+	//gpio_hw_init();
 }
-
+#if 0
 void TIM3_IRQHandler(void){
 	cabinet_door_scan_state();
 	HAL_TIM_IRQHandler(&io_scan_timer);
 }
-
+#endif
 static void cabinet_door_scan_state(void){
 	for(uint16_t i=0;i<CABINET_CELL_NUM;i++){
 		door_update_state(i);
@@ -152,7 +152,7 @@ static void cabinet_io_scan_timer_init(void){
 
 static void cabinet_io_scan_timer_init_nvic(void){
 	/* TIM3 interrupt Init */
-	HAL_NVIC_SetPriority(TIM3_IRQn, IO_SCAN_TIM_PRIORITY, 0);
+	HAL_NVIC_SetPriority(TIM3_IRQn, PROCESS_DATA_COM_IRQN_PRIORITY, 0);
 	HAL_NVIC_EnableIRQ(TIM3_IRQn);
 }
 

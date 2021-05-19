@@ -38,6 +38,10 @@ struct Cabinet_App_t{
 	TIMING_STATE	timing_state;
 	uint8_t 		time_stamp;
 	BSS_Data		bss;
+	uint8_t			rx_data[32];
+	uint8_t			rx_index;
+	uint8_t			is_new_msg;
+	uint8_t*		start_msg_index;
 };
 
 void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
@@ -56,6 +60,7 @@ void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff);
 void cab_app_process_cab_cmd_hmi(Cabinet_App* p_ca, char* token);
 void capp_on_cabinet_door_close(Cabinet_App* p_app,Cabinet* p_cab);
 void cab_app_active_charge(Cabinet_App* p_ca,uint8_t cab_id);
+void cab_app_parse_hmi_msg(Cabinet_App* p_ca);
 
 static inline void cab_app_set_state(Cabinet_App* p_ca, CABIN_STATE state){
 	p_ca->state = state;

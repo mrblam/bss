@@ -10,6 +10,10 @@
 
 static char tx_buff[50];
 
+static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca);
+static void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint8_t cab_id,
+		const char obj, const uint8_t state);
+static void cab_app_reset_buffer(Cabinet_App* p_ca);
 
 void cab_app_active_charge(Cabinet_App* p_ca,uint8_t cab_id){
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state=3;
@@ -124,5 +128,69 @@ void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char
 		break;
 	default:
 		break;
+	}
+}
+
+static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca){
+	uint8_t* buff = (uint8_t*)p_ca->rx_data;
+	buff += p_ca->rx_index-1;
+	while((*buff != '*') || (*buff != '\0')){
+		if(*buff == '*'){
+			*buff = '\0';
+			buff--;
+			while((*buff != ':') || (*buff != '\0')){
+				if(*buff == ':'){
+					p_ca->start_msg_index = ++buff;
+					return 1;
+				}
+				else if(*buff == '\0') return 0;
+				buff--;
+			}
+		}
+		else if(*buff == '\0') return 0;
+		buff--;
+	}
+	return 0;
+}
+
+void cab_app_parse_hmi_msg(Cabinet_App* p_ca){
+	if(cab_app_check_valid_hmi_msg(p_ca)){
+		if(*p_ca->start_msg_index == 'W'){
+			char* token = strtok((char*)++p_ca->start_msg_index,",");
+			token = strtok(NULL, ",");
+			uint8_t cab_id = string_to_long(token);
+			token = strtok(NULL, ",");
+			char obj = *token;
+			token = strtok(NULL, ",");
+			uint8_t state = string_to_long(token);
+			cab_app_process_hmi_command(p_ca, cab_id, obj, state);
+		}
+		cab_app_reset_buffer(p_ca);
+	}
+}
+
+static void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint8_t cab_id, const char obj, const uint8_t state){
+	if(state == 1){
+		switch(obj){
+		case 'D':
+			if(state == 1){
+				sw_on(&p_ca->bss.cabs[cab_id].door.solenoid);
+				p_ca->is_new_msg = 0;
+			}
+			break;
+		case 'F':
+			break;
+		case 'C':
+			break;
+		case 'S':
+			break;
+		}
+	}
+}
+
+static void cab_app_reset_buffer(Cabinet_App* p_ca){
+	p_ca->rx_index = 0;
+	for(uint8_t i = 0; i < 32; i++){
+		p_ca->rx_data[i] = 0;
 	}
 }

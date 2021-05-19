@@ -57,7 +57,7 @@ SRCS+=$(BSP_SRCS)
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))		
 SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
 
-TEST_SRCS+= test_master_command.c 
+TEST_SRCS+= test_rs485_multi_thread.c 
 
 SRCS+=$(TEST_SRCS)
 OBJS+=$(TEST_SRCS)

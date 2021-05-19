@@ -71,17 +71,5 @@ typedef enum TIMING_STATE{
 	TIMING_ST_ACTIVE = 1
 } TIMING_STATE;
 
-typedef enum SLAVE_OBJECTS{
-	SLAVE_DOOR 		= 'D',
-	SLAVE_FAN 		= 'F',
-	SLAVE_NODE_ID 	= 'N',
-	SLAVE_CHARGER	= 'C'
-}SLAVE_OBJECTS;
-
-typedef enum SLAVE_OBJECT_STATE{
-	DEACTIVE	= '0',
-	ACTIVE 		= '1',
-	FAIL		= '2'
-} SLAVE_OBJECT_STATE;
 
 #endif /* APP_CONFIG_APP_CONFIG_H_ */
