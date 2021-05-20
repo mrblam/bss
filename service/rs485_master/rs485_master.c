@@ -72,8 +72,6 @@ void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp){
 		p_485m->state = RS485_MASTER_ST_WAIT_CONFIRM;
 		break;
 	case RS485_MASTER_ST_SUCCESS:
-		rs485_master_reset_buffer(p_485m);
-		p_485m->state = RS485_MASTER_ST_IDLE;
 		break;
 	case RS485_MASTER_ST_FAIL:
 		break;

@@ -9,6 +9,7 @@
 #include "cabinet_cell.h"
 #include "board.h"
 #include "cabinet_app.h"
+#include "peripheral_init.h"
 
 Cabinet_App		selex_bss_app;
 RS485_Master 	rs485m;
@@ -60,21 +61,27 @@ static void hmi_receive_handle_impl(UART_hw* p_hw){
 static void door_switch_on1(Switch* p_sw){
 	(void)p_sw;
 	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID1, SLAVE_DOOR, ACTIVE);
-	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
 	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door_switch_on2(Switch* p_sw){
 	(void)p_sw;
 	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID2, SLAVE_DOOR, ACTIVE);
-	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
 	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id_switch_on1(Switch* p_sw){
 	(void)p_sw;
 	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID1, SLAVE_NODE_ID, ACTIVE);
-	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
 	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
@@ -88,15 +95,27 @@ static void node_id_switch_off1(Switch* p_sw){
 static void node_id_switch_on2(Switch* p_sw){
 	(void)p_sw;
 	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID2, SLAVE_NODE_ID, ACTIVE);
-	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
 	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id_switch_off2(Switch* p_sw){
 	(void)p_sw;
 	rs485_master_set_csv_data(&rs485m, TEST_SLAVE_ID2, SLAVE_NODE_ID, DEACTIVE);
-	rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
 	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+}
+
+static void request_slave_sync_data(uint8_t slave_id){
+	rs485_master_set_csv_data(&rs485m, slave_id, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 int main(void){
@@ -104,10 +123,12 @@ int main(void){
 	HAL_Init();
 	core_hw_init();
 	uart_hw_init();
+	//peripheral_init(&selex_bss_app);
 	max485_hw_init();
 	sys_tick_ms=1000/SYSTICK_FREQ_Hz;
 	sys_timestamp=0;
 	cabinet_hw_init();
+	can_hardware_init();
 
 	rs485_master_init(&rs485m, 1, &cabinet_485_hw);
 	rs485m.p_hw->uart_module = rs485_com.uart_module;
@@ -177,6 +198,11 @@ void TIM3_IRQHandler(void){
 	if((com_timestamp%500) == 0){
 		if(selex_bss_app.is_new_msg){
 			cab_app_parse_hmi_msg(&selex_bss_app);
+		}
+	}
+	else if((com_timestamp%10) == 0){
+		if(rs485m.state == RS485_MASTER_ST_IDLE){
+			request_slave_sync_data(TEST_SLAVE_ID1);
 		}
 	}
 	else{

@@ -45,20 +45,20 @@ void cab_app_update_tilt_ss(Cabinet_App* p_ca){
 
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
 	bss_data_serialize(&p_ca->bss, tx_buff);
-	uart_sends(&power_sys_port, (uint8_t*)tx_buff);
+	uart_sends(&hmi_com, (uint8_t*)tx_buff);
 }
 
 void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){
 	if(p_ca->bss.cabs[cab_id].bp->base.con_state!=CO_SLAVE_CON_ST_CONNECTED) return;
 
 	bp_data_serialize(p_ca->bss.cabs[cab_id].bp, tx_buff);
-	uart_sends(&power_sys_port, (uint8_t*)tx_buff);
+	uart_sends(&hmi_com, (uint8_t*)tx_buff);
 }
 
 void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){
 
 	cab_cell_data_serialize(&p_ca->bss.cabs[cab_id], tx_buff);
-	uart_sends(&power_sys_port, (uint8_t*)tx_buff);
+	uart_sends(&hmi_com, (uint8_t*)tx_buff);
 }
 
 void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff){

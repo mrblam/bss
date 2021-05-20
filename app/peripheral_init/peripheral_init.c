@@ -9,6 +9,7 @@
 #include "cabinet_app.h"
 #include "cabinet_hw_hal.h"
 
+
 static const uint16_t ntc_lookups[] = {
 	    58747,//-10
 	    55498,//-9
@@ -222,6 +223,13 @@ static void cell_fan15_switch_off( Switch* p_sw);
 static void ntc_init(Cabinet_App* p_ca);
 static void ntc_sensor_get_adc_value(NTC* p_ntc);
 
+static void rs485_set_tx_mode(RS485_Master* p_485m);
+static void rs485_set_rx_mode(RS485_Master* p_485m);
+static void rs485_receive_handle_impl(UART_hw* p_hw);
+static void hmi_receive_handle_impl(UART_hw* p_hw);
+static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
+
+
 static sw_act door_interface[] = {door1_switch_on, door2_switch_on, door3_switch_on, door4_switch_on, door5_switch_on,
 								door6_switch_on, door7_switch_on, door8_switch_on, door9_switch_on, door10_switch_on,
 								door11_switch_on, door12_switch_on, door13_switch_on, door14_switch_on, door15_switch_on};
@@ -278,6 +286,25 @@ static sw_act node_set_low[]={
 void peripheral_init(Cabinet_App* p_ca){
 	//ioe_init();
 	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
+		p_ca->bss.cabs[cab_id].node_id_sw.sw_on = node_set_high[cab_id];
+		p_ca->bss.cabs[cab_id].node_id_sw.sw_off = node_set_low[cab_id];
+		p_ca->bss.cabs[cab_id].door.solenoid.sw_on = door_interface[cab_id];
+		p_ca->bss.cabs[cab_id].door.io_state.get_io_state = ios_interface[cab_id];
+	}
+
+	rs485_master_init(&rs485m, 1, &cabinet_485_hw);
+	rs485m.p_hw->uart_module = rs485_com.uart_module;
+	rs485_com.receive_handle = rs485_receive_handle_impl;
+	rs485m.set_transmit_mode = rs485_set_tx_mode;
+	rs485m.set_receive_mode = rs485_set_rx_mode;
+	rs485m.rx_index = 0;
+	rs485m.state = RS485_MASTER_ST_IDLE;
+	rs485m.parse_slave_msg_handle = rs485_parse_slave_msg_handle_impl;
+
+	hmi_com.receive_handle = hmi_receive_handle_impl;
+
+#if 0
+	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
 
 		p_ca->bss.cabs[cab_id].node_id_sw.sw_on=node_set_high[cab_id];
 		p_ca->bss.cabs[cab_id].node_id_sw.sw_off=node_set_low[cab_id];
@@ -288,6 +315,7 @@ void peripheral_init(Cabinet_App* p_ca){
 		p_ca->bss.cabs[cab_id].cell_fan.sw_on = cell_fan_on_interface[cab_id];
 		p_ca->bss.cabs[cab_id].cell_fan.sw_off = cell_fan_off_interface[cab_id];
 	}
+#endif
 	//ntc_init(p_ca);
 }
 
@@ -298,154 +326,278 @@ static void ntc_init(Cabinet_App* p_ca){
 	}
 }
 
+/* ------------------------------------------------------------------------------ */
+
 static void node_id1_sw_on(Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID1_HIGH;
+	rs485_master_set_csv_data(&rs485m, 0, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id2_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID2_HIGH;
+	rs485_master_set_csv_data(&rs485m, 1, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id3_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID3_HIGH;
+	rs485_master_set_csv_data(&rs485m, 2, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id4_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID4_HIGH;
+	rs485_master_set_csv_data(&rs485m, 3, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id5_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID5_HIGH;
+	rs485_master_set_csv_data(&rs485m, 4, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id6_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID6_HIGH;
+	rs485_master_set_csv_data(&rs485m, 5, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id7_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID7_HIGH;
+	rs485_master_set_csv_data(&rs485m, 6, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id8_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID8_HIGH;
+	rs485_master_set_csv_data(&rs485m, 7, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id9_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID9_HIGH;
+	rs485_master_set_csv_data(&rs485m, 8, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id10_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID10_HIGH;
+	rs485_master_set_csv_data(&rs485m, 9, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id11_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID11_HIGH;
+	rs485_master_set_csv_data(&rs485m, 10, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id12_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID12_HIGH;
+	rs485_master_set_csv_data(&rs485m, 11, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id13_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID13_HIGH;
+	rs485_master_set_csv_data(&rs485m, 12, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id14_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID14_HIGH;
+	rs485_master_set_csv_data(&rs485m, 13, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id15_sw_on( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID15_HIGH;
+	rs485_master_set_csv_data(&rs485m, 14, SLAVE_NODE_ID, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
+
+/* ------------------------------------------------------------------------------ */
 
 static void node_id1_sw_off(Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID1_LOW;
+	rs485_master_set_csv_data(&rs485m, 0, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id2_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID2_LOW;
+	rs485_master_set_csv_data(&rs485m, 1, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id3_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID3_LOW;
+	rs485_master_set_csv_data(&rs485m, 2, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id4_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID4_LOW;
+	rs485_master_set_csv_data(&rs485m, 3, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id5_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID5_LOW;
+	rs485_master_set_csv_data(&rs485m, 4, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id6_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID6_LOW;
+	rs485_master_set_csv_data(&rs485m, 5, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id7_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID7_LOW;
+	rs485_master_set_csv_data(&rs485m, 6, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id8_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID8_LOW;
+	rs485_master_set_csv_data(&rs485m, 7, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id9_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID9_LOW;
+	rs485_master_set_csv_data(&rs485m, 8, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id10_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID10_LOW;
+	rs485_master_set_csv_data(&rs485m, 9, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id11_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID11_LOW;
+	rs485_master_set_csv_data(&rs485m, 10, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id12_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID12_LOW;
+	rs485_master_set_csv_data(&rs485m, 11, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id13_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID13_LOW;
+	rs485_master_set_csv_data(&rs485m, 12, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id14_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID14_LOW;
+	rs485_master_set_csv_data(&rs485m, 13, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void node_id15_sw_off( Switch* p_cm){
 	(void)p_cm;
-	HAL_NODE_ID15_LOW;
+	rs485_master_set_csv_data(&rs485m, 14, SLAVE_NODE_ID, DEACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 /*--------------------------------------------------------------------------------*/
@@ -606,152 +758,355 @@ static void cell_fan15_switch_off( Switch* p_sw){
 
 static DOOR_STATE door1_get_state( IO_State* p_io){
 	(void) p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB1);
+	rs485_master_set_csv_data(&rs485m, 0, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	while((rs485m.state == RS485_MASTER_ST_SEND_CMD) ||
+			(rs485m.state == RS485_MASTER_ST_SEND_SYNC) ||
+			(rs485m.state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(&rs485m);
+	rs485m.state = RS485_MASTER_ST_IDLE;
+	return selex_bss_app.bss.cabs[0].door.state;
 }
 
 static DOOR_STATE door2_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB2);
+	rs485_master_set_csv_data(&rs485m, 1, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[1].door.state;
 }
 
 DOOR_STATE door3_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB3);
+	rs485_master_set_csv_data(&rs485m, 2, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[2].door.state;
 }
 
 static DOOR_STATE door4_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB4);
+	rs485_master_set_csv_data(&rs485m, 3, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[3].door.state;
 }
 
 static DOOR_STATE door5_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB5);
+	rs485_master_set_csv_data(&rs485m, 4, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[4].door.state;
 }
 
 static DOOR_STATE door6_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB6);
+	rs485_master_set_csv_data(&rs485m, 5, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[5].door.state;
 }
 
 static DOOR_STATE door7_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB7);
+	rs485_master_set_csv_data(&rs485m, 6, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[6].door.state;
 }
 
 static DOOR_STATE door8_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB8);
+	rs485_master_set_csv_data(&rs485m, 7, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[7].door.state;
 }
 
 static DOOR_STATE door9_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB9);
+	rs485_master_set_csv_data(&rs485m, 8, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[8].door.state;
 }
 
 static DOOR_STATE door10_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB10);
+	rs485_master_set_csv_data(&rs485m, 9, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[9].door.state;
 }
 
 static DOOR_STATE door11_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB11);
+	rs485_master_set_csv_data(&rs485m, 10, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[10].door.state;
 }
 
 static DOOR_STATE door12_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB12);
+	rs485_master_set_csv_data(&rs485m, 11, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[11].door.state;
 }
 
 static DOOR_STATE door13_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB13);
+	rs485_master_set_csv_data(&rs485m, 12, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[12].door.state;
 }
 
 static DOOR_STATE door14_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB14);
+	rs485_master_set_csv_data(&rs485m, 13, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[13].door.state;
 }
 
 static DOOR_STATE door15_get_state( IO_State* p_io){
 	(void)p_io;
-	return (DOOR_STATE) HAL_DOOR_GET_STATE(CAB15);
+	rs485_master_set_csv_data(&rs485m, 14, 0, 0);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	return selex_bss_app.bss.cabs[14].door.state;
 }
 
 /*--------------------------------------------------------------------------------*/
 
 static void door1_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(0);
+	rs485_master_set_csv_data(&rs485m, 0, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door2_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(1);
+	rs485_master_set_csv_data(&rs485m, 1, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door3_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(2);
+	rs485_master_set_csv_data(&rs485m, 2, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door4_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(3);
+	rs485_master_set_csv_data(&rs485m, 3, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door5_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(4);
+	rs485_master_set_csv_data(&rs485m, 4, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door6_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(5);
+	rs485_master_set_csv_data(&rs485m, 5, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door7_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(6);
+	rs485_master_set_csv_data(&rs485m, 6, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door8_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(7);
+	rs485_master_set_csv_data(&rs485m, 7, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door9_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(8);
+	rs485_master_set_csv_data(&rs485m, 8, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door10_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(9);
+	rs485_master_set_csv_data(&rs485m, 9, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door11_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(10);
+	rs485_master_set_csv_data(&rs485m, 10, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door12_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(11);
+	rs485_master_set_csv_data(&rs485m, 11, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door13_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(12);
+	rs485_master_set_csv_data(&rs485m, 12, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door14_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(13);
+	rs485_master_set_csv_data(&rs485m, 13, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
 }
 
 static void door15_switch_on( Switch* p_sw){
 	(void)p_sw;
-	door_sw_on(14);
+	rs485_master_set_csv_data(&rs485m, 14, SLAVE_DOOR, ACTIVE);
+	if(rs485m.state == RS485_MASTER_ST_IDLE){
+		rs485m.state = RS485_MASTER_ST_SEND_CMD;
+	}
+	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+}
+
+/* ------------------------------------------------------------------------------ */
+
+static void rs485_set_tx_mode(RS485_Master* p_485m){
+	(void)p_485m;
+	HAL_MAX485_SET_DIR_TX;
+}
+
+static void rs485_set_rx_mode(RS485_Master* p_485m){
+	(void)p_485m;
+	HAL_MAX485_SET_DIR_RX;
+}
+
+static void rs485_receive_handle_impl(UART_hw* p_hw){
+	rs485m.is_new_msg = 1;
+	if(rs485m.rx_index == 32){
+		rs485m.rx_index = 0;
+		return;
+	}
+	if(p_hw->rx_data != '\0'){
+		rs485m.rx_data[rs485m.rx_index] = p_hw->rx_data;
+		rs485m.rx_index++;
+	}
+}
+
+static void hmi_receive_handle_impl(UART_hw* p_hw){
+	selex_bss_app.is_new_msg = 1;
+	if(selex_bss_app.rx_index == 32){
+		selex_bss_app.rx_index = 0;
+		return;
+	}
+	selex_bss_app.rx_data[selex_bss_app.rx_index] = p_hw->rx_data;
+	selex_bss_app.rx_index++;
+}
+
+static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
+	char* token = strtok((char*)p_485m->start_msg_index,",");
+	if(p_485m->csv.id == string_to_long(token)){
+		token = strtok(NULL, ",");
+		switch (*token){
+		case MASTER_WRITE:
+			token = strtok(NULL, ",");
+			if(*token == p_485m->csv.obj){
+				p_485m->state = RS485_MASTER_ST_SEND_SYNC;
+			}
+			break;
+		case MASTER_READ:
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].door.state = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].cell_fan.state = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].node_id_sw.state = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].charger.state = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].temp = string_to_long(token);
+			p_485m->state = RS485_MASTER_ST_SUCCESS;
+			break;
+		default:
+			break;
+		}
+	}
 }

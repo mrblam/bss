@@ -10,7 +10,8 @@ include $(PROJ_ROOT)/board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include $(PROJ_ROOT)/gcc.mk
 
 SRCS:=board/board.c
-SRCS+=app/cabinet_app/cabinet_app.c 
+SRCS+=app/cabinet_app/cabinet_app.c \
+	app/peripheral_init/peripheral_init.c
 SRCS+=component/adc_sensor/adc_sensor.c \
 	component/bp_data/bp_data.c \
 	component/bss_data/bss_data.c \
@@ -27,7 +28,7 @@ BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 #INCLUDES:=. app_config board service component util app
-INCLUDES:=app/cabinet_app  app_config board component
+INCLUDES:=app/cabinet_app app/peripheral_init app_config board component
 INCLUDES+=component/adc_sensor \
 	component/bp_data \
 	component/bss_data \
@@ -57,7 +58,7 @@ SRCS+=$(BSP_SRCS)
 OBJS:=$(addprefix $(PROJ_ROOT)/$(OBJDIR)/,$(SRCS))		
 SRCS:=$(addprefix $(PROJ_ROOT)/,$(SRCS))
 
-TEST_SRCS+= test_rs485_multi_thread.c 
+TEST_SRCS+= test_id_assign.c 
 
 SRCS+=$(TEST_SRCS)
 OBJS+=$(TEST_SRCS)

@@ -10,6 +10,10 @@
 
 #include "board.h"
 #include "cabinet_app.h"
+#include "rs485_master.h"
+
+extern Cabinet_App		selex_bss_app;
+extern RS485_Master 	rs485m;
 
 void peripheral_init(Cabinet_App* p_ca);
 

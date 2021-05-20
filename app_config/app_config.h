@@ -12,7 +12,7 @@
 #define APP_STATE_MACHINE_UPDATE_TICK_mS                (1000/HAL_SYSTICK_FREQ_Hz)
 #define BP_INACTIVE_TIMEOUT_mS                                  5000
 
-#define CABINET_CELL_NUM	15
+#define CABINET_CELL_NUM	1
 #define VREF				3300
 #define ADC_RESOLUTION		4095
 
