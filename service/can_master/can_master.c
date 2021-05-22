@@ -26,6 +26,7 @@ void can_master_init(CAN_master *p_cm, CO_Slave **slaves,
 	p_cm->sdo_server.state = SDO_ST_IDLE;
 	p_cm->sdo_server.is_new_msg = 0;
 	p_cm->slave_num = slave_num;
+	//p_cm->pdo_sync_timestamp = 10000000;
 }
 
 static void co_send_sync(CAN_master *p_cm) {
@@ -267,7 +268,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 	case CM_ASSIGN_ST_WAIT_CONFIRM:
 		if (p_cm->assign_timeout < timestamp) {
 		        co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_DISCONNECT);
-			p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id);
+			p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-5);
 			can_master_start_assign_next_slave(p_cm,timestamp);
 		}
 		break;

@@ -334,7 +334,11 @@ static void node_id1_sw_on(Switch* p_cm){
 	if(rs485m.state == RS485_MASTER_ST_IDLE){
 		rs485m.state = RS485_MASTER_ST_SEND_CMD;
 	}
-	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	while((rs485m.state == RS485_MASTER_ST_SEND_CMD) ||
+			(rs485m.state == RS485_MASTER_ST_SEND_SYNC) ||
+			(rs485m.state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(&rs485m);
+	rs485m.state = RS485_MASTER_ST_IDLE;
 }
 
 static void node_id2_sw_on( Switch* p_cm){
@@ -343,7 +347,11 @@ static void node_id2_sw_on( Switch* p_cm){
 	if(rs485m.state == RS485_MASTER_ST_IDLE){
 		rs485m.state = RS485_MASTER_ST_SEND_CMD;
 	}
-	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	while((rs485m.state == RS485_MASTER_ST_SEND_CMD) ||
+			(rs485m.state == RS485_MASTER_ST_SEND_SYNC) ||
+			(rs485m.state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(&rs485m);
+	rs485m.state = RS485_MASTER_ST_IDLE;
 }
 
 static void node_id3_sw_on( Switch* p_cm){
@@ -471,7 +479,11 @@ static void node_id1_sw_off(Switch* p_cm){
 	if(rs485m.state == RS485_MASTER_ST_IDLE){
 		rs485m.state = RS485_MASTER_ST_SEND_CMD;
 	}
-	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	while((rs485m.state == RS485_MASTER_ST_SEND_CMD) ||
+			(rs485m.state == RS485_MASTER_ST_SEND_SYNC) ||
+			(rs485m.state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(&rs485m);
+	rs485m.state = RS485_MASTER_ST_IDLE;
 }
 
 static void node_id2_sw_off( Switch* p_cm){
@@ -480,7 +492,11 @@ static void node_id2_sw_off( Switch* p_cm){
 	if(rs485m.state == RS485_MASTER_ST_IDLE){
 		rs485m.state = RS485_MASTER_ST_SEND_CMD;
 	}
-	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	while((rs485m.state == RS485_MASTER_ST_SEND_CMD) ||
+			(rs485m.state == RS485_MASTER_ST_SEND_SYNC) ||
+			(rs485m.state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(&rs485m);
+	rs485m.state = RS485_MASTER_ST_IDLE;
 }
 
 static void node_id3_sw_off( Switch* p_cm){
@@ -776,7 +792,11 @@ static DOOR_STATE door2_get_state( IO_State* p_io){
 	if(rs485m.state == RS485_MASTER_ST_IDLE){
 		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
 	}
-	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
+	while((rs485m.state == RS485_MASTER_ST_SEND_CMD) ||
+			(rs485m.state == RS485_MASTER_ST_SEND_SYNC) ||
+			(rs485m.state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(&rs485m);
+	rs485m.state = RS485_MASTER_ST_IDLE;
 	return selex_bss_app.bss.cabs[1].door.state;
 }
 

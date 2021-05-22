@@ -47,7 +47,7 @@ static void adc_hw_init_module(void){
 
 static void adc_hw_init_nvic(void){
     /* ADC1 interrupt Init */
-    HAL_NVIC_SetPriority(ADC1_2_IRQn, ADC_IRQN_PRIORITY, 0);
+    //HAL_NVIC_SetPriority(ADC1_2_IRQn, ADC_IRQN_PRIORITY, 0);
     //HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
 }
 

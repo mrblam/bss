@@ -42,8 +42,8 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 		/* read battery state and update to owner cabinet */
 		cab_cell_update_state(&p_bss->cabs[i]);
 	}
-	//bss_update_io_state(p_bss);
-	cab_cell_update_door_state(&p_bss->cabs[0]);
+	bss_update_io_state(p_bss);
+	//cab_cell_update_door_state(&p_bss->cabs[0]);
 }
 
 static void bss_update_io_state(BSS_Data* p_bss){

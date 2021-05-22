@@ -143,13 +143,13 @@ void TIM3_IRQHandler(void){
                alive_heartbeat_counter=0;
         	}
 		}
-
+#if 0
 		else if((com_timestamp%10) == 0){
 			if(rs485m.state == RS485_MASTER_ST_IDLE){
 			request_slave_sync_data(0);
 			}
 		}
-
+#endif
 		else{
 			rs485_master_update_state(&rs485m, com_timestamp);
 		}
@@ -216,7 +216,7 @@ static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id){
 	(void)p_cm;
 	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
-	//cab_app_active_charge(&selex_bss_app,id);
+	cab_app_active_charge(&selex_bss_app,id);
 }
 
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id){

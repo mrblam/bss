@@ -54,7 +54,7 @@ int main(void){
 	rs485m.set_transmit_mode = rs485_set_tx_mode;
 	rs485m.set_receive_mode = rs485_set_rx_mode;
 	rs485m.rx_index = 0;
-	rs485m.parse_sync_msg_handle = rs485_parse_sync_msg_handle;
+	rs485m.parse_slave_msg_handle = rs485_parse_sync_msg_handle;
 
 	rs485m.state = RS485_MASTER_ST_IDLE;
 	//cnt = 1;
