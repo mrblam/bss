@@ -314,3 +314,4 @@ static CO_Slave* can_master_get_assign_request_slave(
 	}
 	return NULL;
 }
+

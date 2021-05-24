@@ -31,6 +31,10 @@ typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 #define SDO_CS_FINISH_WRITE             6
 #define SDO_CS_ABORT                    7
 
+#define BP_VOL_CUR_TPDO_COBID                           CO_CAN_ID_TPDO_1
+#define BP_LOW_CELLS_VOL_TPDO_COBID                     CO_CAN_ID_TPDO_2
+#define BP_HIGH_CELLS_VOL_TPDO_COBID                    CO_CAN_ID_TPDO_3
+#define BP_TEMP_TPDO_COBID                              CO_CAN_ID_TPDO_4
 
 typedef enum SDO_STATE_t{
         SDO_ST_IDLE=        0,
@@ -93,6 +97,7 @@ struct CAN_master_t{
 	CAN_Master_Slave_Select slave_deselect;
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
 	void (*on_slave_assign_fail)(const CAN_master* const p_cm,uint32_t slave_id);
+	void (*rpdo_process)(const CAN_master* const p_cm);
 };
 
 void can_master_init(CAN_master* p_cm,CO_Slave** slaves,

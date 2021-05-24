@@ -26,7 +26,7 @@ BP* bp_construct(void){
     }
     *sn_buff++='\0';
 
-    p_bp->vol = p_bp->cur = p_bp->soc = p_bp->soh = p_bp->temp = p_bp->cycle = 0;
+    //p_bp->vol = p_bp->cur = p_bp->soc = p_bp->soh = p_bp->temp = p_bp->cycle = 0;
 	p_bp->data_serialize = bp_data_serialize_impl;
 	return p_bp;
 }

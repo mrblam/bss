@@ -229,6 +229,7 @@ static void rs485_receive_handle_impl(UART_hw* p_hw);
 static void hmi_receive_handle_impl(UART_hw* p_hw);
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
 
+static void can_master_rpdo_process_impl(CAN_master* p_cm);
 
 static sw_act door_interface[] = {door1_switch_on, door2_switch_on, door3_switch_on, door4_switch_on, door5_switch_on,
 								door6_switch_on, door7_switch_on, door8_switch_on, door9_switch_on, door10_switch_on,
@@ -302,6 +303,8 @@ void peripheral_init(Cabinet_App* p_ca){
 	rs485m.parse_slave_msg_handle = rs485_parse_slave_msg_handle_impl;
 
 	hmi_com.receive_handle = hmi_receive_handle_impl;
+
+	p_ca->base.rpdo_process = can_master_rpdo_process_impl;
 
 #if 0
 	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
@@ -1130,3 +1133,35 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 		}
 	}
 }
+
+static void can_master_rpdo_process_impl(CAN_master* p_cm){
+	uint32_t cob_id = p_cm->p_hw->can_rx.StdId & 0xFFFFFF80;
+    uint8_t node_id=(uint8_t)(p_cm->p_hw->can_rx.StdId & 0x7F);
+    uint8_t cab_id=node_id - 5;
+    if(bp_get_con_state(selex_bss_app.bss.cabs[cab_id].bp) != CO_SLAVE_CON_ST_CONNECTED){
+    	return;
+    }
+
+    bp_reset_inactive_counter(selex_bss_app.bss.cabs[cab_id].bp);
+    switch(cob_id){
+    case BP_VOL_CUR_TPDO_COBID:
+    	selex_bss_app.bss.cabs[cab_id].bp->vol=10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data);
+    	selex_bss_app.bss.cabs[cab_id].bp->cur=(int32_t)10*((int16_t)CO_getUint16(p_cm->p_hw->rx_data+2));
+    	selex_bss_app.bss.cabs[cab_id].bp->soc=p_cm->p_hw->rx_data[4];
+    	selex_bss_app.bss.cabs[cab_id].bp->state=p_cm->p_hw->rx_data[5];
+    	selex_bss_app.bss.cabs[cab_id].bp->status=(uint16_t)CO_getUint16(p_cm->p_hw->rx_data+6);
+        break;
+    case BP_LOW_CELLS_VOL_TPDO_COBID:
+        CO_memcpy(selex_bss_app.bss.cabs[cab_id].bp->cell_vol,p_cm->p_hw->rx_data,8);
+        break;
+    case BP_HIGH_CELLS_VOL_TPDO_COBID:
+        CO_memcpy(selex_bss_app.bss.cabs[cab_id].bp->cell_vol,p_cm->p_hw->rx_data,8);
+        break;
+    case BP_TEMP_TPDO_COBID:
+        CO_memcpy((uint8_t*)selex_bss_app.bss.cabs[cab_id].bp->temp,p_cm->p_hw->rx_data,8);
+        break;
+    default:
+    	break;
+    }
+}
+

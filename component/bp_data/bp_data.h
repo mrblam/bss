@@ -26,12 +26,14 @@ struct BP_t{
 	BP_STATE 	state;
 	uint32_t inactive_time;
 	uint32_t charge_sw_state;
+	uint8_t 	status;
 	uint8_t 	pos;
 	uint8_t 	soc;
 	uint8_t 	soh;
 	uint8_t 	vol;
 	uint8_t 	cur;
-	uint16_t 	temp;
+	uint8_t		cell_vol[16];
+	int8_t		temp[8];
 	uint32_t 	cycle;
 	void		(*data_serialize)(BP* p_bp, char* buff);
 };
