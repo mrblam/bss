@@ -229,7 +229,7 @@ static void rs485_receive_handle_impl(UART_hw* p_hw);
 static void hmi_receive_handle_impl(UART_hw* p_hw);
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
 
-static void can_master_rpdo_process_impl(CAN_master* p_cm);
+static void can_master_rpdo_process_impl(const CAN_master* const p_cm);
 
 static sw_act door_interface[] = {door1_switch_on, door2_switch_on, door3_switch_on, door4_switch_on, door5_switch_on,
 								door6_switch_on, door7_switch_on, door8_switch_on, door9_switch_on, door10_switch_on,
@@ -1134,7 +1134,7 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 	}
 }
 
-static void can_master_rpdo_process_impl(CAN_master* p_cm){
+static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 	uint32_t cob_id = p_cm->p_hw->can_rx.StdId & 0xFFFFFF80;
     uint8_t node_id=(uint8_t)(p_cm->p_hw->can_rx.StdId & 0x7F);
     uint8_t cab_id=node_id - 5;

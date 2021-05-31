@@ -59,16 +59,28 @@ void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp){
 			if(rs485_master_check_valid_msg(p_485m)){
 				p_485m->parse_slave_msg_handle(p_485m);
 				p_485m->is_new_msg = 0;
+				return;
 			}
 		}
+
 		if(p_485m->timeout < timestamp){
 			p_485m->state = RS485_MASTER_ST_FAIL;
+			return;
+		}
+
+		if((p_485m->timeout - timestamp) == 100){
+			if(p_485m->csv.obj){
+				rs485_master_command_serialize(p_485m);
+			}
+			else rs485_master_sync_data_serialize(p_485m);
+			rs485_master_sends(p_485m);
 		}
 		break;
 	case RS485_MASTER_ST_SEND_SYNC:
+		p_485m->csv.obj = p_485m->csv.state = 0;
 		rs485_master_sync_data_serialize(p_485m);
 		rs485_master_sends(p_485m);
-		p_485m->timeout = timestamp + 100;
+		p_485m->timeout = timestamp + 200;
 		p_485m->state = RS485_MASTER_ST_WAIT_CONFIRM;
 		break;
 	case RS485_MASTER_ST_SUCCESS:
@@ -130,4 +142,26 @@ static uint8_t rs485_master_check_valid_msg(RS485_Master* p_485m){
 	return 0;
 }
 
+void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE_OBJECTS obj, SLAVE_OBJECT_STATE state){
+	rs485_master_set_csv_data(p_485m, id, obj, state);
+	if(p_485m->state == RS485_MASTER_ST_IDLE){
+		p_485m->state = RS485_MASTER_ST_SEND_CMD;
+	}
+	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
+			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
+			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(p_485m);
+	p_485m->state = RS485_MASTER_ST_IDLE;
+}
 
+void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
+	rs485_master_set_csv_data(p_485m, id, 0, 0);
+	if(p_485m->state == RS485_MASTER_ST_IDLE){
+		p_485m->state = RS485_MASTER_ST_SEND_SYNC;
+	}
+	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
+			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
+			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(p_485m);
+	p_485m->state = RS485_MASTER_ST_IDLE;
+}
