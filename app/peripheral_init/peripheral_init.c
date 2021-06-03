@@ -228,6 +228,7 @@ static void rs485_set_rx_mode(RS485_Master* p_485m);
 static void rs485_receive_handle_impl(UART_hw* p_hw);
 static void hmi_receive_handle_impl(UART_hw* p_hw);
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
+static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff);
 
 static void can_master_rpdo_process_impl(const CAN_master* const p_cm);
 
@@ -285,12 +286,14 @@ static sw_act node_set_low[]={
 
 
 void peripheral_init(Cabinet_App* p_ca){
-	//ioe_init();
 	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
 		p_ca->bss.cabs[cab_id].node_id_sw.sw_on = node_set_high[cab_id];
 		p_ca->bss.cabs[cab_id].node_id_sw.sw_off = node_set_low[cab_id];
 		p_ca->bss.cabs[cab_id].door.solenoid.sw_on = door_interface[cab_id];
 		p_ca->bss.cabs[cab_id].door.io_state.get_io_state = ios_interface[cab_id];
+		p_ca->bss.cabs[cab_id].cell_fan.sw_on = cell_fan_on_interface[cab_id];
+		p_ca->bss.cabs[cab_id].cell_fan.sw_off = cell_fan_off_interface[cab_id];
+		p_ca->bss.cabs[cab_id].data_serialize = cab_cell_data_serialze_impl;
 	}
 
 	rs485_master_init(&rs485m, 1, &cabinet_485_hw);
@@ -305,21 +308,7 @@ void peripheral_init(Cabinet_App* p_ca){
 	hmi_com.receive_handle = hmi_receive_handle_impl;
 
 	p_ca->base.rpdo_process = can_master_rpdo_process_impl;
-
-#if 0
-	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
-
-		p_ca->bss.cabs[cab_id].node_id_sw.sw_on=node_set_high[cab_id];
-		p_ca->bss.cabs[cab_id].node_id_sw.sw_off=node_set_low[cab_id];
-
-		p_ca->bss.cabs[cab_id].door.solenoid.sw_on = door_interface[cab_id];
-		p_ca->bss.cabs[cab_id].door.io_state.get_io_state = ios_interface[cab_id];
-
-		p_ca->bss.cabs[cab_id].cell_fan.sw_on = cell_fan_on_interface[cab_id];
-		p_ca->bss.cabs[cab_id].cell_fan.sw_off = cell_fan_off_interface[cab_id];
-	}
-#endif
-	//ntc_init(p_ca);
+	p_ca->slave_com = &rs485m;
 }
 
 static void ntc_init(Cabinet_App* p_ca){
@@ -1100,8 +1089,10 @@ static void hmi_receive_handle_impl(UART_hw* p_hw){
 		selex_bss_app.rx_index = 0;
 		return;
 	}
-	selex_bss_app.rx_data[selex_bss_app.rx_index] = p_hw->rx_data;
-	selex_bss_app.rx_index++;
+	if(p_hw->rx_data != '\0'){
+		selex_bss_app.rx_data[selex_bss_app.rx_index] = p_hw->rx_data;
+		selex_bss_app.rx_index++;
+	}
 }
 
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
@@ -1163,5 +1154,35 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
     default:
     	break;
     }
+}
+
+static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
+	*buff++=':';
+	*buff++='R';
+	*buff++='C';
+    *buff++=',';
+	buff+=long_to_string(p_cc->cab_id,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->state,buff);
+    *buff++=',';
+    buff+=long_to_string(selex_bss_app.base.assign_state, buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->door.state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->cell_fan.state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cc->temp,buff);
+    *buff++=',';
+    if(p_cc->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED){
+        for(uint8_t i = 0; *(p_cc->bp->base.sn + i) != '\0'; i++){
+        	*buff++= *(p_cc->bp->base.sn+i);
+        }
+    }
+    else{
+    	*buff++='0';
+    }
+    *buff++='*';
+    *buff++='\n';
+    *buff++='\0';
 }
 

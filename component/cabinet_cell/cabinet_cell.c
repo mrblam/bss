@@ -7,10 +7,8 @@
 
 #include "cabinet_cell.h"
 
-static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff);
-
 void cabinet_init(Cabinet* p_cc){
-	p_cc->data_serialize=cab_cell_data_serialze_impl;
+	//p_cc->data_serialize=cab_cell_data_serialze_impl;
 }
 
 void cab_cell_update_state(Cabinet* p_cab){
@@ -63,10 +61,6 @@ void cab_cell_update_cell_temp(Cabinet* p_cc){
 	ntc_update_temp(p_cc->temp_ss);
 }
 
-int32_t cab_cell_get_temp(Cabinet* p_cc){
-	return 0;
-}
-
 void cab_cell_fan_turn_on(Cabinet* p_cc){
 	sw_on(&p_cc->cell_fan);
 }
@@ -81,33 +75,4 @@ void cab_cell_active_charger(Cabinet* p_cc){
 
 void cab_cell_deactive_charger(Cabinet* p_cc){
 	sw_off(&p_cc->charger);
-}
-
-static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
-
-	*buff++=':';
-	*buff++='R';
-	*buff++='C';
-    *buff++=',';
-	buff+=long_to_string(p_cc->cab_id,buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->state,buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->door.state,buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->cell_fan.state,buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->temp,buff);
-    *buff++=',';
-    if(p_cc->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED){
-        for(uint8_t i = 0; *(p_cc->bp->base.sn + i) != '\0'; i++){
-        	*buff++= *(p_cc->bp->base.sn+i);
-        }
-    }
-    else{
-    	*buff++='0';
-    }
-    *buff++='*';
-    *buff++='\n';
-    *buff++='\0';
 }

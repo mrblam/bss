@@ -17,6 +17,7 @@
 #include "ioe.h"
 #include "linked_list.h"
 #include "bss_data.h"
+#include "rs485_master.h"
 
 typedef struct Cabinet_App_t Cabinet_App;
 
@@ -32,6 +33,7 @@ typedef enum CABIN_STATE{
 struct Cabinet_App_t{
 	CAN_master		base;
 	//Cabinet_Cell*	cabin[CABINET_CELL_NUM];
+	RS485_Master*	slave_com;
 	IOE*			ioe_sol;
 	IOE*			ioe_cfan;
 	CABIN_STATE		state;
@@ -46,18 +48,9 @@ struct Cabinet_App_t{
 
 void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
-void cab_app_check_bp_state(Cabinet_App* p_ca, CABIN_ID cab_id);
-void cab_app_update_tilt_ss(Cabinet_App* p_ca);
-void cab_app_check_hmi_msg(Cabinet_App* p_ca);
-void cab_app_check_sim_msg(Cabinet_App* p_ca);
-void cab_app_stream_data_hmi(Cabinet_App* p_ca);
-void cab_app_stream_data_sim(Cabinet_App* p_ca);
-void cab_app_send_warning_msg(Cabinet_App* p_ca);
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca);
 void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
-void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff);
-void cab_app_process_cab_cmd_hmi(Cabinet_App* p_ca, char* token);
 void capp_on_cabinet_door_close(Cabinet_App* p_app,Cabinet* p_cab);
 void cab_app_active_charge(Cabinet_App* p_ca,uint8_t cab_id);
 void cab_app_parse_hmi_msg(Cabinet_App* p_ca);

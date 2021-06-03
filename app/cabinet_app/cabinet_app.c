@@ -35,14 +35,6 @@ void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
 }
 
-void cab_app_check_bp_state(Cabinet_App* p_ca, CABIN_ID cab_id){
-
-}
-
-void cab_app_update_tilt_ss(Cabinet_App* p_ca){
-
-}
-
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
 	bss_data_serialize(&p_ca->bss, tx_buff);
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
@@ -56,79 +48,8 @@ void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){
 }
 
 void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){
-
 	cab_cell_data_serialize(&p_ca->bss.cabs[cab_id], tx_buff);
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
-}
-
-void cab_app_decode_cmd_hmi(Cabinet_App* p_ca, char* buff){
-	char* token;
-
-	token = strtok(buff, ",");
-	switch(*token){
-	case 'C':
-		cab_app_process_cab_cmd_hmi(p_ca, token);
-		break;
-	case 'B':
-		break;
-	case 'S':
-		break;
-	default:
-		break;
-	}
-}
-
-void cab_app_process_bss_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char* token){
-	token = strtok(NULL, ",");
-	char* obj = token;
-	token = strtok(NULL, ",");
-	uint8_t state = string_to_long(token);
-
-	switch(*obj){
-	case 'F':
-		break;
-	case 'C':
-		break;
-	case 'L':
-		break;
-	default:
-		break;
-	}
-}
-
-void cab_app_process_cab_cmd_hmi(__attribute__((unused)) Cabinet_App* p_ca, char* token){
-	token = strtok(NULL, ",");
-	uint8_t id = string_to_long(token);
-	token = strtok(NULL, ",");
-	char* obj = token;
-	token = strtok(NULL, ",");
-	uint8_t state = string_to_long(token);
-
-	switch(*obj){
-	case 'F':
-		if(state == 1){
-			cab_cell_fan_turn_on(&p_ca->bss.cabs[id]);
-		}
-		else {
-			cab_cell_fan_turn_off(&p_ca->bss.cabs[id]);
-		}
-		break;
-	case 'D':
-		if(state == 1){
-			cab_cell_open_door(&p_ca->bss.cabs[id]);
-		}
-		break;
-	case 'C':
-		if(state == 1){
-			cab_cell_active_charger(&p_ca->bss.cabs[id]);
-		}
-		else {
-			cab_cell_deactive_charger(&p_ca->bss.cabs[id]);
-		}
-		break;
-	default:
-		break;
-	}
 }
 
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca){
@@ -169,27 +90,23 @@ void cab_app_parse_hmi_msg(Cabinet_App* p_ca){
 	}
 }
 
-static void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint8_t cab_id, const char obj, const uint8_t state){
+static void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint8_t cab_id,
+		const char obj, const uint8_t state){
 	switch(obj){
 	case 'D':
-		if(state == 1){
-			sw_on(&p_ca->bss.cabs[cab_id].door.solenoid);
-			p_ca->is_new_msg = 0;
-		}
+		if(state == 1)	sw_on(&p_ca->bss.cabs[cab_id].door.solenoid);
 		break;
-	case 'N':
-		if(state == 1){
-			sw_on(&p_ca->bss.cabs[cab_id].node_id_sw);
-			p_ca->is_new_msg = 0;
-		}
-		else if(state == 0){
-			sw_off(&p_ca->bss.cabs[cab_id].node_id_sw);
-			p_ca->is_new_msg = 0;
-		}
-		break;
-	case 'C':
+	case 'F':
+		if(state == 1)	sw_on(&p_ca->bss.cabs[cab_id].cell_fan);
+		else if(state == 0)	sw_off(&p_ca->bss.cabs[cab_id].cell_fan);
 		break;
 	case 'S':
+		p_ca->bss.cabs[cab_id].state = state;
+		break;
+	case 'X':
+		p_ca->base.assign_state = state;
+		break;
+	default:
 		break;
 	}
 }

@@ -12,7 +12,7 @@
 #include "peripheral_init.h"
 
 Cabinet_App		selex_bss_app;
-RS485_Master 	rs485m;
+RS485_Master	rs485m;
 char buff[50];
 char s;
 
@@ -57,7 +57,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	        //sw_off(&bss_cabinets[i].node_id_sw);
 	}
 
-	co_slave_set_con_state(bp_slaves[0], CO_SLAVE_CON_ST_CONNECTED);
+	//co_slave_set_con_state(bp_slaves[0], CO_SLAVE_CON_ST_CONNECTED);
 	bss_cabinets[0].bp->soc=100;
 
 	p_ca->base.slave_start_node_id=CABINET_START_NODE_ID;
@@ -74,14 +74,6 @@ void cab_app_init(Cabinet_App* p_ca){
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
 }
 
-static void request_slave_sync_data(uint8_t slave_id){
-	rs485_master_set_csv_data(&rs485m, slave_id, 0, 0);
-	if(rs485m.state == RS485_MASTER_ST_IDLE){
-		rs485m.state = RS485_MASTER_ST_SEND_SYNC;
-	}
-	//while(rs485m.state != RS485_MASTER_ST_SUCCESS);
-}
-
 int main(void){
 	__disable_irq();
 
@@ -96,12 +88,10 @@ int main(void){
 
 	cab_app_init(&selex_bss_app);
 
-	//selex_bss_app.bss.cabs[0].door.io_state.get_io_state(&selex_bss_app.bss.cabs[0].door.io_state);
-	//bss_update_cabinets_state(&selex_bss_app.bss);
 	cab_app_set_state(&selex_bss_app, CABIN_ST_STANDBY);
 
 	__enable_irq();
-	can_master_start_assign_next_slave((CAN_master*)&selex_bss_app, sys_timestamp);
+	//can_master_start_assign_next_slave((CAN_master*)&selex_bss_app, sys_timestamp);
 
 	while(1);
 }
@@ -118,8 +108,8 @@ void TIM3_IRQHandler(void){
 	com_timestamp+=1;
 	if((com_timestamp%500) == 0){
 		if(selex_bss_app.is_new_msg){
-			//cab_app_parse_hmi_msg(&selex_bss_app);
-			return;
+			cab_app_parse_hmi_msg(&selex_bss_app);
+			//return;
 		}
         static uint8_t cab_id=0;
         static uint32_t alive_heartbeat_counter=0;
@@ -139,7 +129,7 @@ void TIM3_IRQHandler(void){
         }
         alive_heartbeat_counter++;
         if(alive_heartbeat_counter>10){
-               cab_app_sync_cab_data_hmi(&selex_bss_app, 0);
+               //cab_app_sync_cab_data_hmi(&selex_bss_app, 0);
                alive_heartbeat_counter=0;
         	}
 		}
