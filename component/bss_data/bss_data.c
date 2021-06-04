@@ -28,8 +28,7 @@ BSS_Data* bss_data_construct(void){
 
     p_bss_data->cab_num = 0;
     p_bss_data->tilt_ss_state = TILT_SS_INACTIVE;
-    p_bss_data->charger_state = CHARGER_ST_INACTIVE;
-    p_bss_data->fan_state = FAN_ST_INACTIVE;
+    //p_bss_data->fan_state = FAN_ST_INACTIVE;
     p_bss_data->lamp_state = LAMP_ST_ACTIVE;
     p_bss_data->temp = 0;
 	p_bss_data->data_serialize = bss_data_serialize_impl;
@@ -43,7 +42,6 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 		cab_cell_update_state(&p_bss->cabs[i]);
 	}
 	bss_update_io_state(p_bss);
-	//cab_cell_update_door_state(&p_bss->cabs[0]);
 }
 
 static void bss_update_io_state(BSS_Data* p_bss){
@@ -70,9 +68,11 @@ static void bss_data_serialize_impl(BSS_Data* p_bss_data, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_bss_data->tilt_ss_state,buff);
     *buff++=',';
-	buff+=long_to_string(p_bss_data->fan_state,buff);
+	//buff+=long_to_string(p_bss_data->fan_state,buff);
     *buff++=',';
-	buff+=long_to_string(p_bss_data->charger_state,buff);
+	buff+=long_to_string(p_bss_data->chargers[0].state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_bss_data->chargers[1].state,buff);
     *buff++=',';
 	buff+=long_to_string(p_bss_data->lamp_state,buff);
     *buff++=',';

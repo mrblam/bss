@@ -13,7 +13,6 @@
 
 Cabinet_App		selex_bss_app;
 RS485_Master	rs485m;
-char buff[50];
 char s;
 
 static void cabinet_door_close_event_handle(Cabinet* p_cab);
@@ -24,9 +23,9 @@ static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint3
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id);
 static void can_receive_handle(CAN_Hw* p_hw);
 
-
 static Cabinet bss_cabinets[CABINET_CELL_NUM];
 static CO_Slave* bp_slaves[CABINET_CELL_NUM];
+static Charger bss_chargers[CHARGER_NUM];
 static uint32_t sys_timestamp=0;
 static uint32_t sys_tick_ms=0;
 static uint32_t com_timestamp = 0;
@@ -35,6 +34,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	p_ca->bss.cab_num=CABINET_CELL_NUM;
 	p_ca->state = CABIN_ST_SETUP;
 	p_ca->bss.cabs=&bss_cabinets[0];
+	p_ca->bss.chargers = &bss_chargers[0];
 	peripheral_init(p_ca);
 	for(int i=0;i<CABINET_CELL_NUM;i++){
 		bss_cabinets[i].state=CAB_CELL_ST_INACTIVE;
@@ -53,8 +53,20 @@ void cab_app_init(Cabinet_App* p_ca){
 	        co_slave_set_con_state(bp_slaves[i],CO_SLAVE_CON_ST_DISCONNECT);
 	        bp_slaves[i]->node_id=CABINET_START_NODE_ID+i;
 	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
-	        cabinet_init(&bss_cabinets[i]);
 	        //sw_off(&bss_cabinets[i].node_id_sw);
+	}
+
+	for(int i = 0; i < CHARGER_NUM; i++){
+		bss_chargers[i].state = CHARGER_ST_INACTIVE;
+		if(i == 0){
+			bss_chargers[i].start_cabin_id = 0;
+			bss_chargers[i].stop_cabin_id = p_ca->bss.cab_num/2;
+		}
+		else if(i == 1){
+			bss_chargers[i].start_cabin_id = p_ca->bss.cab_num/2 + 1;
+			bss_chargers[i].stop_cabin_id = p_ca->bss.cab_num;
+		}
+		bss_chargers[i].charging_cabin = NULL;
 	}
 
 	//co_slave_set_con_state(bp_slaves[0], CO_SLAVE_CON_ST_CONNECTED);
@@ -97,7 +109,6 @@ int main(void){
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void){
-
 	sys_timestamp+= sys_tick_ms;
 	bss_update_cabinets_state(&selex_bss_app.bss);
 	can_master_process((CAN_master*)&selex_bss_app, sys_timestamp);
@@ -106,6 +117,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 
 void TIM3_IRQHandler(void){
 	com_timestamp+=1;
+
 	if((com_timestamp%500) == 0){
 		if(selex_bss_app.is_new_msg){
 			cab_app_parse_hmi_msg(&selex_bss_app);
@@ -114,17 +126,16 @@ void TIM3_IRQHandler(void){
         static uint8_t cab_id=0;
         static uint32_t alive_heartbeat_counter=0;
 
-        //static uint32_t sync_counter=0;
         cab_id++;
         if(cab_id>=selex_bss_app.bss.cab_num){
         	cab_id=0;
         }
         for(uint8_t i=0;i<selex_bss_app.bss.cab_num;i++){
         	if(selex_bss_app.bss.cabs[i].is_changed==1){
-	               cab_app_sync_bp_data_hmi(&selex_bss_app, i);
-	               cab_app_sync_cab_data_hmi(&selex_bss_app, i);
-	               selex_bss_app.bss.cabs[i].is_changed=0;
-	               alive_heartbeat_counter=0;
+        		cab_app_sync_bp_data_hmi(&selex_bss_app, i);
+        		cab_app_sync_cab_data_hmi(&selex_bss_app, i);
+        		selex_bss_app.bss.cabs[i].is_changed=0;
+        		alive_heartbeat_counter=0;
 	        }
         }
         alive_heartbeat_counter++;
@@ -133,17 +144,9 @@ void TIM3_IRQHandler(void){
                alive_heartbeat_counter=0;
         	}
 		}
-#if 0
-		else if((com_timestamp%10) == 0){
-			if(rs485m.state == RS485_MASTER_ST_IDLE){
-			request_slave_sync_data(0);
-			}
-		}
-#endif
 		else{
 			rs485_master_update_state(&rs485m, com_timestamp);
 		}
-		//rs485_master_update_state(&rs485m, com_timestamp);
 
 		HAL_TIM_IRQHandler(&io_scan_timer);
 }
@@ -194,7 +197,6 @@ static void cabinet_door_open_event_handle(Cabinet* p_cab){
 	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
 	cab_cell_update_state(p_cab);
 	sw_off(&p_cab->node_id_sw);
-
 }
 
 static void can_master_slave_select_impl(const CAN_master* p_cm,const uint32_t id){
@@ -214,7 +216,6 @@ static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint3
 }
 
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id){
-
 	(void)p_cm;
 	/* return battery to user */
 	cab_app_delivery_bp(&selex_bss_app, id);

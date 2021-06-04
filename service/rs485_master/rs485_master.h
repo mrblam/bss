@@ -33,7 +33,8 @@ typedef enum SLAVE_OBJECTS{
 	SLAVE_DOOR 		= 'D',
 	SLAVE_FAN 		= 'F',
 	SLAVE_NODE_ID 	= 'N',
-	SLAVE_CHARGER	= 'C'
+	SLAVE_CHARGER	= 'C',
+	SLAVE_STATE		= 'S'
 }SLAVE_OBJECTS;
 
 typedef enum SLAVE_OBJECT_STATE{
@@ -70,10 +71,10 @@ struct RS485_Master_t{
 RS485_Master* rs485_master_construct(void);
 void rs485_master_init(RS485_Master* p_485m, uint8_t slave_num, Max485_Hw* p_hw);
 void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp);
-void rs485_master_set_csv_data(RS485_Master* p_485m, const uint8_t slave_id,
-		const char obj, const uint8_t state);
+void rs485_master_set_csv_data(RS485_Master* p_485m, const uint8_t slave_id, const char obj, const uint8_t state);
 void rs485_master_reset_buffer(RS485_Master* p_485m);
-
+void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE_OBJECTS obj, SLAVE_OBJECT_STATE state);
+void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id);
 
 static inline RS485_MASTER_STATE rs485_master_get_state(const RS485_Master* p_485m){
 	return p_485m->state;

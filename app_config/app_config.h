@@ -13,6 +13,7 @@
 #define BP_INACTIVE_TIMEOUT_mS                                  5000
 
 #define CABINET_CELL_NUM	1
+#define CHARGER_NUM			2
 #define VREF				3300
 #define ADC_RESOLUTION		4095
 

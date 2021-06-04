@@ -7,9 +7,7 @@
 
 #include "cabinet_cell.h"
 
-void cabinet_init(Cabinet* p_cc){
-	//p_cc->data_serialize=cab_cell_data_serialze_impl;
-}
+
 
 void cab_cell_update_state(Cabinet* p_cab){
         CABINET_STATE old_state=p_cab->state;
@@ -25,7 +23,7 @@ void cab_cell_update_state(Cabinet* p_cab){
 		new_state=CAB_CELL_ST_BP_ID_AUTHORIZE;
 		break;
 	case CO_SLAVE_CON_ST_CONNECTED:
-		new_state=CAB_CELL_ST_ST_STANDBY;
+		new_state=CAB_CELL_ST_STANDBY;
 		break;
 	}
 	if(new_state!=old_state){
@@ -54,6 +52,27 @@ void cab_cell_update_door_state(Cabinet* p_cc){
 				p_cc->on_door_open(p_cc);
 			}
 		}
+	}
+}
+
+void cab_cell_update_charge_state(Cabinet* p_cc){
+	switch(p_cc->state){
+	case CAB_CELL_ST_BP_ID_ASSIGN:
+		break;
+	case CAB_CELL_ST_BP_ID_AUTHORIZE:
+		break;
+	case CAB_CELL_ST_EMPTY:
+		sw_off(&p_cc->node_id_sw);
+		sw_off(&p_cc->charger);
+		break;
+	case CAB_CELL_ST_STANDBY:
+		sw_off(&p_cc->charger);
+		break;
+	case CAB_CELL_ST_CHARGING:
+		sw_on(&p_cc->charger);
+		break;
+	case CAB_CELL_ST_INACTIVE:
+		break;
 	}
 }
 

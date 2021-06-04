@@ -17,7 +17,6 @@ static void cabinet_io_scan_timer_init_nvic(void);
 static void cabinet_door_scan_state(void);
 static void cabinet_io_scan_timer_init_nvic(void);
 static void door_update_state(uint16_t id);
-static void ntc_update_temp(uint16_t id);
 
 static GPIO_TypeDef* door_state_ports[]={
 		DOOR_ST_PORT1_4,
@@ -81,13 +80,14 @@ void TIM3_IRQHandler(void){
 	cabinet_door_scan_state();
 	HAL_TIM_IRQHandler(&io_scan_timer);
 }
-#endif
+
 static void cabinet_door_scan_state(void){
 	for(uint16_t i=0;i<CABINET_CELL_NUM;i++){
 		door_update_state(i);
 		ntc_update_temp(i);
 	}
 }
+#endif
 
 static void door_update_state(uint16_t id){
 	uint8_t pre_state = door_state[id];

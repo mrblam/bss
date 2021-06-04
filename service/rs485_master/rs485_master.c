@@ -150,6 +150,9 @@ void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE
 	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
 			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
 			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
+	if(p_485m->state == RS485_MASTER_ST_FAIL){
+		p_485m->csv.state = FAIL;
+	}
 	rs485_master_reset_buffer(p_485m);
 	p_485m->state = RS485_MASTER_ST_IDLE;
 }

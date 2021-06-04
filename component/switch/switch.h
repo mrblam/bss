@@ -10,10 +10,10 @@
 
 #include "stdlib.h"
 
-typedef enum SW_STATE
-{
+typedef enum SW_STATE{
+	SW_ST_OFF,
 	SW_ST_ON,
-	SW_ST_OFF
+	SW_ST_FAIL
 }SW_STATE;
 
 typedef struct Switch_t Switch;

@@ -18,8 +18,8 @@
 #define SLAVE_SERIAL_NUMBER_OBJECT_INDEX				0x2101
 #define BMS_MAINSWITCH_INDEX							0x2109
 
-#define SLAVE_RPDO1							0x200
-#define SDO_RX_BUFFER_SIZE                 (32UL)
+#define SLAVE_RPDO1										0x200
+#define SDO_RX_BUFFER_SIZE                 				(32UL)
 typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 
 #define SDO_CS_INIT_READ                0
@@ -37,11 +37,12 @@ typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 #define BP_TEMP_TPDO_COBID                              CO_CAN_ID_TPDO_4
 
 typedef enum SDO_STATE_t{
-        SDO_ST_IDLE=        0,
-        SDO_ST_SENT=			1,
-	SDO_ST_SUCCESS=	2,
-	SDO_ST_FAIL=			3
+	SDO_ST_IDLE 	= 0,
+	SDO_ST_SENT		= 1,
+	SDO_ST_SUCCESS	= 2,
+	SDO_ST_FAIL		= 3
 }SDO_STATE;
+
 struct CO_SDO_SERVER_t{
         uint32_t timeout;
         SDO_STATE state;
@@ -101,8 +102,7 @@ struct CAN_master_t{
 	void (*rpdo_process)(const CAN_master* const p_cm);
 };
 
-void can_master_init(CAN_master* p_cm,CO_Slave** slaves,
-		const uint32_t slave_num,CAN_Hw* p_hw);
+void can_master_init(CAN_master* p_cm,CO_Slave** slaves, const uint32_t slave_num,CAN_Hw* p_hw);
 void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_start_assign_next_slave(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp);
@@ -113,24 +113,20 @@ void co_sdo_read_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_
 void co_sdo_write_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,
 		uint8_t* tx_buff,const uint32_t len,const uint32_t timeout);
 
-static inline void can_master_slave_select(const CAN_master* p_cm,
-		const uint32_t id){
+static inline void can_master_slave_select(const CAN_master* p_cm, const uint32_t id){
 	p_cm->slave_select(p_cm,id);
 }
 
-static inline void can_master_slave_deselect(const CAN_master* p_cm,
-		const uint32_t id){
+static inline void can_master_slave_deselect(const CAN_master* p_cm, const uint32_t id){
 	p_cm->slave_deselect(p_cm,id);
 }
 
-
 static inline SDO_STATE sdo_server_get_state(const CO_SDO_SERVER* const p_svr){
-        return p_svr->state;
+	return p_svr->state;
 }
 
-static inline void sdo_server_set_state(CO_SDO_SERVER* p_svr,
-		const SDO_STATE state){
-        p_svr->state=state;
+static inline void sdo_server_set_state(CO_SDO_SERVER* p_svr, const SDO_STATE state){
+	p_svr->state=state;
 }
 
 #endif /* SERVICE_CAN_MASTER_CAN_MASTER_H_ */
