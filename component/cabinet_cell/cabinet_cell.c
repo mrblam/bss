@@ -10,8 +10,8 @@
 
 
 void cab_cell_update_state(Cabinet* p_cab){
-        CABINET_STATE old_state=p_cab->state;
-        CABINET_STATE new_state=CAB_CELL_ST_EMPTY;
+        CABINET_OP_STATE old_state=p_cab->state;
+        CABINET_OP_STATE new_state=CAB_CELL_ST_EMPTY;
 	switch(p_cab->bp->base.con_state){
 	case CO_SLAVE_CON_ST_DISCONNECT:
 		new_state=CAB_CELL_ST_EMPTY;

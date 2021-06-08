@@ -88,6 +88,7 @@ void cab_app_init(Cabinet_App* p_ca){
 
 int main(void){
 	__disable_irq();
+	//selex_bss_app.state = BSS_ST_MAINTAIN;
 
 	HAL_Init();
 	core_hw_init();
@@ -139,8 +140,8 @@ void TIM3_IRQHandler(void){
 	        }
         }
         alive_heartbeat_counter++;
-        if(alive_heartbeat_counter>10){
-               //cab_app_sync_cab_data_hmi(&selex_bss_app, 0);
+        if(alive_heartbeat_counter>4){
+               cab_app_sync_bss_data_hmi(&selex_bss_app);
                alive_heartbeat_counter=0;
         	}
 		}

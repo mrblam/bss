@@ -19,17 +19,17 @@
 
 typedef struct Cabinet_t Cabinet;
 
-typedef enum CABINET_STATE{
+typedef enum CABINET_OP_STATE_t{
 	CAB_CELL_ST_INACTIVE		= 0,
 	CAB_CELL_ST_EMPTY 			= 1,
 	CAB_CELL_ST_BP_ID_ASSIGN	= 2,
 	CAB_CELL_ST_BP_ID_AUTHORIZE	= 3,
 	CAB_CELL_ST_STANDBY 		= 4,
 	CAB_CELL_ST_CHARGING 	= 5
-} CABINET_STATE;
+} CABINET_OP_STATE;
 
 struct Cabinet_t{
-	CABINET_STATE 	state;
+	CABINET_OP_STATE 	state;
 	uint8_t			cab_id;
 	BP*				bp;
 	Cabinet_Door	door;
@@ -45,7 +45,7 @@ struct Cabinet_t{
 };
 
 void cab_cell_set_state(Cabinet* p_cc);
-CABINET_STATE cab_cell_get_state(Cabinet* p_cc);
+CABINET_OP_STATE cab_cell_get_state(Cabinet* p_cc);
 void cab_cell_update_state(Cabinet* p_cab);
 void cab_cell_update_door_state(Cabinet* p_cc);
 void cab_cell_open_door(Cabinet* p_cc);
