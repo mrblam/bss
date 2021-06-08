@@ -34,7 +34,8 @@ typedef enum SLAVE_OBJECTS{
 	SLAVE_FAN 		= 'F',
 	SLAVE_NODE_ID 	= 'N',
 	SLAVE_CHARGER	= 'C',
-	SLAVE_STATE		= 'S'
+	SLAVE_STATE		= 'S',
+	SLAVE_LED		= 'L'
 }SLAVE_OBJECTS;
 
 typedef enum SLAVE_OBJECT_STATE{
