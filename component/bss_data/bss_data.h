@@ -46,33 +46,30 @@ typedef enum LAMP_STATE{
 
 typedef struct Charger_t Charger;
 struct Charger_t{
-	CHARGER_STATE	state;
 	uint8_t			start_cabin_id;
 	uint8_t			stop_cabin_id;
 	Cabinet*		charging_cabin;
-	Switch			power_charger;
+	Switch			input_power;
 };
 
 typedef struct BSS_Data_t BSS_Data;
 struct BSS_Data_t{
-	char			serial_number[32];
 	BSS_STATE 		state;
 	uint8_t 		cab_num;
-	TILT_SS_STATE 	tilt_ss_state;
-	Charger*		chargers;
-	Switch			fan[2];
-	LAMP_STATE 		lamp_state;
-	int32_t 		temp;
+	IO_State	 	tilt_ss;
+	Charger*		ac_chargers;
+	Switch			bss_fans[2];
+	Switch 			bss_lamps[4];
+	int32_t 		bss_temps[2];
 	Cabinet*        cabs;
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
 };
 
-BSS_Data* bss_data_construct(void);
+void bss_init(BSS_Data* p_bss);
+void bss_update_cabinet_state(BSS_Data* p_bss, uint8_t id);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){
 	p_bss_data->data_serialize(p_bss_data, buff);
 }
-
-void bss_update_cabinets_state(BSS_Data* p_bss);
 
 #endif /* COMPONENT_BSS_DATA_BSS_DATA_H_ */

@@ -9,7 +9,6 @@
 
 static void rs485_master_command_serialize(RS485_Master* p_485m);
 static void rs485_master_sync_data_serialize(RS485_Master* p_485m);
-static void rs485_master_parse_msg(RS485_Master* p_485m);
 static void rs485_master_sends(RS485_Master* p_485m);
 static uint8_t rs485_master_check_valid_msg(RS485_Master* p_485m);
 
@@ -19,10 +18,9 @@ RS485_Master* rs485_master_construct(void){
 	return p_485m;
 }
 
-void rs485_master_init(RS485_Master* p_485m, uint8_t slave_num, Max485_Hw* p_hw){
+void rs485_master_init(RS485_Master* p_485m, Max485_Hw* p_hw){
 	p_485m->state = RS485_MASTER_ST_IDLE;
 	p_485m->p_hw = p_hw;
-	p_485m->slave_num = slave_num;
 	p_485m->is_new_msg = 0;
 	rs485_master_reset_buffer(p_485m);
 	p_485m->start_msg_index = 0;
@@ -62,12 +60,10 @@ void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp){
 				return;
 			}
 		}
-
 		if(p_485m->timeout < timestamp){
 			p_485m->state = RS485_MASTER_ST_FAIL;
 			return;
 		}
-
 		if((p_485m->timeout - timestamp) == 100){
 			if(p_485m->csv.obj){
 				rs485_master_command_serialize(p_485m);
@@ -86,6 +82,7 @@ void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp){
 	case RS485_MASTER_ST_SUCCESS:
 		break;
 	case RS485_MASTER_ST_FAIL:
+		p_485m->csv.state = FAIL;
 		break;
 	default:
 		break;
@@ -127,6 +124,8 @@ static uint8_t rs485_master_check_valid_msg(RS485_Master* p_485m){
 	buff += p_485m->rx_index-1;
 	while((*buff != '*') || (*buff != '\0')){
 		if(*buff == '*'){
+			*buff = '\0';
+			buff--;
 			while((*buff != ':') || (*buff != '\0')){
 				if(*buff == ':'){
 					p_485m->start_msg_index = ++buff;
@@ -150,9 +149,6 @@ void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE
 	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
 			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
 			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
-	if(p_485m->state == RS485_MASTER_ST_FAIL){
-		p_485m->csv.state = FAIL;
-	}
 	rs485_master_reset_buffer(p_485m);
 	p_485m->state = RS485_MASTER_ST_IDLE;
 }
@@ -168,3 +164,17 @@ void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
 	rs485_master_reset_buffer(p_485m);
 	p_485m->state = RS485_MASTER_ST_IDLE;
 }
+
+#if 0
+void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE_OBJECTS obj, SLAVE_OBJECT_STATE state){
+	while(p_485m->state != RS485_MASTER_ST_IDLE);
+	rs485_master_set_csv_data(p_485m, id, obj, state);
+	p_485m->state = RS485_MASTER_ST_SEND_CMD;
+}
+
+void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
+	while(p_485m->state != RS485_MASTER_ST_IDLE);
+	rs485_master_set_csv_data(p_485m, id, 0, 0);
+	p_485m->state = RS485_MASTER_ST_SEND_SYNC;
+}
+#endif

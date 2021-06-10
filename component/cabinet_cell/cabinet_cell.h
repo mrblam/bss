@@ -29,36 +29,31 @@ typedef enum CABINET_OP_STATE_t{
 } CABINET_OP_STATE;
 
 struct Cabinet_t{
-	CABINET_OP_STATE 	state;
-	uint8_t			cab_id;
-	BP*				bp;
-	Cabinet_Door	door;
-	Switch			cell_fan;
-	Switch			charger;
-	Switch			node_id_sw;
-	NTC*			temp_ss;
-	int32_t			temp;
-	uint8_t is_changed;
-	void (*data_serialize)(Cabinet* p_cc, char* buff);
+	CABINET_OP_STATE 	op_state;
+	uint8_t				cab_id;
+	BP*					bp;
+	Cabinet_Door		door;
+	Switch				cell_fan;
+	Switch				charger;
+	Switch				node_id_sw;
+	uint8_t				temp;
+	uint8_t 			is_changed;
+	void (*data_serialize)(Cabinet* p_cab, char* buff);
 	void (*on_door_close)(Cabinet* p_cab);
 	void (*on_door_open)(Cabinet* p_cab);
 };
 
-void cab_cell_set_state(Cabinet* p_cc);
-CABINET_OP_STATE cab_cell_get_state(Cabinet* p_cc);
+void cab_cell_init(Cabinet* p_cab);
+void cab_cell_set_state(Cabinet* p_cab);
+CABINET_OP_STATE cab_cell_get_state(Cabinet* p_cab);
 void cab_cell_update_state(Cabinet* p_cab);
-void cab_cell_update_door_state(Cabinet* p_cc);
-void cab_cell_open_door(Cabinet* p_cc);
-int32_t cab_cell_get_cell_temp(Cabinet* p_cc);
-void cab_cell_fan_turn_on(Cabinet* p_cc);
-void cab_cell_fan_turn_off(Cabinet* p_cc);
-void cab_cell_deactive_charger(Cabinet* p_cc);
-void cab_cell_active_charger(Cabinet* p_cc);
-void cab_cell_active_cell_fan(Cabinet* p_cc);
-void cab_cell_deactive_cell_fan(Cabinet* p_cc);
+void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state);
+void cab_cell_update_fan_state(Cabinet* p_cab, SW_STATE new_state);
+void cab_cell_update_temp(Cabinet* p_cab, uint8_t new_temp);
+void cab_cell_open_door(Cabinet* p_cab);
 
-static inline void cab_cell_data_serialize(Cabinet* p_cc, char* buff){
-	p_cc->data_serialize(p_cc, buff);
+static inline void cab_cell_data_serialize(Cabinet* p_cab, char* buff){
+	p_cab->data_serialize(p_cab, buff);
 }
 
 #endif /* COMPONENT_CABINET_CELL_CABINET_CELL_H_ */

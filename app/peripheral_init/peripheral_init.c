@@ -299,7 +299,6 @@ static void rs485_set_rx_mode(RS485_Master* p_485m);
 static void rs485_receive_handle_impl(UART_hw* p_hw);
 static void hmi_receive_handle_impl(UART_hw* p_hw);
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
-static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff);
 
 static void can_master_rpdo_process_impl(const CAN_master* const p_cm);
 
@@ -342,10 +341,9 @@ void peripheral_init(Cabinet_App* p_ca){
 		p_ca->bss.cabs[cab_id].door.io_state.get_io_state = door_state_interface[cab_id];
 		p_ca->bss.cabs[cab_id].cell_fan.sw_on = cell_fan_on_interface[cab_id];
 		p_ca->bss.cabs[cab_id].cell_fan.sw_off = cell_fan_off_interface[cab_id];
-		p_ca->bss.cabs[cab_id].data_serialize = cab_cell_data_serialze_impl;
 	}
 
-	rs485_master_init(&rs485m, 1, &cabinet_485_hw);
+	rs485_master_init(&rs485m, &cabinet_485_hw);
 	rs485m.p_hw->uart_module = rs485_com.uart_module;
 	rs485_com.receive_handle = rs485_receive_handle_impl;
 	rs485m.set_transmit_mode = rs485_set_tx_mode;
@@ -360,13 +358,14 @@ void peripheral_init(Cabinet_App* p_ca){
 	p_ca->slave_com = &rs485m;
 }
 
+#if 0
 static void ntc_init(Cabinet_App* p_ca){
 	for(uint8_t cab_id = CAB1; cab_id < CAB15; cab_id++){
 		p_ca->bss.cabs[cab_id].temp_ss->base.hw->adc_value = cab_temp[cab_id];
 		ntc_set_lut(p_ca->bss.cabs[cab_id].temp_ss, ntc_lookups);
 	}
 }
-
+#endif
 static void rs485_set_tx_mode(RS485_Master* p_485m){
 	(void)p_485m;
 	HAL_MAX485_SET_DIR_TX;
@@ -416,15 +415,15 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 			break;
 		case MASTER_READ:
 			token = strtok(NULL, ",");
-			selex_bss_app.bss.cabs[p_485m->csv.id].door.state = string_to_long(token);
+			cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
 			token = strtok(NULL, ",");
-			selex_bss_app.bss.cabs[p_485m->csv.id].cell_fan.state = string_to_long(token);
+			cab_cell_update_fan_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
 			token = strtok(NULL, ",");
 			selex_bss_app.bss.cabs[p_485m->csv.id].node_id_sw.state = string_to_long(token);
 			token = strtok(NULL, ",");
 			selex_bss_app.bss.cabs[p_485m->csv.id].charger.state = string_to_long(token);
 			token = strtok(NULL, ",");
-			selex_bss_app.bss.cabs[p_485m->csv.id].temp = string_to_long(token);
+			cab_cell_update_temp(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
 			p_485m->state = RS485_MASTER_ST_SUCCESS;
 			break;
 		default:
@@ -462,36 +461,6 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
     default:
     	break;
     }
-}
-
-static void cab_cell_data_serialze_impl(Cabinet* p_cc, char* buff){
-	*buff++=':';
-	*buff++='R';
-	*buff++='C';
-    *buff++=',';
-	buff+=long_to_string(p_cc->cab_id,buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->state,buff);
-    *buff++=',';
-    buff+=long_to_string(selex_bss_app.base.assign_state, buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->door.state,buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->cell_fan.state,buff);
-    *buff++=',';
-	buff+=long_to_string(p_cc->temp,buff);
-    *buff++=',';
-    if(p_cc->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED){
-        for(uint8_t i = 0; *(p_cc->bp->base.sn + i) != '\0'; i++){
-        	*buff++= *(p_cc->bp->base.sn+i);
-        }
-    }
-    else{
-    	*buff++='0';
-    }
-    *buff++='*';
-    *buff++='\n';
-    *buff++='\0';
 }
 
 /* ------------------------------------------------------------------------------ */
@@ -824,7 +793,7 @@ static void cell_fan1_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 0, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[0].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[0], rs485m.csv.state);
 	}
 }
 
@@ -832,7 +801,7 @@ static void cell_fan2_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 1, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[1].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[1], rs485m.csv.state);
 	}
 }
 
@@ -840,7 +809,7 @@ static void cell_fan3_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 2, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[2].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[2], rs485m.csv.state);
 	}
 }
 
@@ -848,7 +817,7 @@ static void cell_fan4_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 3, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[3].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[3], rs485m.csv.state);
 	}
 }
 
@@ -856,7 +825,7 @@ static void cell_fan5_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 4, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[4].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[4], rs485m.csv.state);
 	}
 }
 
@@ -864,7 +833,7 @@ static void cell_fan6_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 5, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[5].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[5], rs485m.csv.state);
 	}
 }
 
@@ -872,7 +841,7 @@ static void cell_fan7_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 6, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[6].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[6], rs485m.csv.state);
 	}
 }
 
@@ -880,7 +849,7 @@ static void cell_fan8_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 7, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[7].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[7], rs485m.csv.state);
 	}
 }
 
@@ -888,7 +857,7 @@ static void cell_fan9_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 8, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[8].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[8], rs485m.csv.state);
 	}
 }
 
@@ -896,7 +865,7 @@ static void cell_fan10_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 9, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[9].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[9], rs485m.csv.state);
 	}
 }
 
@@ -904,7 +873,7 @@ static void cell_fan11_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 10, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[10].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[10], rs485m.csv.state);
 	}
 }
 
@@ -912,7 +881,7 @@ static void cell_fan12_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 11, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[11].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[11], rs485m.csv.state);
 	}
 }
 
@@ -920,7 +889,7 @@ static void cell_fan13_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 12, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[12].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[12], rs485m.csv.state);
 	}
 }
 
@@ -928,7 +897,7 @@ static void cell_fan14_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 13, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[13].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[13], rs485m.csv.state);
 	}
 }
 
@@ -936,7 +905,7 @@ static void cell_fan15_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 14, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[14].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[14], rs485m.csv.state);
 	}
 }
 
@@ -944,7 +913,7 @@ static void cell_fan16_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 15, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[15].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[15], rs485m.csv.state);
 	}
 }
 
@@ -952,7 +921,7 @@ static void cell_fan17_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 16, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[16].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[16], rs485m.csv.state);
 	}
 }
 
@@ -960,7 +929,7 @@ static void cell_fan18_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 17, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[17].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[17], rs485m.csv.state);
 	}
 }
 
@@ -968,7 +937,7 @@ static void cell_fan19_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 18, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[18].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[18], rs485m.csv.state);
 	}
 }
 
@@ -976,7 +945,7 @@ static void cell_fan20_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 19, SLAVE_FAN, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[19].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[19], rs485m.csv.state);
 	}
 }
 
@@ -986,7 +955,7 @@ static void cell_fan1_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 0, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[0].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[0], rs485m.csv.state);
 	}
 }
 
@@ -994,7 +963,7 @@ static void cell_fan2_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 1, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[1].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[1], rs485m.csv.state);
 	}
 }
 
@@ -1002,7 +971,7 @@ static void cell_fan3_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 2, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[2].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[2], rs485m.csv.state);
 	}
 }
 
@@ -1010,7 +979,7 @@ static void cell_fan4_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 3, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[3].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[3], rs485m.csv.state);
 	}
 }
 
@@ -1018,7 +987,7 @@ static void cell_fan5_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 4, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[4].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[4], rs485m.csv.state);
 	}
 }
 
@@ -1026,7 +995,7 @@ static void cell_fan6_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 5, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[5].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[5], rs485m.csv.state);
 	}
 }
 
@@ -1034,7 +1003,7 @@ static void cell_fan7_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 6, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[6].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[6], rs485m.csv.state);
 	}
 }
 
@@ -1042,7 +1011,7 @@ static void cell_fan8_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 7, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[7].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[7], rs485m.csv.state);
 	}
 }
 
@@ -1050,7 +1019,7 @@ static void cell_fan9_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 8, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[8].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[8], rs485m.csv.state);
 	}
 }
 
@@ -1058,7 +1027,7 @@ static void cell_fan10_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 9, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[9].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[9], rs485m.csv.state);
 	}
 }
 
@@ -1066,7 +1035,7 @@ static void cell_fan11_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 10, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[10].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[10], rs485m.csv.state);
 	}
 }
 
@@ -1074,7 +1043,7 @@ static void cell_fan12_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 11, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[11].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[11], rs485m.csv.state);
 	}
 }
 
@@ -1082,7 +1051,7 @@ static void cell_fan13_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 12, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[12].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[12], rs485m.csv.state);
 	}
 }
 
@@ -1090,7 +1059,7 @@ static void cell_fan14_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 13, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[13].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[13], rs485m.csv.state);
 	}
 }
 
@@ -1098,7 +1067,7 @@ static void cell_fan15_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 14, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[14].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[14], rs485m.csv.state);
 	}
 }
 
@@ -1106,7 +1075,7 @@ static void cell_fan16_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 15, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[15].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[15], rs485m.csv.state);
 	}
 }
 
@@ -1114,7 +1083,7 @@ static void cell_fan17_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 16, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[16].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[16], rs485m.csv.state);
 	}
 }
 
@@ -1122,7 +1091,7 @@ static void cell_fan18_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 17, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[17].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[17], rs485m.csv.state);
 	}
 }
 
@@ -1130,7 +1099,7 @@ static void cell_fan19_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 18, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[18].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[18], rs485m.csv.state);
 	}
 }
 
@@ -1138,7 +1107,7 @@ static void cell_fan20_switch_off( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 19, SLAVE_FAN, DEACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[19].cell_fan.state = SW_ST_FAIL;
+		cab_cell_update_fan_state(&selex_bss_app.bss.cabs[19], rs485m.csv.state);
 	}
 }
 
@@ -1270,7 +1239,7 @@ static void door1_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 0, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[0].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[0], rs485m.csv.state);
 	}
 }
 
@@ -1278,7 +1247,7 @@ static void door2_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 1, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[1].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[1], rs485m.csv.state);
 	}
 }
 
@@ -1286,7 +1255,7 @@ static void door3_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 2, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[2].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[2], rs485m.csv.state);
 	}
 }
 
@@ -1294,7 +1263,7 @@ static void door4_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 3, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[3].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[3], rs485m.csv.state);
 	}
 }
 
@@ -1302,7 +1271,7 @@ static void door5_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 4, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[4].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[4], rs485m.csv.state);
 	}
 }
 
@@ -1310,7 +1279,7 @@ static void door6_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 5, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[5].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[5], rs485m.csv.state);
 	}
 }
 
@@ -1318,7 +1287,7 @@ static void door7_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 6, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[6].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[6], rs485m.csv.state);
 	}
 }
 
@@ -1326,7 +1295,7 @@ static void door8_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 7, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[7].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[7], rs485m.csv.state);
 	}
 }
 
@@ -1334,7 +1303,7 @@ static void door9_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 8, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[8].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[8], rs485m.csv.state);
 	}
 }
 
@@ -1342,7 +1311,7 @@ static void door10_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 9, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[9].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[9], rs485m.csv.state);
 	}
 }
 
@@ -1350,7 +1319,7 @@ static void door11_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 10, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[10].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[10], rs485m.csv.state);
 	}
 }
 
@@ -1358,7 +1327,7 @@ static void door12_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 11, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[11].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[11], rs485m.csv.state);
 	}
 }
 
@@ -1366,7 +1335,7 @@ static void door13_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 12, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[12].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[12], rs485m.csv.state);
 	}
 }
 
@@ -1374,7 +1343,7 @@ static void door14_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 13, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[13].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[13], rs485m.csv.state);
 	}
 }
 
@@ -1382,7 +1351,7 @@ static void door15_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 14, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[14].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[14], rs485m.csv.state);
 	}
 }
 
@@ -1390,7 +1359,7 @@ static void door16_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 15, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[15].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[15], rs485m.csv.state);
 	}
 }
 
@@ -1398,7 +1367,7 @@ static void door17_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 16, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[16].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[16], rs485m.csv.state);
 	}
 }
 
@@ -1406,7 +1375,7 @@ static void door18_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 17, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[17].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[17], rs485m.csv.state);
 	}
 }
 
@@ -1414,7 +1383,7 @@ static void door19_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 18, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[18].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[18], rs485m.csv.state);
 	}
 }
 
@@ -1422,7 +1391,7 @@ static void door20_switch_on( Switch* p_sw){
 	(void)p_sw;
 	rs485_master_process_switch_command(&rs485m, 19, SLAVE_DOOR, ACTIVE);
 	if(rs485m.csv.state == FAIL){
-		selex_bss_app.bss.cabs[19].door.state = SW_ST_FAIL;
+		cab_cell_update_door_state(&selex_bss_app.bss.cabs[19], rs485m.csv.state);
 	}
 }
 

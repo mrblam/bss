@@ -57,7 +57,6 @@ struct RS485_Master_t{
 	RS485_MASTER_STATE	state;
 	Max485_Hw* 			p_hw;
 	uint32_t 			timeout;
-	uint8_t				slave_num;
 	uint8_t 			is_new_msg;
 	uint8_t				tx_data[32];
 	uint8_t 			rx_index;
@@ -70,7 +69,7 @@ struct RS485_Master_t{
 };
 
 RS485_Master* rs485_master_construct(void);
-void rs485_master_init(RS485_Master* p_485m, uint8_t slave_num, Max485_Hw* p_hw);
+void rs485_master_init(RS485_Master* p_485m, Max485_Hw* p_hw);
 void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp);
 void rs485_master_set_csv_data(RS485_Master* p_485m, const uint8_t slave_id, const char obj, const uint8_t state);
 void rs485_master_reset_buffer(RS485_Master* p_485m);
