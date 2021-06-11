@@ -21,6 +21,7 @@ static void can_master_slave_deselect_impl(const CAN_master* p_cm,const uint32_t
 static void bp_assign_id_success_handle(const CAN_master* const p_cm,const uint32_t id);
 static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t id);
 static void can_receive_handle(CAN_Hw* p_hw);
+static void can_master_rpdo_process_handle_impl(const CAN_master* const p_cm);
 
 static Cabinet bss_cabinets[CABINET_CELL_NUM];
 static CO_Slave* bp_slaves[CABINET_CELL_NUM];
@@ -41,10 +42,12 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bss_cabinets[i].cab_id=i;
 	        bss_cabinets[i].bp=bp_construct();
 	        bss_cabinets[i].bp->pos=i;
+	        bss_cabinets[i].bp->vol = 0;
+	        bss_cabinets[i].bp->cur = 0;
 	        bss_cabinets[i].bp->soc=90;
 	        bss_cabinets[i].bp->soc=100;
 	        bss_cabinets[i].bp->cycle=8;
-	        bss_cabinets[i].bp->temp[0]=26;
+	        for(uint8_t j = 0; j < 8; j++) bss_cabinets[i].bp->temp[j]=26;
 	        bss_cabinets[i].on_door_close=cabinet_door_close_event_handle;
 	        bss_cabinets[i].on_door_open=cabinet_door_open_event_handle;
 	        bss_cabinets[i].is_changed=1;
@@ -54,6 +57,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	        co_slave_set_con_state(bp_slaves[i],CO_SLAVE_CON_ST_DISCONNECT);
 	        bp_slaves[i]->node_id=CABINET_START_NODE_ID+i;
 	        bp_slaves[i]->sdo_server_address=0x580+bp_slaves[i]->node_id;
+	        bp_slaves[i]->inactive_time_ms = 0;
 	}
 
 	for(int i = 0; i < CHARGER_NUM; i++){
@@ -101,7 +105,17 @@ int main(void){
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void){
 	sys_timestamp += sys_tick_ms;
-
+#if 1
+	for(uint8_t id = 0; id < selex_bss_app.bss.cab_num; id++){
+		if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED) && (selex_bss_app.base.pdo_sync_timestamp)){
+			selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms += sys_tick_ms;
+			if(selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms > BP_INACTIVE_TIMEOUT_mS){
+				cab_cell_disconnected(&selex_bss_app.bss.cabs[id]);
+				sdo_server_set_state(&selex_bss_app.base.sdo_server, SDO_ST_IDLE);
+			}
+		}
+	}
+#endif
 	if(cab_id == selex_bss_app.bss.cab_num){
 		cab_id = 0;
 	}
@@ -110,7 +124,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 	can_master_process((CAN_master*)&selex_bss_app, sys_timestamp);
-	can_master_update_id_assign_process((CAN_master*)&selex_bss_app,sys_timestamp);
+	can_master_update_id_assign_process((CAN_master*)&selex_bss_app, sys_timestamp);
 }
 
 void TIM3_IRQHandler(void){
@@ -135,9 +149,9 @@ void TIM3_IRQHandler(void){
 	        }
         }
         alive_heartbeat_counter++;
-        if(alive_heartbeat_counter > 4){
+        if(alive_heartbeat_counter > 6){
                cab_app_sync_bss_data_hmi(&selex_bss_app);
-               alive_heartbeat_counter=0;
+               alive_heartbeat_counter = 0;
         	}
 		}
 		rs485_master_update_state(&rs485m, com_timestamp);
@@ -149,6 +163,17 @@ void TIM3_IRQHandler(void){
 
 static void can_receive_handle(CAN_Hw* p_hw){
 	uint32_t cob_id=p_hw->can_rx.StdId;
+    switch(p_hw->can_rx.StdId & 0xFFFFFF80){
+    case CO_CAN_ID_TPDO_1:
+    case CO_CAN_ID_TPDO_2:
+    case CO_CAN_ID_TPDO_3:
+    case CO_CAN_ID_TPDO_4:
+    	can_master_rpdo_process_handle_impl((CAN_master*)&selex_bss_app);
+    	break;
+    default:
+    	break;
+    }
+
 	/* if assign request message */
 	if (cob_id == selex_bss_app.base.node_id_scan_cobid) {
 		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST) {
@@ -218,6 +243,55 @@ static void bp_assign_id_fail_handle(const CAN_master* const p_cm,const uint32_t
 	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
 }
 
+static void can_master_rpdo_process_handle_impl(const CAN_master* const p_cm){
+    uint32_t cob_id= p_cm->p_hw->can_rx.StdId & 0xFFFFFF80;
+    uint8_t node_id=(uint8_t)(p_cm->p_hw->can_rx.StdId & 0x7F);
+    uint8_t bp_id=node_id - p_cm->slave_start_node_id;
 
+    if(bp_get_con_state(selex_bss_app.bss.cabs[bp_id].bp) != CO_SLAVE_CON_ST_CONNECTED){
+            return;
+    }
+    bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
+
+    switch(cob_id){
+    case BP_VOL_CUR_TPDO_COBID:
+    	cab_cell_update_bp_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)&selex_bss_app.bss.cabs[bp_id].bp->vol,
+				10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data));
+    	cab_cell_update_bp_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)&selex_bss_app.bss.cabs[bp_id].bp->cur,
+				(int32_t)10*((int16_t)CO_getUint16(p_cm->p_hw->rx_data+2)));
+    	cab_cell_update_bp_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)&selex_bss_app.bss.cabs[bp_id].bp->soc,
+				(int32_t)p_cm->p_hw->rx_data[4]);
+    	cab_cell_update_bp_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)&selex_bss_app.bss.cabs[bp_id].bp->state,
+				(int32_t)p_cm->p_hw->rx_data[5]);
+    	cab_cell_update_bp_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)&selex_bss_app.bss.cabs[bp_id].bp->status,
+				(int32_t)CO_getUint16(p_cm->p_hw->rx_data+6));
+    	//selex_bss_app.bss.cabs[bp_id].bp->status = (uint16_t)CO_getUint16(p_cm->p_hw->rx_data+6);
+    	break;
+    case BP_LOW_CELLS_VOL_TPDO_COBID:
+    	cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)selex_bss_app.bss.cabs[bp_id].bp->cell_vol, 8,
+				(int32_t*)p_cm->p_hw->rx_data);
+    	break;
+    case BP_HIGH_CELLS_VOL_TPDO_COBID:
+    	cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)(selex_bss_app.bss.cabs[bp_id].bp->cell_vol + 8), 8,
+				(int32_t*)p_cm->p_hw->rx_data);
+    	//CO_memcpy(selex_bss_app.bss.cabs[bp_id].bp->cell_vol+8, p_cm->p_hw->rx_data, 8);
+    	break;
+    case BP_TEMP_TPDO_COBID:
+    	cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id],
+    			(int32_t*)selex_bss_app.bss.cabs[bp_id].bp->temp, 8,
+				(int32_t*)p_cm->p_hw->rx_data);
+    	//CO_memcpy((uint8_t*)selex_bss_app.bss.cabs[bp_id].bp->temp, p_cm->p_hw->rx_data, 8);
+    	break;
+    default:
+    	break;
+    }
+}
 
 

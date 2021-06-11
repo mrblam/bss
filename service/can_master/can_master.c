@@ -37,10 +37,15 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 		can_master_process_sdo(p_cm, timestamp);
 		p_cm->sdo_server.is_new_msg = 0;
 	}
-
+#if 0
 	if (p_cm->pdo_sync_timestamp >= timestamp) {
 		co_send_sync(p_cm);
 		p_cm->pdo_sync_timestamp += 500;
+	}
+#endif
+	if((p_cm->pdo_sync_timestamp == timestamp) && (p_cm->pdo_sync_timestamp != 0)){
+		co_send_sync(p_cm);
+		p_cm->pdo_sync_timestamp += 2000;
 	}
 }
 

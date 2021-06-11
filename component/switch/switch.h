@@ -29,12 +29,12 @@ Switch* sw_construct(void);
 
 static inline void sw_on(Switch* p_sw){
 	p_sw->sw_on(p_sw);
-	p_sw->state=SW_ST_ON;
+	//p_sw->state=SW_ST_ON;
 }
 
 static inline void sw_off(Switch* p_sw){
 	p_sw->sw_off(p_sw);
-	p_sw->state=SW_ST_OFF;
+	//p_sw->state=SW_ST_OFF;
 }
 
 static inline SW_STATE sw_get_state(Switch* p_sw){

@@ -67,6 +67,32 @@ void cab_cell_update_temp(Cabinet* p_cab, uint8_t new_temp){
 	}
 }
 
+void cab_cell_update_bp_data(Cabinet* p_cab, int32_t* p_data, int32_t new_var){
+	int32_t old_var = *p_data;
+	if(old_var != new_var){
+		*p_data = new_var;
+		p_cab->is_changed = 1;
+	}
+}
+
+void cab_cell_update_bp_array_data(Cabinet* p_cab, int32_t p_data[], uint8_t arr_size, int32_t new_var[]){
+	uint8_t i = 0;
+	for(i = 0; i < arr_size - 6; i++){
+		int32_t old_var = p_data[i];
+		if(old_var != new_var[i]){
+			p_data[i] = new_var[i];
+			p_cab->is_changed = 1;
+		}
+	}
+}
+
+void cab_cell_disconnected(Cabinet* p_cab){
+	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
+	p_cab->bp->base.inactive_time_ms = 0;
+	sw_off(&p_cab->node_id_sw);
+	p_cab->bp->vol = 0;
+}
+
 static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
 	*buff++=':';
 	*buff++='R';

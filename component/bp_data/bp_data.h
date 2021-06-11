@@ -16,25 +16,48 @@
 typedef struct BP_t BP;
 
 typedef enum BP_STATE{
-	BP_ST_FAIL = 0,
-	BP_ST_IDLE = 1,
-	BP_ST_CHARGING = 2
+	BP_ST_INIT=0,
+	BP_ST_IDLE,
+	BP_ST_ID_ASSIGN_START,
+	BP_ST_ID_ASSIGN_WAIT_CONFIRM,
+	BP_ST_ID_ASSIGN_CONFIRMED,
+	BP_ST_ID_ASSIGN_WAIT_SLAVE_SELECT,
+	BP_ST_START_AUTHENTICATE,
+	BP_ST_AUTHENTICATING,
+	BP_ST_SOFTSTART,
+	BP_ST_SYSTEM_BOOST_UP,
+	BP_ST_STANDBY,
+	BP_ST_DISCHARGING,
+	BP_ST_CHARGING,
+	BP_ST_FAULT,
+	BP_ST_SHIPMODE
 } BP_STATE;
 
+typedef enum BP_STATUS{
+	BP_STT_OK				= 0,
+	BP_STT_OCD 				= 1,
+	BP_STT_SCD 				= 2,
+	BP_STT_OV 				= 4,
+	BP_STT_UV 				= 8,
+	BP_STT_OVRD_ALERT 		= 16,
+	BP_STT_DEVICE_XREADY	= 32,
+	BP_STT_RSVD 			= 64,
+	BP_STT_CC_READY 		= 128
+}BP_STATUS;
+
 struct BP_t{
-    CO_Slave base;
-	BP_STATE 	state;
-	uint32_t inactive_time;
-	uint32_t charge_sw_state;
-	uint8_t 	status;
+    CO_Slave 	base;
+    BP_STATE	state;
+    uint32_t 	charge_sw_state;
 	uint8_t 	pos;
 	uint8_t 	soc;
 	uint8_t 	soh;
-	uint8_t 	vol;
-	uint8_t 	cur;
-	uint8_t		cell_vol[16];
-	int8_t		temp[8];
+	uint32_t 	vol;
+	int32_t 	cur;
 	uint32_t 	cycle;
+	uint8_t 	cell_vol[16];
+	uint8_t 	temp[8];
+	BP_STATUS 	status;
 	void		(*data_serialize)(BP* p_bp, char* buff);
 };
 
@@ -42,27 +65,6 @@ BP* bp_construct(void);
 
 void bp_update_state(BP* p_bp, BP_STATE state);
 BP_STATE bp_get_state(BP* p_bp);
-
-void bp_set_serial_number(BP* p_bp, char* sn);
-char* bp_get_serial_number(BP* p_bp);
-
-void bp_set_soc(BP* p_bp, uint8_t soc);
-uint8_t bp_get_soc(BP* p_bp);
-
-void bp_set_soh(BP* p_bp, uint8_t soh);
-uint8_t bp_get_soh(BP* p_bp);
-
-void bp_set_vol(BP* p_bp, uint8_t vol);
-uint8_t bp_get_vol(BP* p_bp);
-
-void bp_set_cur(BP* p_bp, uint8_t cur);
-uint8_t bp_get_cur(BP* p_bp);
-
-void bp_set_temp(BP* p_bp, uint16_t temp);
-uint16_t bp_get_temp(BP* p_bp);
-
-void bp_set_cycle(BP* p_bp, uint32_t cycle);
-uint32_t bp_get_cycle(BP* p_bp);
 
 static inline CO_SLAVE_NET_STATE bp_get_con_state(const BP* const p_bp){
         return p_bp->base.con_state;
@@ -73,7 +75,7 @@ static inline void bp_set_con_state(BP* p_bp,const CO_SLAVE_NET_STATE state){
 }
 
 static inline void bp_reset_inactive_counter(BP* p_bp){
-        p_bp->inactive_time=0;
+        p_bp->base.inactive_time_ms=0;
 }
 
 static inline void bp_data_serialize(BP* p_bp, char* buff){

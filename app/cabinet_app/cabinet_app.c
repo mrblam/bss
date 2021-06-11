@@ -8,7 +8,7 @@
 #include "cabinet_app.h"
 #include "uart_hw_hal.h"
 
-static char tx_buff[60];
+static char tx_buff[200];
 
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca);
 static void cab_app_reset_buffer(Cabinet_App* p_ca);
@@ -41,7 +41,8 @@ void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
 }
 
 void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){
-	if(p_ca->bss.cabs[cab_id].bp->base.con_state!=CO_SLAVE_CON_ST_CONNECTED) return;
+	if((p_ca->bss.cabs[cab_id].bp->base.con_state!=CO_SLAVE_CON_ST_CONNECTED) ||
+			(p_ca->bss.cabs[cab_id].bp->vol == 0)) return;
 
 	bp_data_serialize(p_ca->bss.cabs[cab_id].bp, tx_buff);
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
@@ -118,6 +119,7 @@ static void	cab_app_process_hmi_bss_cmd(Cabinet_App* p_ca, const uint32_t timest
 	case BSS_AUTHORIZE:
 		if(p_ca->hmi_csv.obj_state == AUTH_OK){
 			p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
+			p_ca->base.pdo_sync_timestamp = timestamp + 10;
 		}
 		else if(p_ca->hmi_csv.obj_state == AUTH_FAIL){
 			p_ca->base.assign_state = CM_ASSIGN_ST_FAIL;
@@ -139,6 +141,12 @@ static void cab_app_process_hmi_cab_cmd(Cabinet_App* p_ca){
 		}
 		break;
 	case FAN:
+		if(p_ca->hmi_csv.obj_state == SW_ACTIVE){
+			sw_on(&p_ca->bss.cabs[p_ca->hmi_csv.id].cell_fan);
+		}
+		else if(p_ca->hmi_csv.obj_state == SW_DEACTIVE){
+			sw_off(&p_ca->bss.cabs[p_ca->hmi_csv.id].cell_fan);
+		}
 		break;
 	default:
 		break;

@@ -44,6 +44,7 @@ struct Cabinet_t{
 };
 
 void cab_cell_init(Cabinet* p_cab);
+void cab_cell_disconnected(Cabinet* p_cab);
 void cab_cell_set_state(Cabinet* p_cab);
 CABINET_OP_STATE cab_cell_get_state(Cabinet* p_cab);
 void cab_cell_update_state(Cabinet* p_cab);
@@ -51,7 +52,8 @@ void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state);
 void cab_cell_update_fan_state(Cabinet* p_cab, SW_STATE new_state);
 void cab_cell_update_temp(Cabinet* p_cab, uint8_t new_temp);
 void cab_cell_open_door(Cabinet* p_cab);
-
+void cab_cell_update_bp_data(Cabinet* p_cab, int32_t* p_data, int32_t new_var);
+void cab_cell_update_bp_array_data(Cabinet* p_cab, int32_t p_data[], uint8_t arr_size, int32_t new_var[]);
 static inline void cab_cell_data_serialize(Cabinet* p_cab, char* buff){
 	p_cab->data_serialize(p_cab, buff);
 }
