@@ -46,8 +46,8 @@ typedef enum LAMP_STATE{
 
 typedef struct Charger_t Charger;
 struct Charger_t{
-	uint8_t			start_cabin_id;
-	uint8_t			stop_cabin_id;
+	uint8_t			assigned_cab_num;
+	Cabinet* 		assigned_cabs;
 	Cabinet*		charging_cabin;
 	Switch			input_power;
 };

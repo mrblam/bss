@@ -38,6 +38,7 @@ typedef enum SUB_OBJS{
 	BSS_AUTHORIZE	= 'A',
 	DOOR			= 'D',
 	FAN				= 'F',
+	CHARGER			= 'C',
 	LAMP			= 'L',
 	STATE			= 'S'
 } SUB_OBJS;

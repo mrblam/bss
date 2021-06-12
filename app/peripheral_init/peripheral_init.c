@@ -322,25 +322,36 @@ static sw_act cell_fan_off_interface[] = {cell_fan1_switch_off, cell_fan2_switch
 								cell_fan11_switch_off, cell_fan12_switch_off, cell_fan13_switch_off, cell_fan14_switch_off, cell_fan15_switch_off,
 								cell_fan16_switch_off, cell_fan17_switch_off, cell_fan18_switch_off, cell_fan19_switch_off, cell_fan20_switch_off};
 
-static sw_act node_set_high[]={node_id1_sw_on, node_id2_sw_on, node_id3_sw_on, node_id4_sw_on, node_id5_sw_on,
+static sw_act node_id_high_interface[]={node_id1_sw_on, node_id2_sw_on, node_id3_sw_on, node_id4_sw_on, node_id5_sw_on,
 								node_id6_sw_on,	node_id7_sw_on,	node_id8_sw_on,	node_id9_sw_on,	node_id10_sw_on,
 								node_id11_sw_on, node_id12_sw_on, node_id13_sw_on, node_id14_sw_on,	node_id15_sw_on,
 								node_id16_sw_on, node_id17_sw_on, node_id18_sw_on, node_id19_sw_on,	node_id20_sw_on};
 
-static sw_act node_set_low[]={node_id1_sw_off, node_id2_sw_off, node_id3_sw_off, node_id4_sw_off, node_id5_sw_off,
+static sw_act node_id_low_interface[]={node_id1_sw_off, node_id2_sw_off, node_id3_sw_off, node_id4_sw_off, node_id5_sw_off,
 								node_id6_sw_off, node_id7_sw_off, node_id8_sw_off, node_id9_sw_off, node_id10_sw_off,
 								node_id11_sw_off, node_id12_sw_off, node_id13_sw_off, node_id14_sw_off,	node_id15_sw_off,
 								node_id16_sw_off, node_id17_sw_off, node_id18_sw_off, node_id19_sw_off,	node_id20_sw_off};
 
+static sw_act charger_sw_on_interface[] = {charger1_sw_on, charger2_sw_on, charger3_sw_on, charger4_sw_on, charger5_sw_on,
+								charger6_sw_on, charger7_sw_on, charger8_sw_on, charger9_sw_on, charger10_sw_on,
+								charger11_sw_on, charger12_sw_on, charger13_sw_on, charger14_sw_on, charger15_sw_on,
+								charger16_sw_on, charger17_sw_on, charger18_sw_on, charger19_sw_on, charger20_sw_on};
+
+static sw_act charger_sw_off_interface[] = {charger1_sw_off, charger2_sw_off, charger3_sw_off, charger4_sw_off, charger5_sw_off,
+								charger6_sw_off, charger7_sw_off, charger8_sw_off, charger9_sw_off, charger10_sw_off,
+								charger11_sw_off, charger12_sw_off, charger13_sw_off, charger14_sw_off, charger15_sw_off,
+								charger16_sw_off, charger17_sw_off, charger18_sw_off, charger19_sw_off, charger20_sw_off};
 
 void peripheral_init(Cabinet_App* p_ca){
-	for(uint8_t cab_id=0;cab_id<p_ca->bss.cab_num;cab_id++){
-		p_ca->bss.cabs[cab_id].node_id_sw.sw_on = node_set_high[cab_id];
-		p_ca->bss.cabs[cab_id].node_id_sw.sw_off = node_set_low[cab_id];
+	for(uint8_t cab_id = 0; cab_id < p_ca->bss.cab_num; cab_id++){
+		p_ca->bss.cabs[cab_id].node_id_sw.sw_on = node_id_high_interface[cab_id];
+		p_ca->bss.cabs[cab_id].node_id_sw.sw_off = node_id_low_interface[cab_id];
 		p_ca->bss.cabs[cab_id].door.solenoid.sw_on = door_sw_interface[cab_id];
 		p_ca->bss.cabs[cab_id].door.io_state.get_io_state = door_state_interface[cab_id];
 		p_ca->bss.cabs[cab_id].cell_fan.sw_on = cell_fan_on_interface[cab_id];
 		p_ca->bss.cabs[cab_id].cell_fan.sw_off = cell_fan_off_interface[cab_id];
+		p_ca->bss.cabs[cab_id].charger.sw_on = charger_sw_on_interface[cab_id];
+		p_ca->bss.cabs[cab_id].charger.sw_off = charger_sw_off_interface[cab_id];
 	}
 
 	rs485_master_init(&rs485m, &cabinet_485_hw);

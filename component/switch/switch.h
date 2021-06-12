@@ -41,4 +41,13 @@ static inline SW_STATE sw_get_state(Switch* p_sw){
 	return p_sw->state;
 }
 
+static inline void sw_process(Switch* p_sw, SW_STATE state){
+	if(state == SW_ST_OFF){
+		sw_off(p_sw);
+	}
+	else if(state == SW_ST_ON){
+		sw_on(p_sw);
+	}
+}
+
 #endif /* COMPONENT_SWITCH_SWITCH_H_ */

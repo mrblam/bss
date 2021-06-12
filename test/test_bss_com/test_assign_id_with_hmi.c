@@ -37,7 +37,7 @@ void cab_app_init(Cabinet_App* p_ca){
 	p_ca->bss.cabs=&bss_cabinets[0];
 	p_ca->bss.ac_chargers = &bss_chargers[0];
 	peripheral_init(p_ca);
-	for(int i=0;i<CABINET_CELL_NUM;i++){
+	for(int i = 0; i < p_ca->bss.cab_num; i++){
 		bss_cabinets[i].op_state=CAB_CELL_ST_INACTIVE;
 	        bss_cabinets[i].cab_id=i;
 	        bss_cabinets[i].bp=bp_construct();
@@ -60,16 +60,13 @@ void cab_app_init(Cabinet_App* p_ca){
 	        bp_slaves[i]->inactive_time_ms = 0;
 	}
 
+	/* CHARGER INIT */
+	p_ca->bss.ac_chargers[0].assigned_cabs = &bss_cabinets[0];
+	p_ca->bss.ac_chargers[1].assigned_cabs = &bss_cabinets[10];
+	bss_chargers[0].assigned_cab_num = ASSIGNED_CAB_NUM_1;
+	bss_chargers[1].assigned_cab_num = ASSIGNED_CAB_NUM_2;
 	for(int i = 0; i < CHARGER_NUM; i++){
 		bss_chargers[i].input_power.state = CHARGER_ST_INACTIVE;
-		if(i == 0){
-			bss_chargers[i].start_cabin_id = 0;
-			bss_chargers[i].stop_cabin_id = p_ca->bss.cab_num/2;
-		}
-		else if(i == 1){
-			bss_chargers[i].start_cabin_id = p_ca->bss.cab_num/2 + 1;
-			bss_chargers[i].stop_cabin_id = p_ca->bss.cab_num;
-		}
 		bss_chargers[i].charging_cabin = NULL;
 	}
 
@@ -98,14 +95,18 @@ int main(void){
 	cab_app_set_state(&selex_bss_app, CAB_APP_ST_SETUP);
 
 	__enable_irq();
-	can_master_start_assign_next_slave((CAN_master*)&selex_bss_app, sys_timestamp);
+
+	for(uint8_t i = 0; i < selex_bss_app.bss.cab_num; i++){
+		sw_off(&selex_bss_app.bss.cabs[i].node_id_sw);
+		sw_off(&selex_bss_app.bss.cabs[i].charger);
+	}
 
 	while(1);
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void){
 	sys_timestamp += sys_tick_ms;
-#if 1
+
 	for(uint8_t id = 0; id < selex_bss_app.bss.cab_num; id++){
 		if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED) && (selex_bss_app.base.pdo_sync_timestamp)){
 			selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms += sys_tick_ms;
@@ -115,7 +116,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void){
 			}
 		}
 	}
-#endif
+
 	if(cab_id == selex_bss_app.bss.cab_num){
 		cab_id = 0;
 	}
@@ -270,7 +271,6 @@ static void can_master_rpdo_process_handle_impl(const CAN_master* const p_cm){
     	cab_cell_update_bp_data(&selex_bss_app.bss.cabs[bp_id],
     			(int32_t*)&selex_bss_app.bss.cabs[bp_id].bp->status,
 				(int32_t)CO_getUint16(p_cm->p_hw->rx_data+6));
-    	//selex_bss_app.bss.cabs[bp_id].bp->status = (uint16_t)CO_getUint16(p_cm->p_hw->rx_data+6);
     	break;
     case BP_LOW_CELLS_VOL_TPDO_COBID:
     	cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id],
@@ -281,13 +281,11 @@ static void can_master_rpdo_process_handle_impl(const CAN_master* const p_cm){
     	cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id],
     			(int32_t*)(selex_bss_app.bss.cabs[bp_id].bp->cell_vol + 8), 8,
 				(int32_t*)p_cm->p_hw->rx_data);
-    	//CO_memcpy(selex_bss_app.bss.cabs[bp_id].bp->cell_vol+8, p_cm->p_hw->rx_data, 8);
     	break;
     case BP_TEMP_TPDO_COBID:
     	cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id],
     			(int32_t*)selex_bss_app.bss.cabs[bp_id].bp->temp, 8,
 				(int32_t*)p_cm->p_hw->rx_data);
-    	//CO_memcpy((uint8_t*)selex_bss_app.bss.cabs[bp_id].bp->temp, p_cm->p_hw->rx_data, 8);
     	break;
     default:
     	break;

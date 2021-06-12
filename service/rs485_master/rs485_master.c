@@ -165,16 +165,3 @@ void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
 	p_485m->state = RS485_MASTER_ST_IDLE;
 }
 
-#if 0
-void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE_OBJECTS obj, SLAVE_OBJECT_STATE state){
-	while(p_485m->state != RS485_MASTER_ST_IDLE);
-	rs485_master_set_csv_data(p_485m, id, obj, state);
-	p_485m->state = RS485_MASTER_ST_SEND_CMD;
-}
-
-void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
-	while(p_485m->state != RS485_MASTER_ST_IDLE);
-	rs485_master_set_csv_data(p_485m, id, 0, 0);
-	p_485m->state = RS485_MASTER_ST_SEND_SYNC;
-}
-#endif

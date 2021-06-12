@@ -41,6 +41,7 @@ void cab_cell_update_state(Cabinet* p_cab){
 
 void cab_cell_open_door(Cabinet* p_cab){
 	cab_door_open(&p_cab->door);
+	cab_cell_disconnected(p_cab);
 }
 
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
