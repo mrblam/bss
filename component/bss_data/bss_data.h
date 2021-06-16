@@ -14,32 +14,32 @@
 #include "cabinet_cell.h"
 
 typedef enum BSS_STATE{
-	BSS_ST_STANDBY,
-	BSS_ST_ACTIVE,
+	BSS_ST_ACTIVE = 0,
 	BSS_ST_MAINTAIN,
-	BSS_ST_FAIL
+	BSS_ST_FAIL,
+	BSS_ST_INIT
 } BSS_STATE;
 
 typedef enum TILT_SS_STATE{
-	TILT_SS_INACTIVE,
+	TILT_SS_INACTIVE = 0,
 	TILT_SS_ACTIVE,
 	TILT_SS_FAIL
 } TILT_SS_STATE;
 
 typedef enum CHARGER_STATE{
-	CHARGER_ST_INACTIVE,
+	CHARGER_ST_INACTIVE = 0,
 	CHARGER_ST_ACTIVE,
 	CHARGER_ST_FAIL
 } CHARGER_STATE;
 
 typedef enum FAN_STATE{
-	FAN_ST_INACTIVE,
+	FAN_ST_INACTIVE = 0,
 	FAN_ST_ACTIVE,
 	FAN_ST_FAIL,
 } FAN_STATE;
 
 typedef enum LAMP_STATE{
-	LAMP_ST_INACTIVE,
+	LAMP_ST_INACTIVE = 0,
 	LAMP_ST_ACTIVE,
 	LAMP_ST_FAIL,
 } LAMP_STATE;
@@ -63,10 +63,12 @@ struct BSS_Data_t{
 	int32_t 		bss_temps[2];
 	Cabinet*        cabs;
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
+	uint8_t 		is_changed;
 };
 
 void bss_init(BSS_Data* p_bss);
 void bss_update_cabinet_state(BSS_Data* p_bss, uint8_t id);
+void bss_set_state(BSS_Data* p_bss, BSS_STATE state);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){
 	p_bss_data->data_serialize(p_bss_data, buff);

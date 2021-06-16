@@ -25,7 +25,8 @@ typedef enum CABINET_OP_STATE_t{
 	CAB_CELL_ST_BP_ID_ASSIGN	= 2,
 	CAB_CELL_ST_BP_ID_AUTHORIZE	= 3,
 	CAB_CELL_ST_STANDBY 		= 4,
-	CAB_CELL_ST_CHARGING 	= 5
+	CAB_CELL_ST_CHARGING 	= 5,
+	CAB_CELL_ST_INIT
 } CABINET_OP_STATE;
 
 struct Cabinet_t{
@@ -44,7 +45,7 @@ struct Cabinet_t{
 };
 
 void cab_cell_init(Cabinet* p_cab);
-void cab_cell_disconnected(Cabinet* p_cab);
+void cab_cell_reset(Cabinet* p_cab);
 CABINET_OP_STATE cab_cell_get_state(Cabinet* p_cab);
 void cab_cell_update_state(Cabinet* p_cab);
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state);

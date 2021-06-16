@@ -165,7 +165,7 @@ void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint
 }
 
 void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave) {
-    co_slave_set_con_state(slave, CO_SLAVE_CON_ST_AUTHORIZING);
+    //co_slave_set_con_state(slave, CO_SLAVE_CON_ST_AUTHORIZING);
 	p_cm->assign_state = CM_ASSIGN_ST_AUTHORIZING;
 	can_master_read_slave_sn(p_cm, slave->node_id - p_cm->slave_start_node_id);
 }
@@ -236,8 +236,8 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 		}
 	    break;
 	case CM_ASSIGN_ST_START:
-		can_master_slave_select(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 		p_cm->assign_state = CM_ASSIGN_ST_SLAVE_SELECT;
+		can_master_slave_select(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 		break;
 	case CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM:
 		p_cm->p_hw->can_tx.StdId = p_cm->node_id_scan_cobid;
@@ -254,6 +254,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 			p_cm->sdo_server.state = SDO_ST_IDLE;
 		}
 		else if (p_cm->sdo_server.state == SDO_ST_SUCCESS){
+			co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_AUTHORIZING);
 			p_cm->on_slave_assign_success(p_cm,	p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 			//co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_CONNECTED);
 			//can_master_slave_deselect(p_cm,	p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
@@ -263,8 +264,8 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 	case CM_ASSIGN_ST_DONE:
 		break;
 	case CM_ASSIGN_ST_FAIL:
-        co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_DISCONNECT);
         p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
+        co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_DISCONNECT);
 		p_cm->assign_state = CM_ASSIGN_ST_DONE;
 		break;
 	}

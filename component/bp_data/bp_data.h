@@ -58,6 +58,7 @@ struct BP_t{
 	uint8_t 	cell_vol[16];
 	uint8_t 	temp[8];
 	BP_STATUS 	status;
+	uint8_t 	is_changed;
 	void		(*data_serialize)(BP* p_bp, char* buff);
 };
 

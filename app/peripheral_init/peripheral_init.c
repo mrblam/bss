@@ -402,7 +402,10 @@ static void rs485_receive_handle_impl(UART_hw* p_hw){
 }
 
 static void hmi_receive_handle_impl(UART_hw* p_hw){
-	selex_bss_app.is_new_msg = 1;
+	//selex_bss_app.is_new_msg = 1;
+	if(p_hw->rx_data != '*'){
+		selex_bss_app.is_new_msg = 1;
+	}
 	if(selex_bss_app.rx_index == 32){
 		selex_bss_app.rx_index = 0;
 		return;
@@ -426,7 +429,10 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 			break;
 		case MASTER_READ:
 			token = strtok(NULL, ",");
-			cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
+			if(p_485m->csv.id == 2){
+				cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], !string_to_long(token));
+			}
+			else cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
 			token = strtok(NULL, ",");
 			cab_cell_update_fan_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
 			token = strtok(NULL, ",");

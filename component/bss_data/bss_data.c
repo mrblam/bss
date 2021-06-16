@@ -14,9 +14,34 @@ static void bss_update_io_state(BSS_Data* p_bss);
 static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff);
 
 void bss_init(BSS_Data* p_bss){
+	p_bss->state = BSS_ST_INIT;
 	p_bss->data_serialize = bss_data_serialize_impl;
 	p_bss->bss_temps[0] = p_bss->bss_temps[1] = 30;
 
+}
+
+void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
+	BSS_STATE old_state = p_bss->state;
+	if(old_state != new_state){
+		p_bss->state = new_state;
+		p_bss->is_changed = 1;
+	}
+
+	switch(p_bss->state){
+	case BSS_ST_MAINTAIN:
+		for(uint8_t i = 0; i < p_bss->cab_num; i++){
+			cab_cell_reset(&p_bss->cabs[i]);
+			p_bss->cabs[i].op_state = CAB_CELL_ST_EMPTY;
+			p_bss->cabs[i].is_changed = 1;
+		}
+		break;
+	case BSS_ST_ACTIVE:
+		break;
+	case BSS_ST_FAIL:
+		break;
+	default:
+		break;
+	}
 }
 
 void bss_update_cabinet_state(BSS_Data* p_bss, uint8_t id){

@@ -18,6 +18,7 @@ void cab_cell_update_state(Cabinet* p_cab){
         CABINET_OP_STATE new_state = CAB_CELL_ST_EMPTY;
 	switch(p_cab->bp->base.con_state){
 	case CO_SLAVE_CON_ST_DISCONNECT:
+		if(old_state == CAB_CELL_ST_INACTIVE) return;
 		new_state = CAB_CELL_ST_EMPTY;
 		break;
 	case CO_SLAVE_CON_ST_ASSIGNING:
@@ -27,9 +28,7 @@ void cab_cell_update_state(Cabinet* p_cab){
 		new_state = CAB_CELL_ST_BP_ID_AUTHORIZE;
 		break;
 	case CO_SLAVE_CON_ST_CONNECTED:
-		if(old_state == CAB_CELL_ST_CHARGING){
-			return;
-		}
+		if(old_state == CAB_CELL_ST_CHARGING) return;
 		new_state = CAB_CELL_ST_STANDBY;
 		break;
 	}
@@ -41,7 +40,7 @@ void cab_cell_update_state(Cabinet* p_cab){
 
 void cab_cell_open_door(Cabinet* p_cab){
 	cab_door_open(&p_cab->door);
-	cab_cell_disconnected(p_cab);
+	cab_cell_reset(p_cab);
 }
 
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
@@ -72,7 +71,7 @@ void cab_cell_update_bp_data(Cabinet* p_cab, int32_t* p_data, int32_t new_var){
 	int32_t old_var = *p_data;
 	if(old_var != new_var){
 		*p_data = new_var;
-		p_cab->is_changed = 1;
+		p_cab->bp->is_changed = 1;
 	}
 }
 
@@ -82,12 +81,12 @@ void cab_cell_update_bp_array_data(Cabinet* p_cab, int32_t p_data[], uint8_t arr
 		int32_t old_var = p_data[i];
 		if(old_var != new_var[i]){
 			p_data[i] = new_var[i];
-			p_cab->is_changed = 1;
+			p_cab->bp->is_changed = 1;
 		}
 	}
 }
 
-void cab_cell_disconnected(Cabinet* p_cab){
+void cab_cell_reset(Cabinet* p_cab){
 	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
 	p_cab->bp->base.inactive_time_ms = 0;
 	sw_off(&p_cab->node_id_sw);

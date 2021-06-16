@@ -40,24 +40,21 @@ typedef enum SUB_OBJS{
 	FAN				= 'F',
 	CHARGER			= 'C',
 	LAMP			= 'L',
-	STATE			= 'S'
+	STATE			= 'S',
+	SYNC_DATA		= 'Y',
+	CAB_NUM			= 'N'
 } SUB_OBJS;
 
-typedef enum OBJ_STATE{
-	SW_DEACTIVE	= '0',
-	SW_ACTIVE	= '1',
-	SW_FAIL		= '2',
-	AUTH_START	= 'S',
-	AUTH_OK		= 'O',
-	AUTH_FAIL	= 'F'
-} OBJ_STATE;
+#define AUTH_OK		'O'
+#define AUTH_FAIL	'F'
 
 typedef struct CSV_t CSV;
 struct CSV_t{
-	uint8_t id;
-	MAIN_OBJS		main_obj;
-	SUB_OBJS		sub_obj;
-	OBJ_STATE		obj_state;
+	uint8_t 		valid_msg_num;
+	uint8_t			id[AVAILABLE_HMI_MSG_NUM];
+	MAIN_OBJS		main_obj[AVAILABLE_HMI_MSG_NUM];
+	SUB_OBJS		sub_obj[AVAILABLE_HMI_MSG_NUM];
+	uint8_t			obj_state[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			is_new_data;
 };
 
@@ -71,6 +68,7 @@ struct Cabinet_App_t{
 	uint8_t				rx_index;
 	uint8_t				is_new_msg;
 	uint8_t*			start_msg_index;
+	uint8_t 			is_hmi_req_sync;
 };
 
 void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
@@ -82,6 +80,7 @@ void cab_app_active_charge(Cabinet_App* p_ca,uint8_t cab_id);
 void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_parse_hmi_msg(Cabinet_App* p_ca);
 void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp);
+void cab_app_check_buffer(Cabinet_App* p_ca);
 
 static inline CABINET_APP_STATE cab_app_get_state(Cabinet_App* p_ca){
 	return p_ca->state;
