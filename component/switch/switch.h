@@ -11,7 +11,7 @@
 #include "stdlib.h"
 
 typedef enum SW_STATE{
-	SW_ST_OFF,
+	SW_ST_OFF = 0,
 	SW_ST_ON,
 	SW_ST_FAIL
 }SW_STATE;

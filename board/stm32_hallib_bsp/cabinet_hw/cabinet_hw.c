@@ -83,7 +83,7 @@ void TIM3_IRQHandler(void){
 }
 
 static void cabinet_door_scan_state(void){
-	for(uint16_t i=0;i<CABINET_CELL_NUM;i++){
+	for(uint16_t i = 0; i < CABINET_CELL_NUM; i++){
 		door_update_state(i);
 		ntc_update_temp(i);
 	}

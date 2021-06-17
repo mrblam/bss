@@ -20,30 +20,6 @@ typedef enum BSS_STATE{
 	BSS_ST_INIT
 } BSS_STATE;
 
-typedef enum TILT_SS_STATE{
-	TILT_SS_INACTIVE = 0,
-	TILT_SS_ACTIVE,
-	TILT_SS_FAIL
-} TILT_SS_STATE;
-
-typedef enum CHARGER_STATE{
-	CHARGER_ST_INACTIVE = 0,
-	CHARGER_ST_ACTIVE,
-	CHARGER_ST_FAIL
-} CHARGER_STATE;
-
-typedef enum FAN_STATE{
-	FAN_ST_INACTIVE = 0,
-	FAN_ST_ACTIVE,
-	FAN_ST_FAIL,
-} FAN_STATE;
-
-typedef enum LAMP_STATE{
-	LAMP_ST_INACTIVE = 0,
-	LAMP_ST_ACTIVE,
-	LAMP_ST_FAIL,
-} LAMP_STATE;
-
 typedef struct Charger_t Charger;
 struct Charger_t{
 	uint8_t			assigned_cab_num;
@@ -67,7 +43,7 @@ struct BSS_Data_t{
 };
 
 void bss_init(BSS_Data* p_bss);
-void bss_update_cabinet_state(BSS_Data* p_bss, uint8_t id);
+void bss_update_cabinets_state(BSS_Data* p_bss);
 void bss_set_state(BSS_Data* p_bss, BSS_STATE state);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){
