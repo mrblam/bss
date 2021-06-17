@@ -30,13 +30,13 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 	switch(p_bss->state){
 	case BSS_ST_MAINTAIN:
 		for(uint8_t i = 0; i < p_bss->cab_num; i++){
-			cab_cell_reset(&p_bss->cabs[i]);
-			p_bss->cabs[i].op_state = CAB_CELL_ST_EMPTY;
-			p_bss->cabs[i].is_changed = 1;
+			if(p_bss->cabs[i].op_state != CAB_CELL_ST_INACTIVE){
+				cab_cell_reset(&p_bss->cabs[i]);
+				p_bss->cabs[i].is_changed = 1;
+			}
 		}
 		break;
 	case BSS_ST_ACTIVE:
-		//p_ca->base.pdo_sync_timestamp = timestamp + 10;
 		break;
 	case BSS_ST_FAIL:
 		break;

@@ -106,7 +106,6 @@ static void	cab_app_process_hmi_bss_cmd(Cabinet_App* p_ca, const uint8_t msg_id,
 			if(state == AUTH_OK){
 				p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 				co_slave_set_con_state(p_ca->base.assigning_slave, CO_SLAVE_CON_ST_CONNECTED);
-				//p_ca->base.pdo_sync_timestamp = timestamp + 10;
 			}
 			else if(state == AUTH_FAIL){
 				p_ca->base.assign_state = CM_ASSIGN_ST_FAIL;
@@ -116,6 +115,9 @@ static void	cab_app_process_hmi_bss_cmd(Cabinet_App* p_ca, const uint8_t msg_id,
 		break;
 	case STATE:
 		bss_set_state(&p_ca->bss, (BSS_STATE)atoi((char*)&state));
+		if(p_ca->bss.state == BSS_ST_ACTIVE){
+			p_ca->base.pdo_sync_timestamp = timestamp + 10;
+		}
 		break;
 	case SYNC_DATA:
 		p_ca->is_hmi_req_sync = 1;
@@ -155,7 +157,7 @@ static void cab_app_process_hmi_cab_cmd(Cabinet_App* p_ca, const uint8_t msg_id)
 	case CHARGER:
 		sw_process(&p_ca->bss.cabs[id].charger, atoi((char*)&state));
 		break;
-	case STATE:
+	case OP_STATE:
 		if(atoi((char*)&state) == CAB_CELL_ST_INACTIVE){
 			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_INACTIVE;
 			cab_cell_reset(&p_ca->bss.cabs[id]);
@@ -179,28 +181,6 @@ static void cab_app_reset_buffer(Cabinet_App* p_ca){
 	p_ca->is_new_msg = 0;
 }
 
-static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca){
-	uint8_t* buff = (uint8_t*)p_ca->rx_data;
-	buff += p_ca->rx_index-1;
-	while((*buff != '*') || (*buff != '\0')){
-		if(*buff == '*'){
-			*buff = '\0';
-			buff--;
-			while((*buff != ':') || (*buff != '\0')){
-				if(*buff == ':'){
-					p_ca->start_msg_index = ++buff;
-					return 1;
-				}
-				else if(*buff == '\0') return 0;
-				buff--;
-			}
-		}
-		else if(*buff == '\0') return 0;
-		buff--;
-	}
-	return 0;
-}
-
 static int8_t cab_app_search_char(char* buff, uint8_t start, uint8_t stop, char find_char){
 	for(uint8_t i = start; i < stop; i++){
 		if(buff[i] == find_char) return i;
@@ -218,7 +198,6 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 		start = cab_app_search_char((char*)buff, stop + 1, p_ca->rx_index, ':');
 		if(start == -1) break;
 		stop = cab_app_search_char((char*)buff, stop + 2, p_ca->rx_index, '*');
-		buff[stop] = '\0';
 		if(stop <= start) break;
 
 		/* Parse data */
@@ -249,22 +228,3 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 	p_ca->is_new_msg = 0;
 	cab_app_reset_buffer(p_ca);
 }
-#if 0
-void cab_app_parse_hmi_msg(Cabinet_App* p_ca){
-	if(cab_app_check_valid_hmi_msg(p_ca)){
-		char* token = strtok((char*)p_ca->start_msg_index, ",");
-		if((*token == 'W') || (*token == 'R')){
-			token = strtok(NULL, ",");
-			p_ca->hmi_csv.main_obj = *token;
-			token = strtok(NULL, ",");
-			p_ca->hmi_csv.id = string_to_long(token);
-			token = strtok(NULL, ",");
-			p_ca->hmi_csv.sub_obj = *token;
-			token = strtok(NULL, ",");
-			p_ca->hmi_csv.obj_state = *token;
-		}
-		p_ca->hmi_csv.is_new_data = 1;
-	}
-	cab_app_reset_buffer(p_ca);
-}
-#endif

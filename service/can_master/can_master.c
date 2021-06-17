@@ -38,6 +38,7 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 		p_cm->sdo_server.is_new_msg = 0;
 	}
 
+	/* Send Sync request msg every 2s */
 	if((p_cm->pdo_sync_timestamp == timestamp) && (p_cm->pdo_sync_timestamp != 0)){
 		co_send_sync(p_cm);
 		p_cm->pdo_sync_timestamp += 2000;
@@ -142,7 +143,7 @@ void can_master_start_assign_next_slave(CAN_master *p_cm,const uint32_t timestam
 	for (int i = 0; i < 32; i++) {
 		p_cm->assigning_slave->sn[i] = 0;
 	}
-	p_cm->assign_timeout=timestamp+2000;
+	p_cm->assign_timeout=timestamp+200;
 	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
 	can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
 	/*
@@ -159,7 +160,7 @@ void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint
 	for(uint8_t i = 0; i < 32; i++){
 		p_cm->assigning_slave->sn[i] = 0;
 	}
-	p_cm->assign_timeout = timestamp + 2000;
+	p_cm->assign_timeout = timestamp + 200;
 	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
 	can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 }

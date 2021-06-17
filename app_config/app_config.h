@@ -12,7 +12,7 @@
 #define APP_STATE_MACHINE_UPDATE_TICK_mS                (1000/HAL_SYSTICK_FREQ_Hz)
 #define BP_INACTIVE_TIMEOUT_mS                                  5000
 
-#define CABINET_CELL_NUM						3
+#define CABINET_CELL_NUM						5
 
 #define CHARGER_NUM								1
 #define ASSIGNED_CAB_NUM_1						1
@@ -20,7 +20,7 @@
 #define BP_START_CHARGE_THRESHOLD				63000
 #define BP_STOP_CHARGER_THRESHOLD				64000
 
-#define AVAILABLE_HMI_MSG_NUM					2
+#define AVAILABLE_HMI_MSG_NUM					3
 
 #define VREF				3300
 #define ADC_RESOLUTION		4095

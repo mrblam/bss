@@ -1,10 +1,3 @@
-/*
- * test_assign_id_with_hmi.c
- *
- *  Created on: May 24, 2021
- *      Author: KhanhDinh
- */
-
 #include "rs485_master.h"
 #include "cabinet_cell.h"
 #include "board.h"
@@ -100,6 +93,9 @@ int main(void) {
 	cab_app_init(&selex_bss_app);
 	cab_app_set_state(&selex_bss_app, CAB_APP_ST_SETUP);
 
+	bp_set_con_state(selex_bss_app.bss.cabs[0].bp, CO_SLAVE_CON_ST_CONNECTED);
+	selex_bss_app.bss.cabs[0].op_state = CAB_CELL_ST_STANDBY;
+
 	__enable_irq();
 #if 1
 	for (uint8_t i = 0; i < selex_bss_app.bss.cab_num; i++) {
@@ -114,10 +110,12 @@ int main(void) {
 void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 	sys_timestamp += sys_tick_ms;
 
+	/* Ignore COM with Slave at BSS_ST_INIT */
 	if(selex_bss_app.bss.state != BSS_ST_INIT){
+		/* Process PDO and update Door state at BSS_ACTIVE */
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
 			for(uint8_t id = 0; id < selex_bss_app.bss.cab_num; id++){
-				if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)&&
+				if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED) &&
 						(selex_bss_app.base.pdo_sync_timestamp)){
 
 					selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms += sys_tick_ms;
@@ -136,6 +134,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 					(DOOR_STATE)io_get_state(&selex_bss_app.bss.cabs[cab_id].door.io_state));
 			cab_id++;
 		}
+
+		/* Process at BSS_ST_MAINTAIN and BSS_ST_ACTIVE */
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
@@ -239,8 +239,8 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 static void cabinet_door_close_event_handle(Cabinet *p_cab) {
 	if (selex_bss_app.state == CAB_APP_ST_SETUP) return;
 
-	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_ASSIGNING);
-	can_master_start_assign_next_slave((CAN_master*) &selex_bss_app, sys_timestamp);
+	//bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_ASSIGNING);
+	//can_master_start_assign_next_slave((CAN_master*) &selex_bss_app, sys_timestamp);
 }
 
 static void cabinet_door_open_event_handle(Cabinet *p_cab) {

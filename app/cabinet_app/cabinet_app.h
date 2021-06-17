@@ -41,6 +41,7 @@ typedef enum SUB_OBJS{
 	CHARGER			= 'C',
 	LAMP			= 'L',
 	STATE			= 'S',
+	OP_STATE 		= 'O',
 	SYNC_DATA		= 'Y',
 	CAB_NUM			= 'N'
 } SUB_OBJS;
