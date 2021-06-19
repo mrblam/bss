@@ -36,7 +36,7 @@ struct BSS_Data_t{
 	Charger*		ac_chargers;
 	Switch			bss_fans[2];
 	Switch 			bss_lamps[4];
-	int32_t 		bss_temps[2];
+	uint8_t 		bss_temps[2];
 	Cabinet*        cabs;
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
 	uint8_t 		is_changed;

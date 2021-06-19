@@ -165,33 +165,11 @@ void TIM3_IRQHandler(void) {
 		}
 	}
 	/* Sync Data to HMI */
-	if(selex_bss_app.is_hmi_req_sync == 1){
-		if(selex_bss_app.bss.is_changed == 1){
-			cab_app_sync_bss_data_hmi(&selex_bss_app);
-			selex_bss_app.bss.is_changed = 0;
-			data_changed++;
+	for(uint8_t i = 0; i < selex_bss_app.hmi_csv.valid_msg_num; i++){
+		if(selex_bss_app.hmi_csv.is_new_msg_to_send){
+			cab_app_send_msg_to_hmi(&selex_bss_app);
+			selex_bss_app.hmi_csv.is_new_msg_to_send = 0;
 		}
-		for (uint8_t i = 0; i < selex_bss_app.bss.cab_num; i++){
-			if(selex_bss_app.bss.cabs[i].op_state != CAB_CELL_ST_INACTIVE){
-				if (selex_bss_app.bss.cabs[i].is_changed == 1) {
-					cab_app_sync_cab_data_hmi(&selex_bss_app, i);
-					selex_bss_app.bss.cabs[i].is_changed = 0;
-					data_changed++;
-				}
-				if (selex_bss_app.bss.cabs[i].bp->is_changed == 1){
-					cab_app_sync_bp_data_hmi(&selex_bss_app, i);
-					selex_bss_app.bss.cabs[i].bp->is_changed = 0;
-					data_changed++;
-				}
-			}
-		}
-		/* Sync BSS Data if no data changed */
-		if(data_changed == 0){
-			cab_app_sync_bss_data_hmi(&selex_bss_app);
-		}
-
-		data_changed = 0;
-		selex_bss_app.is_hmi_req_sync = 0;
 	}
 
 	HAL_TIM_IRQHandler(&io_scan_timer);

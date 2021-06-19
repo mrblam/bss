@@ -27,6 +27,11 @@ typedef enum CABINET_APP_STATE{
 	CAB_APP_ST_FAIL
 } CABINET_APP_STATE;
 
+typedef enum CMD_CODE{
+	HMI_WRITE 	= 'W',
+	HMI_READ 	= 'R'
+} CMD_CODE;
+
 typedef enum MAIN_OBJS{
 	BSS_BP		= 'B',
 	BSS_CABINET = 'C',
@@ -34,8 +39,9 @@ typedef enum MAIN_OBJS{
 } MAIN_OBJS;
 
 typedef enum SUB_OBJS{
+	ALL				= 'A',
 	BSS_ID_ASSIGN	= 'I',
-	BSS_AUTHORIZE	= 'A',
+	BSS_AUTHORIZE	= 'U',
 	DOOR			= 'D',
 	FAN				= 'F',
 	CHARGER			= 'C',
@@ -43,20 +49,23 @@ typedef enum SUB_OBJS{
 	STATE			= 'S',
 	OP_STATE 		= 'O',
 	SYNC_DATA		= 'Y',
-	CAB_NUM			= 'N'
+	CAB_NUM			= 'N',
+	TEMP			= 'T'
 } SUB_OBJS;
 
-#define AUTH_OK		'O'
-#define AUTH_FAIL	'F'
+#define STATE_OK		'O'
+#define STATE_FAIL		'F'
 
 typedef struct CSV_t CSV;
 struct CSV_t{
-	uint8_t 		valid_msg_num;
+	CMD_CODE		cmd_code[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			id[AVAILABLE_HMI_MSG_NUM];
 	MAIN_OBJS		main_obj[AVAILABLE_HMI_MSG_NUM];
 	SUB_OBJS		sub_obj[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			obj_state[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			is_new_data;
+	uint8_t			is_new_msg_to_send;
+	uint8_t 		valid_msg_num;
 };
 
 struct Cabinet_App_t{
@@ -82,6 +91,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_parse_hmi_msg(Cabinet_App* p_ca);
 void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp);
 void cab_app_check_buffer(Cabinet_App* p_ca);
+void cab_app_send_msg_to_hmi(Cabinet_App* p_ca);
 
 static inline CABINET_APP_STATE cab_app_get_state(Cabinet_App* p_ca){
 	return p_ca->state;

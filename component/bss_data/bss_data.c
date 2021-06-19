@@ -69,6 +69,10 @@ static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
     *buff++=',';
 	*buff++='S';
     *buff++=',';
+    *buff++='0';
+    *buff++=',';
+    *buff++='A';
+    *buff++=',';
 	buff+=long_to_string(p_bss->cab_num,buff);
     *buff++=',';
 	buff+=long_to_string(p_bss->state,buff);

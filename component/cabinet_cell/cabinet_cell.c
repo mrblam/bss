@@ -35,8 +35,6 @@ void cab_cell_update_state(Cabinet* p_cab){
 		break;
 	}
 
-//	if((old_state == CAB_CELL_ST_INACTIVE) || (old_state == CAB_CELL_ST_CHARGING)) return;
-
 	if(new_state != old_state){
 		p_cab->op_state = new_state;
 		p_cab->is_changed = 1;
@@ -105,6 +103,8 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
 	*buff++='C';
     *buff++=',';
 	buff+=long_to_string(p_cab->cab_id,buff);
+    *buff++=',';
+    *buff++='A';
     *buff++=',';
 	buff+=long_to_string(p_cab->op_state,buff);
     *buff++=',';

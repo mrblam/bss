@@ -343,7 +343,7 @@ static sw_act charger_sw_off_interface[] = {charger1_sw_off, charger2_sw_off, ch
 								charger16_sw_off, charger17_sw_off, charger18_sw_off, charger19_sw_off, charger20_sw_off};
 
 void peripheral_init(Cabinet_App* p_ca){
-	for(uint8_t cab_id = 0; cab_id < p_ca->bss.cab_num; cab_id++){
+	for(uint8_t cab_id = 0; cab_id < CABINET_CELL_NUM; cab_id++){
 		p_ca->bss.cabs[cab_id].node_id_sw.sw_on = node_id_high_interface[cab_id];
 		p_ca->bss.cabs[cab_id].node_id_sw.sw_off = node_id_low_interface[cab_id];
 		p_ca->bss.cabs[cab_id].door.solenoid.sw_on = door_sw_interface[cab_id];
