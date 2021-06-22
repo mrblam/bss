@@ -32,7 +32,6 @@ static uint32_t sys_tick_ms = 0;
 static uint32_t com_timestamp = 0;
 static uint32_t check_hmi_msg_timestamp = 0;
 static uint8_t cab_id = 0;
-static uint8_t data_changed = 0;
 
 void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->bss.cab_num = CABINET_CELL_NUM;
@@ -100,8 +99,8 @@ int main(void) {
 	cab_app_init(&selex_bss_app);
 	cab_app_set_state(&selex_bss_app, CAB_APP_ST_SETUP);
 
-	bp_set_con_state(selex_bss_app.bss.cabs[0].bp, CO_SLAVE_CON_ST_CONNECTED);
-	selex_bss_app.bss.cabs[0].op_state = CAB_CELL_ST_STANDBY;
+	//bp_set_con_state(selex_bss_app.bss.cabs[0].bp, CO_SLAVE_CON_ST_CONNECTED);
+	//selex_bss_app.bss.cabs[0].op_state = CAB_CELL_ST_STANDBY;
 
 	__enable_irq();
 #if 1

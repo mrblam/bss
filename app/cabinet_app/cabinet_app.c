@@ -14,7 +14,6 @@ static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca);
 static void cab_app_reset_buffer(Cabinet_App* p_ca);
 static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t id, const uint32_t timestamp);
 static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t id);
-static Cabinet* cab_app_get_cab_need_charge(Cabinet_App* p_ca, uint8_t charger_id);
 static void cab_app_process_hmi_write_command(Cabinet_App* p_ca, const uint8_t msg_id, const uint32_t timestamp);
 static void cab_app_process_hmi_read_command(Cabinet_App* p_ca, const uint8_t msg_id);
 static void cab_app_confirm_hmi_cmd(Cabinet_App* p_ca, const uint8_t msg_id, char* buff);
@@ -138,7 +137,7 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 	switch(sub_obj){
 	case BSS_ID_ASSIGN:
 		if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
-			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[id], timestamp);
+			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[atoi((char*)&state)], timestamp);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
@@ -161,8 +160,9 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 	case STATE:
 		bss_set_state(&p_ca->bss, (BSS_STATE)atoi((char*)&state));
 		if(p_ca->bss.state == BSS_ST_ACTIVE){
-			p_ca->base.pdo_sync_timestamp = timestamp + 10;
+			p_ca->base.pdo_sync_timestamp = timestamp + 100;
 		}
+		p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		break;
 
@@ -375,21 +375,3 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 	cab_app_reset_buffer(p_ca);
 }
 
-static Cabinet* cab_app_get_cab_need_charge(Cabinet_App* p_ca, uint8_t charger_id){
-	Cabinet* cab = &p_ca->bss.ac_chargers[charger_id].assigned_cabs[0];
-	uint8_t avai_cab_num = 0;		/* Available Cabinet Number */
-
-	/* Get BP which has highest voltage to charge first */
-	for(uint8_t i = 0; i < p_ca->bss.ac_chargers[charger_id].assigned_cab_num; i++){
-		if((p_ca->bss.ac_chargers[charger_id].assigned_cabs[i].bp->vol > 0) &&
-				(p_ca->bss.ac_chargers[charger_id].assigned_cabs[i].bp->vol < BP_START_CHARGE_THRESHOLD) &&
-				(p_ca->bss.ac_chargers[charger_id].assigned_cabs[i].op_state != CAB_CELL_ST_CHARGING)){
-			avai_cab_num++;
-			if(cab->bp->vol < p_ca->bss.ac_chargers[charger_id].assigned_cabs[i].bp->vol){
-				cab = &p_ca->bss.ac_chargers[charger_id].assigned_cabs[i];
-			}
-		}
-	}
-	if(avai_cab_num == 0) return NULL;
-	else return cab;
-}

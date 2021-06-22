@@ -45,6 +45,7 @@ struct BSS_Data_t{
 void bss_init(BSS_Data* p_bss);
 void bss_update_cabinets_state(BSS_Data* p_bss);
 void bss_set_state(BSS_Data* p_bss, BSS_STATE state);
+void bss_update_charge_state(BSS_Data* p_bss);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){
 	p_bss_data->data_serialize(p_bss_data, buff);
