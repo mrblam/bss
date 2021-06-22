@@ -165,9 +165,9 @@ void TIM3_IRQHandler(void) {
 	}
 	/* Sync Data to HMI */
 	for(uint8_t i = 0; i < selex_bss_app.hmi_csv.valid_msg_num; i++){
-		if(selex_bss_app.hmi_csv.is_new_msg_to_send){
+		if(selex_bss_app.hmi_csv.is_new_msg_to_send[i]){
 			cab_app_send_msg_to_hmi(&selex_bss_app);
-			selex_bss_app.hmi_csv.is_new_msg_to_send = 0;
+			selex_bss_app.hmi_csv.is_new_msg_to_send[i] = 0;
 		}
 	}
 

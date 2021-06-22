@@ -79,8 +79,8 @@ void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp){
 		if(p_ca->hmi_csv.sub_obj[i] != ALL){
 			cab_app_confirm_hmi_cmd(p_ca, i, tx_buff);
 		}
-		p_ca->hmi_csv.is_new_msg_to_send = 1;
-		while(p_ca->hmi_csv.is_new_msg_to_send != 0);
+		p_ca->hmi_csv.is_new_msg_to_send[i] = 1;
+		while(p_ca->hmi_csv.is_new_msg_to_send[i] != 0);
 	}
 	p_ca->hmi_csv.valid_msg_num = 0;
 }
@@ -216,10 +216,13 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 	case DOOR:
 		if(atoi((char*)&state) == SW_ST_ON){
 			cab_app_delivery_bp(p_ca, id);
+#if 0
 			if(p_ca->bss.cabs[id].door.state == atoi((char*)&state)){
 				p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 			}
 			else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+#endif
+			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		break;
 

@@ -64,7 +64,7 @@ struct CSV_t{
 	SUB_OBJS		sub_obj[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			obj_state[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			is_new_data;
-	uint8_t			is_new_msg_to_send;
+	uint8_t			is_new_msg_to_send[AVAILABLE_HMI_MSG_NUM];
 	uint8_t 		valid_msg_num;
 };
 
