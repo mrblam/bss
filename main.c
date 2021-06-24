@@ -49,6 +49,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 		bss_cabinets[i].bp->soc = 90;
 		bss_cabinets[i].bp->soc = 100;
 		bss_cabinets[i].bp->cycle = 8;
+		bss_cabinets[i].bp->state = BP_ST_INIT;
 		for (uint8_t j = 0; j < 8; j++)	bss_cabinets[i].bp->temp[j] = 26;
 		bss_cabinets[i].on_door_close = cabinet_door_close_event_handle;
 		bss_cabinets[i].on_door_open = cabinet_door_open_event_handle;
@@ -120,6 +121,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 	if(selex_bss_app.bss.state != BSS_ST_INIT){
 		/* Process PDO and update Door state at BSS_ACTIVE */
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
+#if 0
 			for(uint8_t id = 0; id < selex_bss_app.bss.cab_num; id++){
 				if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED) &&
 						(selex_bss_app.base.pdo_sync_timestamp)){
@@ -132,7 +134,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 					}
 				}
 			}
-
+#endif
 			if(cab_id == selex_bss_app.bss.cab_num){
 				cab_id = 0;
 			}
@@ -142,6 +144,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 		}
 
 		/* Process at BSS_ST_MAINTAIN and BSS_ST_ACTIVE */
+
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
@@ -249,7 +252,7 @@ static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_
 static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id) {
 	(void) p_cm;
 	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
-	cab_app_active_charge(&selex_bss_app, id);
+	//cab_app_active_charge(&selex_bss_app, id);
 }
 
 static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id) {
@@ -265,7 +268,7 @@ static void can_master_rpdo_process_handle_impl(const CAN_master *const p_cm){
 	uint8_t node_id = (uint8_t) (p_cm->p_hw->can_rx.StdId & 0x7F);
 	uint8_t bp_id = node_id - p_cm->slave_start_node_id;
 
-	if(bp_get_con_state(selex_bss_app.bss.cabs[bp_id].bp) != CO_SLAVE_CON_ST_CONNECTED)  return;
+	//if(bp_get_con_state(selex_bss_app.bss.cabs[bp_id].bp) != CO_SLAVE_CON_ST_CONNECTED)  return;
 	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
 
 	switch (cob_id) {
@@ -280,21 +283,29 @@ static void can_master_rpdo_process_handle_impl(const CAN_master *const p_cm){
 				(int32_t)p_cm->p_hw->rx_data[5]);
 		cab_cell_update_bp_data(&selex_bss_app.bss.cabs[bp_id],	(int32_t*)&selex_bss_app.bss.cabs[bp_id].bp->status,
 				(int32_t)CO_getUint16(p_cm->p_hw->rx_data + 6));
+		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
 	case BP_LOW_CELLS_VOL_TPDO_COBID:
 		cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id], (int32_t*)selex_bss_app.bss.cabs[bp_id].bp->cell_vol, 8,
 				(int32_t*)p_cm->p_hw->rx_data);
+		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
 	case BP_HIGH_CELLS_VOL_TPDO_COBID:
 		cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id], (int32_t*)(selex_bss_app.bss.cabs[bp_id].bp->cell_vol + 8), 8,
 				(int32_t*)p_cm->p_hw->rx_data);
+		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
 	case BP_TEMP_TPDO_COBID:
 		cab_cell_update_bp_array_data(&selex_bss_app.bss.cabs[bp_id], (int32_t*)selex_bss_app.bss.cabs[bp_id].bp->temp, 8,
 				(int32_t*)p_cm->p_hw->rx_data);
+		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
 	default:
 		break;
+	}
+
+	if(selex_bss_app.bss.cabs[bp_id].bp->is_data_available == 0){
+		selex_bss_app.bss.cabs[bp_id].bp->is_data_available = 1;
 	}
 }
 

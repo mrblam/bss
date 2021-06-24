@@ -257,6 +257,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 		else if (p_cm->sdo_server.state == SDO_ST_SUCCESS){
 			co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_AUTHORIZING);
 			p_cm->on_slave_assign_success(p_cm,	p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
+			p_cm->pdo_sync_timestamp = timestamp + 20;
 			//co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_CONNECTED);
 			//can_master_slave_deselect(p_cm,	p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 			p_cm->sdo_server.state = SDO_ST_IDLE;

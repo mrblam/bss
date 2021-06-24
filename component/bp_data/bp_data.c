@@ -37,8 +37,15 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){
     *buff++=',';
     buff+=long_to_string(p_bp->pos, buff);
     *buff++=',';
-    for(uint8_t i = 0; *(p_bp->base.sn + i) != '\0'; i++){
-    	*buff++= *(p_bp->base.sn + i);
+    *buff++='A';
+    *buff++=',';
+    if(p_bp->base.sn[0] == '\0'){
+    	*buff++='0';
+    }
+    else{
+        for(uint8_t i = 0; *(p_bp->base.sn + i) != '\0'; i++){
+        	*buff++= *(p_bp->base.sn + i);
+        }
     }
     *buff++=',';
 	buff+=long_to_string(p_bp->state,buff);

@@ -50,6 +50,11 @@ void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
 	DOOR_STATE old_state=p_cab->door.state;
 	if(old_state != new_state){
 		p_cab->door.state = new_state;
+#if 0
+		if(p_cab->door.state == DOOR_ST_CLOSE){
+			p_cab->op_state = CAB_CELL_ST_INIT;
+		}
+#endif
 		p_cab->is_changed = 1;
 	}
 }
@@ -91,7 +96,9 @@ void cab_cell_update_bp_array_data(Cabinet* p_cab, int32_t p_data[], uint8_t arr
 
 void cab_cell_reset(Cabinet* p_cab){
 	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
+	p_cab->bp->state = BP_ST_INIT;
 	p_cab->bp->base.inactive_time_ms = 0;
+	p_cab->bp->is_data_available = 0;
 	sw_off(&p_cab->node_id_sw);
 	p_cab->bp->vol = 0;
 }
@@ -114,7 +121,9 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cab->temp,buff);
     *buff++=',';
-    if(p_cab->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED){
+    if((p_cab->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED) ||
+    		(p_cab->bp->is_data_available)){
+    	//p_cab->bp->is_data_available = 0;
         for(uint8_t i = 0; *(p_cab->bp->base.sn + i) != '\0'; i++){
         	*buff++= *(p_cab->bp->base.sn+i);
         }

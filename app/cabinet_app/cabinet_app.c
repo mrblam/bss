@@ -80,6 +80,7 @@ void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp){
 			cab_app_confirm_hmi_cmd(p_ca, i, tx_buff);
 		}
 		p_ca->hmi_csv.is_new_msg_to_send[i] = 1;
+		p_ca->hmi_csv.cmd_code[i] = p_ca->hmi_csv.id[i] = p_ca->hmi_csv.main_obj[i] = p_ca->hmi_csv.obj_state[i] = p_ca->hmi_csv.sub_obj[i] = 0;
 		while(p_ca->hmi_csv.is_new_msg_to_send[i] != 0);
 	}
 	p_ca->hmi_csv.valid_msg_num = 0;
@@ -137,6 +138,7 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 	switch(sub_obj){
 	case BSS_ID_ASSIGN:
 		if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
+			p_ca->base.pdo_sync_timestamp = 0;
 			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[atoi((char*)&state)], timestamp);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
@@ -160,7 +162,9 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 	case STATE:
 		bss_set_state(&p_ca->bss, (BSS_STATE)atoi((char*)&state));
 		if(p_ca->bss.state == BSS_ST_ACTIVE){
-			p_ca->base.pdo_sync_timestamp = timestamp + 100;
+			if(p_ca->base.pdo_sync_timestamp == 0){
+				p_ca->base.pdo_sync_timestamp = timestamp + 20;
+			}
 		}
 		p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
@@ -250,6 +254,10 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 		}
 		else if(atoi((char*)&state) == CAB_CELL_ST_EMPTY){
 			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_EMPTY;
+			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+		}
+		else if(atoi((char*)&state) == CAB_CELL_ST_INIT){
+			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_INIT;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		break;

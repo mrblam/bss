@@ -403,7 +403,7 @@ static void rs485_receive_handle_impl(UART_hw* p_hw){
 
 static void hmi_receive_handle_impl(UART_hw* p_hw){
 	//selex_bss_app.is_new_msg = 1;
-	if(p_hw->rx_data != '*'){
+	if(p_hw->rx_data == '*'){
 		selex_bss_app.is_new_msg = 1;
 	}
 	if(selex_bss_app.rx_index == 32){

@@ -59,6 +59,7 @@ struct BP_t{
 	uint8_t 	temp[8];
 	BP_STATUS 	status;
 	uint8_t 	is_changed;
+	uint8_t 	is_data_available;
 	void		(*data_serialize)(BP* p_bp, char* buff);
 };
 
