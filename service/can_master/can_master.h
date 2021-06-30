@@ -113,6 +113,7 @@ void co_sdo_read_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_
 void co_sdo_write_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,
 		uint8_t* tx_buff,const uint32_t len,const uint32_t timeout);
 void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint32_t timestamp);
+void can_master_disable_pdo(CAN_master* p_cm);
 
 static inline void can_master_slave_select(const CAN_master* p_cm, const uint32_t id){
 	p_cm->slave_select(p_cm,id);

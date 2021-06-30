@@ -140,6 +140,18 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 			}
 			cab_cell_update_door_state(&selex_bss_app.bss.cabs[cab_id],
 					(DOOR_STATE)io_get_state(&selex_bss_app.bss.cabs[cab_id].door.io_state));
+			/* Slave LED control */
+			if(selex_bss_app.bss.cabs[cab_id].is_changed == 1){
+				if(selex_bss_app.bss.cabs[cab_id].door.state == DOOR_ST_CLOSE){
+					rs485_master_process_switch_command(&rs485m, cab_id, SLAVE_LED, 0);
+					rs485_master_process_switch_command(&rs485m, cab_id, SLAVE_LED, 3);
+				}
+				else if(selex_bss_app.bss.cabs[cab_id].door.state == DOOR_ST_OPEN){
+					rs485_master_process_switch_command(&rs485m, cab_id, SLAVE_LED, 1);
+					rs485_master_process_switch_command(&rs485m, cab_id, SLAVE_LED, 3);
+				}
+				selex_bss_app.bss.cabs[cab_id].is_changed = 0;
+			}
 			cab_id++;
 		}
 

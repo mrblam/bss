@@ -138,13 +138,13 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 	switch(sub_obj){
 	case BSS_ID_ASSIGN:
 		if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
-			p_ca->base.pdo_sync_timestamp = 0;
-			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[atoi((char*)&state)], timestamp);
+			can_master_disable_pdo((CAN_master*)p_ca);
+			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[state], timestamp);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
-		break;
 
+		break;
 	case BSS_AUTHORIZE:
 		if(p_ca->base.assign_state == CM_ASSIGN_ST_AUTHORIZING){
 			if(state == STATE_OK){
@@ -157,10 +157,10 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
-		break;
 
+		break;
 	case STATE:
-		bss_set_state(&p_ca->bss, (BSS_STATE)atoi((char*)&state));
+		bss_set_state(&p_ca->bss, (BSS_STATE)state);
 		if(p_ca->bss.state == BSS_ST_ACTIVE){
 			if(p_ca->base.pdo_sync_timestamp == 0){
 				p_ca->base.pdo_sync_timestamp = timestamp + 20;
@@ -168,43 +168,43 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 		}
 		p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		break;
 
+		break;
 	case SYNC_DATA:
 		p_ca->is_hmi_req_sync = 1;
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		break;
 
+		break;
 	case CAB_NUM:
-		p_ca->bss.cab_num = (BSS_STATE)atoi((char*)&state);
+		p_ca->bss.cab_num = state;
 		p_ca->base.slave_num = p_ca->bss.cab_num;
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		break;
 
+		break;
 	case FAN:
-		sw_process(&p_ca->bss.bss_fans[id], (SW_STATE)atoi((char*)&state));
-		if(p_ca->bss.bss_fans[id].state == (SW_STATE)atoi((char*)&state)){
+		sw_process(&p_ca->bss.bss_fans[id], (SW_STATE)state);
+		if(p_ca->bss.bss_fans[id].state == (SW_STATE)state){
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
-		break;
 
+		break;
 	case LAMP:
-		sw_process(&p_ca->bss.bss_lamps[id], (SW_STATE)atoi((char*)&state));
-		if(p_ca->bss.bss_lamps[id].state == (SW_STATE)atoi((char*)&state)){
+		sw_process(&p_ca->bss.bss_lamps[id], (SW_STATE)state);
+		if(p_ca->bss.bss_lamps[id].state == (SW_STATE)state){
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
-		break;
 
+		break;
 	case CHARGER:
-		sw_process(&p_ca->bss.ac_chargers[id].input_power, (SW_STATE)atoi((char*)&state));
-		if(p_ca->bss.ac_chargers[id].input_power.state == (SW_STATE)atoi((char*)&state)){
+		sw_process(&p_ca->bss.ac_chargers[id].input_power, (SW_STATE)state);
+		if(p_ca->bss.ac_chargers[id].input_power.state == (SW_STATE)state){
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
-		break;
 
+		break;
 	default:
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 		break;
@@ -212,16 +212,16 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 }
 
 static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t msg_id){
-	SUB_OBJS sub_obj = p_ca->hmi_csv.sub_obj[msg_id];
-	uint8_t state = p_ca->hmi_csv.obj_state[msg_id];
-	uint8_t id = p_ca->hmi_csv.id[msg_id];
+	SUB_OBJS sub_obj 	= p_ca->hmi_csv.sub_obj[msg_id];
+	uint8_t state 		= p_ca->hmi_csv.obj_state[msg_id];
+	uint8_t id 			= p_ca->hmi_csv.id[msg_id];
 
 	switch(sub_obj){
 	case DOOR:
-		if(atoi((char*)&state) == SW_ST_ON){
+		if(state == SW_ST_ON){
 			cab_app_delivery_bp(p_ca, id);
-#if 0
-			if(p_ca->bss.cabs[id].door.state == atoi((char*)&state)){
+#if 1
+			if(p_ca->bss.cabs[id].door.state == state){
 				p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 			}
 			else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
@@ -231,35 +231,40 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 		break;
 
 	case FAN:
-		sw_process(&p_ca->bss.cabs[id].cell_fan, atoi((char*)&state));
-		if(p_ca->bss.cabs[id].cell_fan.state == atoi((char*)&state)){
+		sw_process(&p_ca->bss.cabs[id].cell_fan, state);
+		if(p_ca->bss.cabs[id].cell_fan.state == state){
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 		break;
 
 	case CHARGER:
-		sw_process(&p_ca->bss.cabs[id].charger, atoi((char*)&state));
-		if(p_ca->bss.cabs[id].charger.state == atoi((char*)&state)){
+		sw_process(&p_ca->bss.cabs[id].charger, state);
+		if(p_ca->bss.cabs[id].charger.state == state){
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 		break;
 
 	case OP_STATE:
-		if(atoi((char*)&state) == CAB_CELL_ST_INACTIVE){
+		if(state == CAB_CELL_ST_INACTIVE){
 			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_INACTIVE;
 			cab_cell_reset(&p_ca->bss.cabs[id]);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
-		else if(atoi((char*)&state) == CAB_CELL_ST_EMPTY){
+		else if(state == CAB_CELL_ST_EMPTY){
 			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_EMPTY;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
-		else if(atoi((char*)&state) == CAB_CELL_ST_INIT){
+		else if(state == CAB_CELL_ST_INIT){
 			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_INIT;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
+		break;
+
+/* Use for test Slave LED */
+	case LAMP:
+		rs485_master_process_switch_command(p_ca->slave_com, 0, SLAVE_LED, state);
 		break;
 
 	default:
@@ -376,8 +381,22 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 			token += 2;
 		}
 		p_ca->hmi_csv.sub_obj[p_ca->hmi_csv.valid_msg_num] = *token;
-		token += 2;
-		p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = *token;
+		token += 3;
+		if((*token != '*') ){
+			*(token+1) = '\0';
+			token -= 1;
+			p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token);
+			token += 3;
+		}
+		else {
+			*token = '\0';
+			token -= 1;
+			if((*token != STATE_OK) && (*token != STATE_FAIL)){
+				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token);
+			}
+			else p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = *token;
+			token += 2;
+		}
 
 		p_ca->hmi_csv.valid_msg_num++;
 	} while((start >= 0) && (stop > start));

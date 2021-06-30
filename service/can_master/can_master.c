@@ -45,6 +45,13 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 	}
 }
 
+void can_master_disable_pdo(CAN_master* p_cm){
+	p_cm->pdo_sync_timestamp = 0;
+	for(uint8_t id = 0; id < p_cm->slave_num; id++){
+		p_cm->slaves[id]->inactive_time_ms = 0;
+	}
+}
+
 static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 
 	if (p_cm->sdo_server.timeout >= timestamp) {

@@ -15,7 +15,7 @@ void cab_cell_init(Cabinet* p_cab){
 
 void cab_cell_update_state(Cabinet* p_cab){
         CABINET_OP_STATE old_state = p_cab->op_state;
-        CABINET_OP_STATE new_state =old_state ;
+        CABINET_OP_STATE new_state = old_state ;
 	switch(p_cab->bp->base.con_state){
 	case CO_SLAVE_CON_ST_DISCONNECT:
 		if((old_state != CAB_CELL_ST_INACTIVE) && (old_state != CAB_CELL_ST_INIT)){
@@ -37,7 +37,6 @@ void cab_cell_update_state(Cabinet* p_cab){
 
 	if(new_state != old_state){
 		p_cab->op_state = new_state;
-		p_cab->is_changed = 1;
 	}
 }
 
@@ -57,13 +56,14 @@ void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
 #endif
 		p_cab->is_changed = 1;
 	}
+
 }
 
 void cab_cell_update_fan_state(Cabinet* p_cab, SW_STATE new_state){
 	SW_STATE old_state = p_cab->cell_fan.state;
 	if(old_state != new_state){
 		p_cab->door.state = new_state;
-		p_cab->is_changed = 1;
+		//p_cab->is_changed = 1;
 	}
 }
 
@@ -71,7 +71,7 @@ void cab_cell_update_temp(Cabinet* p_cab, uint8_t new_temp){
 	uint8_t old_temp = p_cab->temp;
 	if(old_temp != new_temp){
 		p_cab->temp = new_temp;
-		p_cab->is_changed = 1;
+		//p_cab->is_changed = 1;
 	}
 }
 

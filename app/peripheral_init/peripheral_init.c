@@ -429,10 +429,7 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 			break;
 		case MASTER_READ:
 			token = strtok(NULL, ",");
-			if(p_485m->csv.id == 2){
-				cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], !string_to_long(token));
-			}
-			else cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
+			cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], !string_to_long(token));
 			token = strtok(NULL, ",");
 			cab_cell_update_fan_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
 			token = strtok(NULL, ",");
