@@ -9,21 +9,24 @@
 #define APP_CONFIG_APP_CONFIG_H_
 #include "core_hal.h"
 
-#define APP_STATE_MACHINE_UPDATE_TICK_mS                (1000/HAL_SYSTICK_FREQ_Hz)
-#define BP_INACTIVE_TIMEOUT_mS                                  5000
+#define APP_STATE_MACHINE_UPDATE_TICK_mS 		(1000/HAL_SYSTICK_FREQ_Hz)
+#define BP_INACTIVE_TIMEOUT_mS           		5000
 
-#define CABINET_CELL_NUM					5
+#define MAX_CABINET_AVAILABLE					19
+#define MAX_ASSIGNED_CABINET					((MAX_CABINET_AVAILABLE + 1)/2)
+#define CABINET_CELL_NUM						7
+#define CABINET_INIT							(CABINET_CELL_NUM + 1)
 
-#define CHARGER_NUM								1
-#define ASSIGNED_CAB_NUM_1						1
-#define ASSIGNED_CAB_NUM_2						1
+#define CHARGER_NUM								2
+#define MAX_ASSIGNED_CAB_NUM					(CABINET_INIT/2)
+
 #define BP_START_CHARGE_THRESHOLD				63000
 #define BP_STOP_CHARGER_THRESHOLD				64000
 
 #define AVAILABLE_HMI_MSG_NUM					3
 
-#define VREF				3300
-#define ADC_RESOLUTION		4095
+#define VREF									3300
+#define ADC_RESOLUTION							4095
 
 #define CABINET_START_NODE_ID					5
 

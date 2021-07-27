@@ -29,6 +29,14 @@ BP* bp_construct(void){
 	return p_bp;
 }
 
+void bp_reset_data(BP* p_bp){
+	bp_set_con_state(p_bp, CO_SLAVE_CON_ST_DISCONNECT);
+	p_bp->state = BP_ST_INIT;
+	p_bp->base.inactive_time_ms = 0;
+	p_bp->is_data_available = 0;
+	p_bp->vol = 0;
+}
+
 static void bp_data_serialize_impl(BP* p_bp, char* buff){
 	*buff++=':';
 	*buff++='R';

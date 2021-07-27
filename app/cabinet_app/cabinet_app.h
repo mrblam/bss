@@ -79,6 +79,7 @@ struct Cabinet_App_t{
 	uint8_t				is_new_msg;
 	uint8_t*			start_msg_index;
 	uint8_t 			is_hmi_req_sync;
+	uint32_t			charge_timestamp;
 };
 
 void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);

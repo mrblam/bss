@@ -67,6 +67,7 @@ BP* bp_construct(void);
 
 void bp_update_state(BP* p_bp, BP_STATE state);
 BP_STATE bp_get_state(BP* p_bp);
+void bp_reset_data(BP* p_bp);
 
 static inline CO_SLAVE_NET_STATE bp_get_con_state(const BP* const p_bp){
         return p_bp->base.con_state;

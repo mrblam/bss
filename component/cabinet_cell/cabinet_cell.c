@@ -40,67 +40,43 @@ void cab_cell_update_state(Cabinet* p_cab){
 	}
 }
 
+void cab_cell_update_io_state(Cabinet* p_cab){
+	cab_cell_update_door_state(p_cab, (DOOR_STATE)io_get_state(&p_cab->door.io_state));
+
+	if(p_cab->is_changed == 1){
+		if(p_cab->door.state == DOOR_ST_CLOSE){
+			cab_cell_set_led_color(p_cab, RED);
+			cab_cell_set_led_color(p_cab, BLINK);
+		}
+		else if(p_cab->door.state == DOOR_ST_OPEN){
+			cab_cell_set_led_color(p_cab, BLUE);
+			cab_cell_set_led_color(p_cab, BLINK);
+		}
+		p_cab->is_changed = 0;
+	}
+
+	if(p_cab->temp >= 40) sw_on(&p_cab->cell_fan);
+	else if(p_cab->temp <= 30){
+		if(p_cab->cell_fan.state == SW_ST_ON) sw_off(&p_cab->cell_fan);
+	}
+}
+
 void cab_cell_open_door(Cabinet* p_cab){
 	cab_door_open(&p_cab->door);
 	cab_cell_reset(p_cab);
 }
 
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
-	DOOR_STATE old_state=p_cab->door.state;
+	DOOR_STATE old_state = p_cab->door.state;
 	if(old_state != new_state){
 		p_cab->door.state = new_state;
-#if 0
-		if(p_cab->door.state == DOOR_ST_CLOSE){
-			p_cab->op_state = CAB_CELL_ST_INIT;
-		}
-#endif
 		p_cab->is_changed = 1;
-	}
-
-}
-
-void cab_cell_update_fan_state(Cabinet* p_cab, SW_STATE new_state){
-	SW_STATE old_state = p_cab->cell_fan.state;
-	if(old_state != new_state){
-		p_cab->door.state = new_state;
-		//p_cab->is_changed = 1;
-	}
-}
-
-void cab_cell_update_temp(Cabinet* p_cab, uint8_t new_temp){
-	uint8_t old_temp = p_cab->temp;
-	if(old_temp != new_temp){
-		p_cab->temp = new_temp;
-		//p_cab->is_changed = 1;
-	}
-}
-
-void cab_cell_update_bp_data(Cabinet* p_cab, int32_t* p_data, int32_t new_var){
-	int32_t old_var = *p_data;
-	if(old_var != new_var){
-		*p_data = new_var;
-		p_cab->bp->is_changed = 1;
-	}
-}
-
-void cab_cell_update_bp_array_data(Cabinet* p_cab, int32_t p_data[], uint8_t arr_size, int32_t new_var[]){
-	uint8_t i = 0;
-	for(i = 0; i < arr_size - 6; i++){
-		int32_t old_var = p_data[i];
-		if(old_var != new_var[i]){
-			p_data[i] = new_var[i];
-			p_cab->bp->is_changed = 1;
-		}
 	}
 }
 
 void cab_cell_reset(Cabinet* p_cab){
-	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
-	p_cab->bp->state = BP_ST_INIT;
-	p_cab->bp->base.inactive_time_ms = 0;
-	p_cab->bp->is_data_available = 0;
 	sw_off(&p_cab->node_id_sw);
-	p_cab->bp->vol = 0;
+	bp_reset_data(p_cab->bp);
 }
 
 static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){

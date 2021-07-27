@@ -25,9 +25,23 @@ typedef enum CABINET_OP_STATE_t{
 	CAB_CELL_ST_BP_ID_ASSIGN	= 2,
 	CAB_CELL_ST_BP_ID_AUTHORIZE	= 3,
 	CAB_CELL_ST_STANDBY 		= 4,
-	CAB_CELL_ST_CHARGING 	= 5,
+	CAB_CELL_ST_CHARGING 		= 5,
 	CAB_CELL_ST_INIT
 } CABINET_OP_STATE;
+
+typedef enum LED_COLOR_t{
+	RED = 0,
+	BLUE = 1,
+	BLINK = 3,
+	NONE = 4
+} LED_COLOR;
+
+typedef struct Cabinet_led_t Cabinet_led;
+typedef void (*led_act)(Cabinet_led* p_led);
+struct Cabinet_led_t{
+	LED_COLOR	color;
+	led_act		update_color;
+};
 
 struct Cabinet_t{
 	CABINET_OP_STATE 	op_state;
@@ -37,6 +51,7 @@ struct Cabinet_t{
 	Switch				cell_fan;
 	Switch				charger;
 	Switch				node_id_sw;
+	Cabinet_led			led;
 	uint8_t				temp;
 	uint8_t 			is_changed;
 	void (*data_serialize)(Cabinet* p_cab, char* buff);
@@ -49,11 +64,8 @@ void cab_cell_reset(Cabinet* p_cab);
 CABINET_OP_STATE cab_cell_get_state(Cabinet* p_cab);
 void cab_cell_update_state(Cabinet* p_cab);
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state);
-void cab_cell_update_fan_state(Cabinet* p_cab, SW_STATE new_state);
-void cab_cell_update_temp(Cabinet* p_cab, uint8_t new_temp);
 void cab_cell_open_door(Cabinet* p_cab);
-void cab_cell_update_bp_data(Cabinet* p_cab, int32_t* p_data, int32_t new_var);
-void cab_cell_update_bp_array_data(Cabinet* p_cab, int32_t p_data[], uint8_t arr_size, int32_t new_var[]);
+void cab_cell_update_io_state(Cabinet* p_cab);
 
 static inline void cab_cell_data_serialize(Cabinet* p_cab, char* buff){
 	p_cab->data_serialize(p_cab, buff);
@@ -61,6 +73,11 @@ static inline void cab_cell_data_serialize(Cabinet* p_cab, char* buff){
 
 static inline void cab_cell_set_op_state(Cabinet* p_cab, CABINET_OP_STATE op_state){
 	p_cab->op_state = op_state;
+}
+
+static inline void cab_cell_set_led_color(Cabinet* p_cab, LED_COLOR color){
+	p_cab->led.color = color;
+	p_cab->led.update_color(&p_cab->led);
 }
 
 #endif /* COMPONENT_CABINET_CELL_CABINET_CELL_H_ */
