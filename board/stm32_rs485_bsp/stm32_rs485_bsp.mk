@@ -36,7 +36,8 @@ BSP_SRCS+=$(BOARD_TYPE).c  \
 	core_hw/core_hw.c \
 	cabinet_hw/cabinet_hw.c \
 	gpio_hw/gpio_hw.c \
-	timer_hw/timer_hw.c
+	timer_hw/timer_hw.c \
+	master_hw/master_hw.c
 
 # ASM sources
 BSP_ASM_SRCS = Core/Startup/startup_stm32f103rbtx.s
@@ -76,6 +77,7 @@ BSP_INCLUDES = . uart_hw \
 	gpio_hw \
 	cabinet_hw \
 	timer_hw \
+	master_hw \
 	Core/Inc \
 	Drivers/STM32F1xx_HAL_Driver/Inc  \
 	Drivers/STM32F1xx_HAL_Driver/Inc/Legacy  \

@@ -1,0 +1,24 @@
+/*
+ * master_hw_hal.h
+ *
+ *  Created on: Jul 28, 2021
+ *      Author: KhanhDinh
+ */
+
+#ifndef BOARD_MASTER_HW_HAL_H_
+#define BOARD_MASTER_HW_HAL_H_
+
+#include "master_hw.h"
+
+#define HAL_MASTER_LED1_SET_HIGH 					MASTER_LED1_SET_HIGH
+#define HAL_MASTER_LED2_SET_HIGH 					MASTER_LED2_SET_HIGH
+#define HAL_MASTER_LED3_SET_HIGH 					MASTER_LED3_SET_HIGH
+#define HAL_MASTER_LED4_SET_HIGH 					MASTER_LED4_SET_HIGH
+#define HAL_MASTER_LED1_SET_LOW 					MASTER_LED1_SET_LOW
+#define HAL_MASTER_LED2_SET_LOW 					MASTER_LED2_SET_LOW
+#define HAL_MASTER_LED3_SET_LOW 					MASTER_LED3_SET_LOW
+#define HAL_MASTER_LED4_SET_LOW	 					MASTER_LED4_SET_LOW
+
+void master_hw_init(void) WEAK;
+
+#endif /* BOARD_MASTER_HW_HAL_H_ */

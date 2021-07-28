@@ -55,8 +55,8 @@ void cab_cell_update_io_state(Cabinet* p_cab){
 		p_cab->is_changed = 0;
 	}
 
-	if(p_cab->temp >= 40) sw_on(&p_cab->cell_fan);
-	else if(p_cab->temp <= 30){
+	if(p_cab->temp >= 45) sw_on(&p_cab->cell_fan);
+	else if(p_cab->temp <= 40){
 		if(p_cab->cell_fan.state == SW_ST_ON) sw_off(&p_cab->cell_fan);
 	}
 }
