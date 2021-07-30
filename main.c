@@ -89,15 +89,6 @@ int main(void) {
 
 	board_init();
 
-	HAL_MASTER_LED4_SET_HIGH;
-	HAL_MASTER_LED1_SET_HIGH;
-	HAL_MASTER_LED1_SET_LOW;
-	HAL_MASTER_LED2_SET_HIGH;
-	HAL_MASTER_LED2_SET_LOW;
-	HAL_MASTER_LED3_SET_HIGH;
-	HAL_MASTER_LED3_SET_LOW;
-
-
 	sys_tick_ms = 1000 / SYSTICK_FREQ_Hz;
 	sys_timestamp = 0;
 	check_hmi_msg_timestamp = com_timestamp + 200;

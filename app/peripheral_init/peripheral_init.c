@@ -311,6 +311,8 @@ static void led17_update_color(Cabinet_led* p_led);
 static void led18_update_color(Cabinet_led* p_led);
 static void led19_update_color(Cabinet_led* p_led);
 
+static void bss_led_set_color_impl(BSS_Led* p_led);
+
 static void ntc_init(Cabinet_App* p_ca);
 static void ntc_sensor_get_adc_value(NTC* p_ntc);
 
@@ -393,6 +395,8 @@ void peripheral_init(Cabinet_App* p_ca){
 
 	p_ca->base.rpdo_process = can_master_rpdo_process_impl;
 	p_ca->slave_com = &rs485m;
+
+	p_ca->bss.led.set_color = bss_led_set_color_impl;
 }
 
 #if 0
@@ -1842,4 +1846,52 @@ static void led18_update_color(Cabinet_led* p_led){
 
 static void led19_update_color(Cabinet_led* p_led){
 	rs485_master_process_switch_command(&rs485m, 18, SLAVE_LED, p_led->color);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+static void bss_led_set_color_impl(BSS_Led* p_led){
+	BSS_LED_ENABLE;
+	switch(p_led->color){
+	case LED_NONE:
+		BSS_LED_DISABLE;
+		break;
+	case LED_RED:
+		BSS_LED_GREEN_SET_LOW;
+		BSS_LED_BLUE_SET_LOW;
+		BSS_LED_RED_SET_HIGH;
+		break;
+	case LED_BLUE:
+		BSS_LED_RED_SET_LOW;
+		BSS_LED_GREEN_SET_LOW;
+		BSS_LED_BLUE_SET_HIGH;
+		break;
+	case LED_GREEN:
+		BSS_LED_BLUE_SET_LOW;
+		BSS_LED_RED_SET_LOW;
+		BSS_LED_GREEN_SET_HIGH;
+		break;
+	case LED_YELLOW:
+		BSS_LED_BLUE_SET_LOW;
+		BSS_LED_RED_SET_HIGH;
+		BSS_LED_GREEN_SET_HIGH;
+		break;
+	case LED_PINK:
+		BSS_LED_GREEN_SET_LOW;
+		BSS_LED_BLUE_SET_HIGH;
+		BSS_LED_RED_SET_HIGH;
+		break;
+	case LED_SKY:
+		BSS_LED_RED_SET_LOW;
+		BSS_LED_BLUE_SET_HIGH;
+		BSS_LED_GREEN_SET_LOW;
+		break;
+	case LED_WHITE:
+		BSS_LED_RED_SET_HIGH;
+		BSS_LED_BLUE_SET_HIGH;
+		BSS_LED_GREEN_SET_LOW;
+		break;
+	default:
+		break;
+	}
 }

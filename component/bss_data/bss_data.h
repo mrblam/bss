@@ -14,6 +14,23 @@
 #include "cabinet_cell.h"
 #include "app_config.h"
 
+typedef enum BSS_LED_COLOR{
+	LED_NONE 	= 0,
+	LED_RED 	= 1,
+	LED_BLUE	= 2,
+	LED_GREEN	= 3,
+	LED_YELLOW	= 4,
+	LED_PINK	= 5,
+	LED_SKY		= 6,
+	LED_WHITE	= 7
+} BSS_LED_COLOR;
+
+typedef struct BSS_Led_t BSS_Led;
+struct BSS_Led_t{
+	BSS_LED_COLOR	color;
+	void			(*set_color)(BSS_Led* p_led);
+};
+
 typedef enum BSS_STATE{
 	BSS_ST_ACTIVE = 0,
 	BSS_ST_MAINTAIN,
@@ -42,6 +59,7 @@ struct BSS_Data_t{
 	Cabinet*        cabs;
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
 	uint8_t 		is_changed;
+	BSS_Led			led;
 };
 
 void bss_init(BSS_Data* p_bss);
@@ -52,6 +70,11 @@ Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){
 	p_bss_data->data_serialize(p_bss_data, buff);
+}
+
+static inline void bss_set_led_color(BSS_Data* p_bss, BSS_LED_COLOR color){
+	p_bss->led.color = color;
+	p_bss->led.set_color(&p_bss->led);
 }
 
 #endif /* COMPONENT_BSS_DATA_BSS_DATA_H_ */

@@ -196,11 +196,7 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 
 		break;
 	case LAMP:
-		sw_process(&p_ca->bss.bss_lamps[id], (SW_STATE)state);
-		if(p_ca->bss.bss_lamps[id].state == (SW_STATE)state){
-			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		}
-		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+		bss_set_led_color(&p_ca->bss, (BSS_LED_COLOR)state);
 
 		break;
 	case CHARGER:
@@ -251,12 +247,12 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 
 	case OP_STATE:
 		if(state == CAB_CELL_ST_INACTIVE){
-			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_INACTIVE;
+			cab_cell_set_op_state(&p_ca->bss.cabs[id], CAB_CELL_ST_INACTIVE);
 			cab_cell_reset(&p_ca->bss.cabs[id]);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else if(state == CAB_CELL_ST_EMPTY){
-			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_EMPTY;
+			cab_cell_set_op_state(&p_ca->bss.cabs[id], CAB_CELL_ST_EMPTY);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else if(state == CAB_CELL_ST_INIT){
