@@ -80,10 +80,7 @@ void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp){
 		p_485m->state = RS485_MASTER_ST_WAIT_CONFIRM;
 		break;
 	case RS485_MASTER_ST_SUCCESS:
-		break;
 	case RS485_MASTER_ST_FAIL:
-		p_485m->csv.state = FAIL;
-		break;
 	default:
 		break;
 	}

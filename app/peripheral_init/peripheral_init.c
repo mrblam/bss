@@ -420,7 +420,9 @@ static void rs485_set_rx_mode(RS485_Master* p_485m){
 /* ------------------------------------------------------------------------------ */
 
 static void rs485_receive_handle_impl(UART_hw* p_hw){
-	rs485m.is_new_msg = 1;
+	if(p_hw->rx_data == '*'){
+		rs485m.is_new_msg = 1;
+	}
 	if(rs485m.rx_index == 32){
 		rs485m.rx_index = 0;
 		return;
@@ -458,7 +460,7 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 			break;
 		case MASTER_READ:
 			token = strtok(NULL, ",");
-			cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], !string_to_long(token));
+			cab_cell_update_door_state(&selex_bss_app.bss.cabs[p_485m->csv.id], string_to_long(token));
 			token = strtok(NULL, ",");
 			selex_bss_app.bss.cabs[p_485m->csv.id].cell_fan.state = string_to_long(token);
 			token = strtok(NULL, ",");
@@ -481,7 +483,7 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 	uint8_t bp_id = node_id - p_cm->slave_start_node_id;
 
 	if(bp_id >= p_cm->slave_num) return;
-	if(bp_get_con_state(selex_bss_app.bss.cabs[bp_id].bp) != CO_SLAVE_CON_ST_CONNECTED)  return;
+	//if(bp_get_con_state(selex_bss_app.bss.cabs[bp_id].bp) != (CO_SLAVE_CON_ST_CONNECTED && CO_SLAVE_CON_ST_AUTHORIZING))  return;
 	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
 
 	switch(cob_id){

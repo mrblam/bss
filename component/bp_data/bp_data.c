@@ -9,21 +9,12 @@
 
 static void bp_data_serialize_impl(BP* p_bp, char* buff);
 
-static const char* default_serial_number="Selex_Battery";
-
 BP* bp_construct(void){
 	BP* p_bp = (BP*)malloc(sizeof(BP));
 	while(p_bp == NULL);
 
 	p_bp->state = BP_ST_IDLE;
 	p_bp->charge_sw_state=0;
-
-    char* sn=(char*)default_serial_number;
-    char* sn_buff=(char*)p_bp->base.sn;
-    while(*sn){
-            *sn_buff++=*sn++;
-    }
-    *sn_buff++='\0';
 
 	p_bp->data_serialize = bp_data_serialize_impl;
 	return p_bp;

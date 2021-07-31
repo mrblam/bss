@@ -54,11 +54,13 @@ void cab_cell_update_io_state(Cabinet* p_cab){
 		}
 		p_cab->is_changed = 0;
 	}
-
-	if(p_cab->temp >= 45) sw_on(&p_cab->cell_fan);
+#if ENABLE_CELL_FAN
+	if((p_cab->temp >= 45)
+			&& (p_cab->temp < 101)) sw_on(&p_cab->cell_fan);
 	else if(p_cab->temp <= 40){
 		if(p_cab->cell_fan.state == SW_ST_ON) sw_off(&p_cab->cell_fan);
 	}
+#endif
 }
 
 void cab_cell_open_door(Cabinet* p_cab){
@@ -77,6 +79,13 @@ void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
 void cab_cell_reset(Cabinet* p_cab){
 	sw_off(&p_cab->node_id_sw);
 	bp_reset_data(p_cab->bp);
+}
+
+void cab_cell_reset_io(Cabinet* p_cab){
+	sw_off(&p_cab->node_id_sw);
+	sw_off(&p_cab->charger);
+	sw_off(&p_cab->cell_fan);
+	cab_cell_set_led_color(p_cab, NONE);
 }
 
 static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){

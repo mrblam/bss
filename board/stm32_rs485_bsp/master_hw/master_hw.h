@@ -12,7 +12,7 @@
 #include "stm32f1xx_hal.h"
 
 #define BSS_LED_PORT				GPIOB
-#define BSS_LED_CTRL_PIN				GPIO_PIN_15
+#define BSS_LED_CTRL_PIN			GPIO_PIN_15
 #define BSS_LED_RED_PIN				GPIO_PIN_14
 #define BSS_LED_BLUE_PIN			GPIO_PIN_13
 #define BSS_LED_GREEN_PIN			GPIO_PIN_12

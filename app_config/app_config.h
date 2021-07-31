@@ -14,7 +14,7 @@
 
 #define MAX_CABINET_AVAILABLE					19
 #define MAX_ASSIGNED_CABINET					((MAX_CABINET_AVAILABLE + 1)/2)
-#define CABINET_CELL_NUM						7
+#define CABINET_CELL_NUM						MAX_CABINET_AVAILABLE
 #define CABINET_INIT							(CABINET_CELL_NUM + 1)
 
 #define CHARGER_NUM								2
@@ -27,6 +27,8 @@
 
 #define VREF									3300
 #define ADC_RESOLUTION							4095
+
+#define ENABLE_CELL_FAN							1
 
 #define CABINET_START_NODE_ID					5
 

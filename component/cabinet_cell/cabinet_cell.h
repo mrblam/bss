@@ -61,7 +61,7 @@ struct Cabinet_t{
 
 void cab_cell_init(Cabinet* p_cab);
 void cab_cell_reset(Cabinet* p_cab);
-CABINET_OP_STATE cab_cell_get_state(Cabinet* p_cab);
+void cab_cell_reset_io(Cabinet* p_cab);
 void cab_cell_update_state(Cabinet* p_cab);
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state);
 void cab_cell_open_door(Cabinet* p_cab);
@@ -74,6 +74,10 @@ static inline void cab_cell_data_serialize(Cabinet* p_cab, char* buff){
 
 static inline void cab_cell_set_op_state(Cabinet* p_cab, CABINET_OP_STATE op_state){
 	p_cab->op_state = op_state;
+}
+
+static inline CABINET_OP_STATE cab_cell_get_op_state(Cabinet* p_cab){
+	return p_cab->op_state;
 }
 
 static inline void cab_cell_set_led_color(Cabinet* p_cab, LED_COLOR color){

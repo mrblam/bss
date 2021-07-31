@@ -20,8 +20,8 @@ static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint
 static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id);
 static void can_receive_handle(CAN_Hw *p_hw);
 
-static Cabinet bss_cabinets[CABINET_CELL_NUM];
-static CO_Slave *bp_slaves[CABINET_CELL_NUM];
+static Cabinet bss_cabinets[CABINET_INIT];
+static CO_Slave *bp_slaves[CABINET_INIT];
 static Charger bss_chargers[CHARGER_NUM];
 static uint8_t	id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET] = {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
 
@@ -39,7 +39,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->bss.ac_chargers = &bss_chargers[0];
 	bss_init(&p_ca->bss);
 	peripheral_init(p_ca);
-	for (int i = 0; i < p_ca->bss.cab_num; i++) {
+	for (int i = 0; i < CABINET_INIT; i++) {
 		bss_cabinets[i].op_state = CAB_CELL_ST_INIT;
 		bss_cabinets[i].cab_id = i;
 		bss_cabinets[i].bp = bp_construct();
@@ -99,8 +99,7 @@ int main(void) {
 	__enable_irq();
 
 	for (uint8_t i = 0; i < selex_bss_app.bss.cab_num; i++) {
-		sw_off(&selex_bss_app.bss.cabs[i].node_id_sw);
-		sw_off(&selex_bss_app.bss.cabs[i].charger);
+		cab_cell_reset_io(&selex_bss_app.bss.cabs[i]);
 	}
 
 	while (1);
@@ -110,21 +109,18 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 	sys_timestamp += sys_tick_ms;
 
 	switch(selex_bss_app.bss.state){
-	case BSS_ST_INIT:
-		break;
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
-#if 0
+#if 1
 			for(uint8_t id = 0; id < selex_bss_app.bss.cab_num; id++){
-				if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED) &&
-						(selex_bss_app.base.pdo_sync_timestamp)){
-
+				if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)
+						&& (selex_bss_app.base.pdo_sync_timestamp)
+						&& (selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms != 0)){
 					selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms += sys_tick_ms;
 
 					if(selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms > BP_INACTIVE_TIMEOUT_mS){
 						cab_cell_reset(&selex_bss_app.bss.cabs[id]);
-						sdo_server_set_state(&selex_bss_app.base.sdo_server, SDO_ST_IDLE);
 					}
 				}
 			}
@@ -134,12 +130,15 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 			}
 			cab_cell_update_io_state(&selex_bss_app.bss.cabs[cab_id]);
 			cab_id++;
+
+			cab_app_update_charge(&selex_bss_app, sys_timestamp);
 		}
 
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		break;
+	case BSS_ST_INIT:
 	case BSS_ST_FAIL:
 	default:
 		break;

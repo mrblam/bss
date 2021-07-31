@@ -32,6 +32,12 @@ static void co_send_sync(CAN_master *p_cm) {
 }
 
 void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
+	if((p_cm->sdo_server.timeout <= timestamp)
+			&& (p_cm->sdo_server.timeout != 0)
+			&& (p_cm->sdo_server.state == SDO_ST_SENT)){
+		p_cm->sdo_server.state = SDO_ST_FAIL;
+		p_cm->sdo_server.timeout = 0;
+	}
 
 	if (p_cm->sdo_server.is_new_msg == 1) {
 		can_master_process_sdo(p_cm, timestamp);
@@ -41,6 +47,12 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 	/* Send Sync request msg every 2s */
 	if((p_cm->pdo_sync_timestamp == timestamp) && (p_cm->pdo_sync_timestamp != 0)){
 		co_send_sync(p_cm);
+		for(uint8_t i = 0; i < p_cm->slave_num; i++){
+			if((p_cm->slaves[i]->inactive_time_ms == 0)
+					&&(p_cm->slaves[i]->con_state == CO_SLAVE_CON_ST_CONNECTED)){
+				p_cm->slaves[i]->inactive_time_ms += 10;
+			}
+		}
 		p_cm->pdo_sync_timestamp += 2000;
 	}
 }
@@ -53,12 +65,12 @@ void can_master_disable_pdo(CAN_master* p_cm){
 }
 
 static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
-
+#if 0
 	if (p_cm->sdo_server.timeout >= timestamp) {
 		p_cm->sdo_server.state = SDO_ST_FAIL;
 		return;
 	}
-
+#endif
 	uint8_t cs = p_cm->p_hw->rx_data[0];
 	uint32_t mux;
 	uint32_t dlc = p_cm->p_hw->can_tx.DLC;
@@ -199,7 +211,7 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id) {
 
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
 		uint8_t *rx_buff, const uint32_t timeout) {
-	(void)timeout;
+	p_cm->sdo_server.timeout = timeout;
 	p_cm->sdo_server.tx_address = 0x580 + node_id;
 	p_cm->sdo_server.rx_address = 0x600 + node_id;
 	p_cm->sdo_server.object_mux = mux;
@@ -217,7 +229,7 @@ void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t nod
 
 void co_sdo_write_object(CAN_master *p_cm, const uint32_t mux,const uint32_t node_id,
 		uint8_t *tx_buff, const uint32_t len, const uint32_t timeout) {
-	(void)timeout;
+	p_cm->sdo_server.timeout = timeout;
 	p_cm->sdo_server.tx_address = 0x580 + node_id;
 	p_cm->sdo_server.rx_address = 0x600 + node_id;
 	p_cm->sdo_server.object_mux = mux;

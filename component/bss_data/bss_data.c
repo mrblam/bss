@@ -36,19 +36,22 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 
 	switch(p_bss->state){
 	case BSS_ST_MAINTAIN:
-		for(uint8_t i = 0; i < p_bss->cab_num; i++){
-			if(p_bss->cabs[i].op_state != CAB_CELL_ST_INACTIVE){
-				cab_cell_reset(&p_bss->cabs[i]);
-				cab_cell_set_led_color(&p_bss->cabs[i], NONE);
-				p_bss->cabs[i].op_state = CAB_CELL_ST_INIT;
-				p_bss->cabs[i].is_changed = 1;
+		if(old_state == BSS_ST_ACTIVE){
+			for(uint8_t i = 0; i < p_bss->cab_num; i++){
+				if(p_bss->cabs[i].op_state != CAB_CELL_ST_INACTIVE){
+					cab_cell_reset_io(&p_bss->cabs[i]);
+					p_bss->cabs[i].op_state = CAB_CELL_ST_INIT;
+					p_bss->cabs[i].is_changed = 1;
+				}
 			}
 		}
+
 		break;
 	case BSS_ST_ACTIVE:
 		for(uint8_t i = 0; i < p_bss->cab_num; i++){
 			p_bss->cabs[i].is_changed = 1;
 		}
+		bss_set_led_color(p_bss, LED_PINK);
 		break;
 	case BSS_ST_FAIL:
 		break;
@@ -75,14 +78,15 @@ static void bss_update_io_state(BSS_Data* p_bss){
 }
 
 Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id){
-	Cabinet* cab = p_bss->ac_chargers[charger_id].assigned_cabs[p_bss->cab_num];
+	Cabinet* cab = &p_bss->cabs[p_bss->cab_num];
 	uint8_t available_cab_num = 0;		/* Available Cabinet Number */
 
 	/* Get BP which has highest voltage to charge first */
 	for(uint8_t i = 0; i < p_bss->ac_chargers[charger_id].assigned_cab_num; i++){
-		if((p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol > 0) &&
-				(p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol <= BP_START_CHARGE_THRESHOLD) &&
-				(p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->state != BP_ST_DISCHARGING)){
+		if((p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol > 0)
+				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol <= BP_START_CHARGE_THRESHOLD)
+				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->state != BP_ST_DISCHARGING)
+				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)){
 			available_cab_num++;
 			if(cab->bp->vol < p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol){
 				cab = p_bss->ac_chargers[charger_id].assigned_cabs[i];
