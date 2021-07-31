@@ -82,14 +82,12 @@ struct Cabinet_App_t{
 	uint32_t			charge_timestamp;
 };
 
-void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca);
 void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);
 void cab_app_active_charge(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
 void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp);
-void cab_app_parse_hmi_msg(Cabinet_App* p_ca);
 void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp);
 void cab_app_check_buffer(Cabinet_App* p_ca);
 void cab_app_send_msg_to_hmi(Cabinet_App* p_ca);

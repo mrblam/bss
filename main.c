@@ -12,24 +12,19 @@
 Cabinet_App selex_bss_app;
 RS485_Master rs485m;
 
-static void cabinet_door_close_event_handle(Cabinet *p_cab);
-static void cabinet_door_open_event_handle(Cabinet *p_cab);
-static void can_master_slave_select_impl(const CAN_master *p_cm, const uint32_t id);
-static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_t id);
-static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id);
-static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id);
 static void can_receive_handle(CAN_Hw *p_hw);
 
-static Cabinet bss_cabinets[CABINET_INIT];
-static CO_Slave *bp_slaves[CABINET_INIT];
-static Charger bss_chargers[CHARGER_NUM];
-static uint8_t	id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET] = {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
+static Cabinet 		bss_cabinets[CABINET_INIT];
+static CO_Slave*	bp_slaves[CABINET_INIT];
+static Charger 		bss_chargers[CHARGER_NUM];
+static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
+					= {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
 
-static uint32_t sys_timestamp = 0;
-static uint32_t sys_tick_ms = 0;
-static uint32_t com_timestamp = 0;
-static uint32_t check_hmi_msg_timestamp = 0;
-static uint8_t cab_id = 0;
+static uint32_t 	sys_timestamp = 0;
+static uint32_t 	sys_tick_ms = 0;
+static uint32_t 	com_timestamp = 0;
+static uint32_t 	check_hmi_msg_timestamp = 0;
+static uint8_t 		cab_id = 0;
 
 void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->bss.cab_num = CABINET_CELL_NUM;
@@ -46,13 +41,11 @@ void cab_app_init(Cabinet_App *p_ca) {
 		bss_cabinets[i].bp->pos = i;
 		bss_cabinets[i].bp->vol = 0;
 		bss_cabinets[i].bp->cur = 0;
-		bss_cabinets[i].bp->soc = 90;
-		bss_cabinets[i].bp->soc = 100;
-		bss_cabinets[i].bp->cycle = 8;
+		bss_cabinets[i].bp->soc = 0;
+		bss_cabinets[i].bp->soc = 0;
+		bss_cabinets[i].bp->cycle = 0;
 		bss_cabinets[i].bp->state = BP_ST_INIT;
-		for (uint8_t j = 0; j < 8; j++)	bss_cabinets[i].bp->temp[j] = 26;
-		bss_cabinets[i].on_door_close = cabinet_door_close_event_handle;
-		bss_cabinets[i].on_door_open = cabinet_door_open_event_handle;
+		for (uint8_t j = 0; j < 8; j++)	bss_cabinets[i].bp->temp[j] = 0;
 		bss_cabinets[i].is_changed = 0;
 		cab_cell_init(&bss_cabinets[i]);
 		while (bss_cabinets[i].bp == NULL);
@@ -75,10 +68,6 @@ void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->base.slave_start_node_id = CABINET_START_NODE_ID;
 	can_master_init((CAN_master*) p_ca, bp_slaves, CABINET_CELL_NUM, &can_port);
 	p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
-	p_ca->base.slave_select = can_master_slave_select_impl;
-	p_ca->base.slave_deselect = can_master_slave_deselect_impl;
-	p_ca->base.on_slave_assign_fail = bp_assign_id_fail_handle;
-	p_ca->base.on_slave_assign_success = bp_assign_id_success_handle;
 	p_ca->base.sdo_server.rx_address = 0x600 + 3;
 
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
@@ -112,7 +101,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
-#if 1
 			for(uint8_t id = 0; id < selex_bss_app.bss.cab_num; id++){
 				if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)
 						&& (selex_bss_app.base.pdo_sync_timestamp)
@@ -124,7 +112,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 					}
 				}
 			}
-#endif
+
 			if(cab_id == selex_bss_app.bss.cab_num){
 				cab_id = 0;
 			}
@@ -167,6 +155,10 @@ void TIM3_IRQHandler(void) {
 			selex_bss_app.hmi_csv.is_new_msg_to_send[i] = 0;
 		}
 	}
+
+#if ENABLE_IWDG_TIMER
+	HAL_IWDG_Refresh(&hiwdg);
+#endif
 
 	HAL_TIM_IRQHandler(&io_scan_timer);
 }
@@ -213,44 +205,5 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
 		selex_bss_app.base.sdo_server.is_new_msg = 1;
 	}
-}
-
-static void cabinet_door_close_event_handle(Cabinet *p_cab) {
-	(void)p_cab;
-	if (selex_bss_app.state == CAB_APP_ST_SETUP) return;
-
-	//bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_ASSIGNING);
-	//can_master_start_assign_next_slave((CAN_master*) &selex_bss_app, sys_timestamp);
-}
-
-static void cabinet_door_open_event_handle(Cabinet *p_cab) {
-	/* ignore event during setup process*/
-	if (selex_bss_app.state == CAB_APP_ST_SETUP) return;
-
-	bp_set_con_state(p_cab->bp, CO_SLAVE_CON_ST_DISCONNECT);
-	cab_cell_update_state(p_cab);
-	sw_off(&p_cab->node_id_sw);
-}
-
-static void can_master_slave_select_impl(const CAN_master *p_cm, const uint32_t id) {
-	(void) p_cm;
-	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
-}
-
-static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_t id) {
-	(void) p_cm;
-	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
-}
-
-static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id) {
-	(void) p_cm;
-	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
-}
-
-static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id) {
-	(void) p_cm;
-	/* return battery to user */
-	cab_cell_update_state(&selex_bss_app.bss.cabs[id]);
-	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
 }
 

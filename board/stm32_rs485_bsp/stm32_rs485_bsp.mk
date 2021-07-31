@@ -21,6 +21,7 @@ BSP_SRCS=  \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_usart.c \
+	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_iwdg.c \
 	Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c  
 
 #BSP_SRCS+=sdk/CMSIS/CM3/CoreSupport/core_cm3.c

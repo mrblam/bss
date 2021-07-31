@@ -55,8 +55,6 @@ struct Cabinet_t{
 	uint8_t				temp;
 	uint8_t 			is_changed;
 	void (*data_serialize)(Cabinet* p_cab, char* buff);
-	void (*on_door_close)(Cabinet* p_cab);
-	void (*on_door_open)(Cabinet* p_cab);
 };
 
 void cab_cell_init(Cabinet* p_cab);
@@ -65,7 +63,6 @@ void cab_cell_reset_io(Cabinet* p_cab);
 void cab_cell_update_state(Cabinet* p_cab);
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state);
 void cab_cell_open_door(Cabinet* p_cab);
-void cab_cell_update_io_state(Cabinet* p_cab);
 void cab_cell_update_io_state(Cabinet* p_cab);
 
 static inline void cab_cell_data_serialize(Cabinet* p_cab, char* buff){

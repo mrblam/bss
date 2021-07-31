@@ -1,5 +1,4 @@
 #include "board.h"
-#include "core_hal.h"
 
 void board_init(void){
 	HAL_Init();

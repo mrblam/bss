@@ -7,13 +7,20 @@
 
 #include "core_hw.h"
 #include "core.h"
+#include "app_config.h"
+
+IWDG_HandleTypeDef hiwdg;
 
 static void system_clock_config(void);
 static void system_tick_config(void);
+static void iwdg_timer_config(void);
 
 void core_hw_init(void){
 	system_clock_config();
 	system_tick_config();
+#if ENABLE_IWDG_TIMER
+	iwdg_timer_config();
+#endif
 }
 
 static void system_clock_config(void){
@@ -59,4 +66,16 @@ static void system_clock_config(void){
 
 static void system_tick_config(void){
 	SysTick_Config(SystemCoreClock/SYSTICK_FREQ_Hz);
+}
+
+static void iwdg_timer_config(void){
+	/* Indepedent Watchdog timer Reset CPU every 5s when error */
+	  hiwdg.Instance = IWDG;
+	  /* IWDG using LSI (40kHz), 256*781/40000 ~ 5s */
+	  hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
+	  hiwdg.Init.Reload = 781;
+	  if (HAL_IWDG_Init(&hiwdg) != HAL_OK){
+		  Error_Handler();
+	  }
+	  HAL_IWDG_Init(&hiwdg);
 }

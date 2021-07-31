@@ -13,6 +13,8 @@
 #include "stm32f1xx_hal.h"
 #include "core.h"
 
+extern IWDG_HandleTypeDef hiwdg;
+
 void core_hw_init(void);
 
 #endif /* BOARD_STM32_HALLIB_BSP_CORE_HW_H_ */

@@ -324,6 +324,13 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
 
 static void can_master_rpdo_process_impl(const CAN_master* const p_cm);
 
+static void cabinet_door_close_event_handle(Cabinet *p_cab);
+static void cabinet_door_open_event_handle(Cabinet *p_cab);
+static void can_master_slave_select_impl(const CAN_master *p_cm, const uint32_t id);
+static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_t id);
+static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id);
+static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id);
+
 static sw_act door_sw_interface[] = {door1_switch_on, door2_switch_on, door3_switch_on, door4_switch_on, door5_switch_on,
 								door6_switch_on, door7_switch_on, door8_switch_on, door9_switch_on, door10_switch_on,
 								door11_switch_on, door12_switch_on, door13_switch_on, door14_switch_on, door15_switch_on,
@@ -381,7 +388,9 @@ void peripheral_init(Cabinet_App* p_ca){
 		p_ca->bss.cabs[cab_id].charger.sw_off 				= charger_sw_off_interface[cab_id];
 		p_ca->bss.cabs[cab_id].led.update_color				= led_update_color[cab_id];
 	}
+	p_ca->bss.led.set_color = bss_led_set_color_impl;
 
+	p_ca->slave_com = &rs485m;
 	rs485_master_init(&rs485m, &cabinet_485_hw);
 	rs485m.p_hw->uart_module = rs485_com.uart_module;
 	rs485_com.receive_handle = rs485_receive_handle_impl;
@@ -394,9 +403,10 @@ void peripheral_init(Cabinet_App* p_ca){
 	hmi_com.receive_handle = hmi_receive_handle_impl;
 
 	p_ca->base.rpdo_process = can_master_rpdo_process_impl;
-	p_ca->slave_com = &rs485m;
-
-	p_ca->bss.led.set_color = bss_led_set_color_impl;
+	p_ca->base.slave_select = can_master_slave_select_impl;
+	p_ca->base.slave_deselect = can_master_slave_deselect_impl;
+	p_ca->base.on_slave_assign_fail = bp_assign_id_fail_handle;
+	p_ca->base.on_slave_assign_success = bp_assign_id_success_handle;
 }
 
 #if 0
@@ -407,6 +417,34 @@ static void ntc_init(Cabinet_App* p_ca){
 	}
 }
 #endif
+
+/* --------------------------------------------------------------------------------- */
+
+static void can_master_slave_select_impl(const CAN_master *p_cm, const uint32_t id) {
+	(void) p_cm;
+	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
+}
+
+static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_t id) {
+	(void) p_cm;
+	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
+}
+
+static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id) {
+	(void) p_cm;
+	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
+	bp_reset_inactive_counter(selex_bss_app.bss.cabs[id].bp);
+}
+
+static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id) {
+	(void) p_cm;
+	/* return battery to user */
+	cab_cell_update_state(&selex_bss_app.bss.cabs[id]);
+	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
+}
+
+/* --------------------------------------------------------------------------------- */
+
 static void rs485_set_tx_mode(RS485_Master* p_485m){
 	(void)p_485m;
 	HAL_MAX485_SET_DIR_TX;

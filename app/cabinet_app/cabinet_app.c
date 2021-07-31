@@ -35,11 +35,6 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + 1000);
 }
 
-void cab_app_receive_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
-	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
-	//cab_cell_update_door_state(&p_ca->bss.cabs[cab_id]);
-}
-
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
 }
@@ -414,7 +409,7 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 				}
 				else{
 					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
-					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
+					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_EMPTY;
 					p_ca->bss.ac_chargers[id].charging_cabin = NULL;
 				}
 			}

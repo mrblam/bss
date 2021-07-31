@@ -10,7 +10,7 @@
 #include "core_hal.h"
 
 #define APP_STATE_MACHINE_UPDATE_TICK_mS 		(1000/HAL_SYSTICK_FREQ_Hz)
-#define BP_INACTIVE_TIMEOUT_mS           		5000
+#define BP_INACTIVE_TIMEOUT_mS           		6000
 
 #define MAX_CABINET_AVAILABLE					19
 #define MAX_ASSIGNED_CABINET					((MAX_CABINET_AVAILABLE + 1)/2)
@@ -29,6 +29,7 @@
 #define ADC_RESOLUTION							4095
 
 #define ENABLE_CELL_FAN							1
+#define ENABLE_IWDG_TIMER						0
 
 #define CABINET_START_NODE_ID					5
 
