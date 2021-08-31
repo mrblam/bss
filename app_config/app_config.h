@@ -28,7 +28,7 @@
 #define VREF									3300
 #define ADC_RESOLUTION							4095
 
-#define ENABLE_CELL_FAN							1
+#define ENABLE_CELL_FAN							0
 #define ENABLE_IWDG_TIMER						0
 #define ENABLE_CHARGER							0
 

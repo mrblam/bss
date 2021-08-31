@@ -37,6 +37,10 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 	switch(p_bss->state){
 	case BSS_ST_MAINTAIN:
 		if(old_state == BSS_ST_ACTIVE){
+			for(uint8_t i = 0; i < 2; i++){
+				p_bss->ac_chargers[i].charging_cabin = NULL;
+			}
+
 			for(uint8_t i = 0; i < p_bss->cab_num; i++){
 				if(p_bss->cabs[i].op_state != CAB_CELL_ST_INACTIVE){
 					cab_cell_reset_io(&p_bss->cabs[i]);

@@ -64,9 +64,13 @@ void cab_cell_update_io_state(Cabinet* p_cab){
 }
 
 void cab_cell_open_door(Cabinet* p_cab){
-	cab_cell_reset(p_cab);
 	cab_door_open(&p_cab->door);
-	cab_cell_set_led_color(p_cab, BLINK);
+#if 0
+	if(p_cab->door.state == DOOR_ST_OPEN){
+		cab_cell_set_led_color(p_cab, BLINK);
+	}
+#endif
+	p_cab->door.state = DOOR_ST_OPEN;
 }
 
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
