@@ -118,8 +118,9 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 			}
 			cab_cell_update_io_state(&selex_bss_app.bss.cabs[cab_id]);
 			cab_id++;
-
+#if ENABLE_CHARGER
 			cab_app_update_charge(&selex_bss_app, sys_timestamp);
+#endif
 		}
 
 		bss_update_cabinets_state(&selex_bss_app.bss);

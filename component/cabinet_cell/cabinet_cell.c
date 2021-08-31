@@ -64,8 +64,9 @@ void cab_cell_update_io_state(Cabinet* p_cab){
 }
 
 void cab_cell_open_door(Cabinet* p_cab){
-	cab_door_open(&p_cab->door);
 	cab_cell_reset(p_cab);
+	cab_door_open(&p_cab->door);
+	cab_cell_set_led_color(p_cab, BLINK);
 }
 
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
@@ -77,8 +78,8 @@ void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
 }
 
 void cab_cell_reset(Cabinet* p_cab){
-	sw_off(&p_cab->node_id_sw);
 	bp_reset_data(p_cab->bp);
+	sw_off(&p_cab->node_id_sw);
 }
 
 void cab_cell_reset_io(Cabinet* p_cab){

@@ -15,6 +15,7 @@ BP* bp_construct(void){
 
 	p_bp->state = BP_ST_IDLE;
 	p_bp->charge_sw_state=0;
+	for(uint8_t i = 0; i < 32; i++) p_bp->base.sn[i] = 0;
 
 	p_bp->data_serialize = bp_data_serialize_impl;
 	return p_bp;
