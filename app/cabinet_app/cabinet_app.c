@@ -36,7 +36,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 }
 
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
-	cab_cell_reset(&p_ca->bss.cabs[cab_id]);
+#if 0
 	for(uint8_t i = 0; i < p_ca->bss.charger_num; i++){
 		if(&p_ca->bss.cabs[cab_id] == p_ca->bss.ac_chargers[i].charging_cabin){
 			sw_off(&p_ca->bss.cabs[cab_id].charger);
@@ -44,7 +44,9 @@ void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 			break;
 		}
 	}
+#endif
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
+	cab_cell_reset(&p_ca->bss.cabs[cab_id]);
 }
 
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
@@ -227,8 +229,8 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 	case DOOR:
 		if(state == SW_ST_ON){
 			cab_app_delivery_bp(p_ca, id);
-			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
+		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		break;
 
 	case FAN:

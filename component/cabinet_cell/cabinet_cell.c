@@ -43,17 +43,6 @@ void cab_cell_update_state(Cabinet* p_cab){
 void cab_cell_update_io_state(Cabinet* p_cab){
 	cab_cell_update_door_state(p_cab, (DOOR_STATE)io_get_state(&p_cab->door.io_state));
 
-	if(p_cab->is_changed == 1){
-		if(p_cab->door.state == DOOR_ST_CLOSE){
-			cab_cell_set_led_color(p_cab, RED);
-			cab_cell_set_led_color(p_cab, BLINK);
-		}
-		else if(p_cab->door.state == DOOR_ST_OPEN){
-			cab_cell_set_led_color(p_cab, BLUE);
-			cab_cell_set_led_color(p_cab, BLINK);
-		}
-		p_cab->is_changed = 0;
-	}
 #if ENABLE_CELL_FAN
 	if((p_cab->temp >= 45)
 			&& (p_cab->temp < 101)) sw_on(&p_cab->cell_fan);
@@ -81,9 +70,23 @@ void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
 	}
 }
 
+void cab_cell_update_led_state(Cabinet* p_cab){
+	if(p_cab->is_changed == 1){
+		if(p_cab->door.state == DOOR_ST_CLOSE){
+			cab_cell_set_led_color(p_cab, RED);
+			cab_cell_set_led_color(p_cab, BLINK);
+		}
+		else if(p_cab->door.state == DOOR_ST_OPEN){
+			cab_cell_set_led_color(p_cab, BLUE);
+			cab_cell_set_led_color(p_cab, BLINK);
+		}
+		p_cab->is_changed = 0;
+	}
+}
+
 void cab_cell_reset(Cabinet* p_cab){
-	bp_reset_data(p_cab->bp);
 	sw_off(&p_cab->node_id_sw);
+	bp_reset_data(p_cab->bp);
 }
 
 void cab_cell_reset_io(Cabinet* p_cab){

@@ -54,6 +54,7 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 	case BSS_ST_ACTIVE:
 		for(uint8_t i = 0; i < p_bss->cab_num; i++){
 			p_bss->cabs[i].is_changed = 1;
+			cab_cell_update_led_state(&p_bss->cabs[i]);
 		}
 		bss_set_led_color(p_bss, LED_PINK);
 		break;
