@@ -458,6 +458,10 @@ static void rs485_set_rx_mode(RS485_Master* p_485m){
 /* ------------------------------------------------------------------------------ */
 
 static void rs485_receive_handle_impl(UART_hw* p_hw){
+	if(p_hw->rx_data == 250){
+		if(rs485m.rx_index == 0) p_hw->rx_data = ';';
+		else p_hw->rx_data = '*';
+	}
 	if(p_hw->rx_data == '*'){
 		rs485m.is_new_msg = 1;
 	}
