@@ -444,3 +444,17 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 		}
 	}
 }
+
+void bs_app_update_connected_cab_state(Cabinet_App* p_app){
+	for(uint8_t id = 0; id < p_app->bss.cab_num; id++){
+		if((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)
+				&& (p_app->base.pdo_sync_timestamp)
+				&& (p_app->bss.cabs[id].bp->base.inactive_time_ms != 0)){
+			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
+
+			if(p_app->bss.cabs[id].bp->base.inactive_time_ms > BP_INACTIVE_TIMEOUT_mS){
+				cab_cell_reset(&p_app->bss.cabs[id]);
+			}
+		}
+	}
+}

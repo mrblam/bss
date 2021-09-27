@@ -67,18 +67,16 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 
 void bss_update_cabinets_state(BSS_Data* p_bss){
 	for(uint8_t i = 0; i < p_bss->cab_num; i++){
-		if(p_bss->cabs[i].op_state != CAB_CELL_ST_INACTIVE){
-			cab_cell_update_state(&p_bss->cabs[i]);
-		}
+		if(p_bss->cabs[i].op_state == CAB_CELL_ST_INACTIVE) continue;
+		cab_cell_update_state(&p_bss->cabs[i]);
 	}
 }
 
 static void bss_update_io_state(BSS_Data* p_bss){
 
 	for(uint8_t i=0;i<p_bss->cab_num;i++){
-		if(p_bss->cabs[i].op_state != CAB_CELL_ST_INACTIVE){
-			cab_cell_update_door_state(&p_bss->cabs[i], (DOOR_STATE)io_get_state(&p_bss->cabs[i].door.io_state));
-		}
+		if(p_bss->cabs[i].op_state == CAB_CELL_ST_INACTIVE) continue;
+		cab_cell_update_door_state(&p_bss->cabs[i], (DOOR_STATE)io_get_state(&p_bss->cabs[i].door.io_state));
 	}
 }
 

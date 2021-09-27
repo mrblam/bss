@@ -92,6 +92,7 @@ void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp);
 void cab_app_check_buffer(Cabinet_App* p_ca);
 void cab_app_send_msg_to_hmi(Cabinet_App* p_ca);
 void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp);
+void bs_app_update_connected_cab_state(Cabinet_App* p_app);
 
 static inline CABINET_APP_STATE cab_app_get_state(Cabinet_App* p_ca){
 	return p_ca->state;

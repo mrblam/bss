@@ -13,6 +13,7 @@ Cabinet_App selex_bss_app;
 RS485_Master rs485m;
 
 static void can_receive_handle(CAN_Hw *p_hw);
+static void bs_app_update_io_cab_state(Cabinet_App*);
 
 static Cabinet 		bss_cabinets[CABINET_INIT];
 static CO_Slave*	bp_slaves[CABINET_INIT];
@@ -68,7 +69,6 @@ void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->base.slave_start_node_id = CABINET_START_NODE_ID;
 	can_master_init((CAN_master*) p_ca, bp_slaves, CABINET_CELL_NUM, &can_port);
 	p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
-	p_ca->base.sdo_server.rx_address = 0x600 + 3;
 
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
 }
@@ -101,26 +101,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
-			for(uint8_t id = 0; id < selex_bss_app.bss.cab_num; id++){
-				if((selex_bss_app.bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)
-						&& (selex_bss_app.base.pdo_sync_timestamp)
-						&& (selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms != 0)){
-					selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms += sys_tick_ms;
-
-					if(selex_bss_app.bss.cabs[id].bp->base.inactive_time_ms > BP_INACTIVE_TIMEOUT_mS){
-						cab_cell_reset(&selex_bss_app.bss.cabs[id]);
-					}
-				}
-			}
-
-			if(cab_id == selex_bss_app.bss.cab_num){
-				cab_id = 0;
-			}
-			cab_cell_update_io_state(&selex_bss_app.bss.cabs[cab_id]);
-			cab_id++;
-#if ENABLE_CHARGER
-			cab_app_update_charge(&selex_bss_app, sys_timestamp);
-#endif
+			bs_app_update_connected_cab_state(&selex_bss_app);
+			bs_app_update_io_cab_state(&selex_bss_app);
 		}
 
 		bss_update_cabinets_state(&selex_bss_app.bss);
@@ -191,7 +173,6 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 		}
 		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_SLAVE_SELECT) {
 			selex_bss_app.base.assign_state = CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;
-
 		}
 		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM) {
 			/* slave confirm assign id success*/
@@ -200,6 +181,7 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 				cm_start_authorize_slave((CAN_master*) &selex_bss_app, selex_bss_app.base.assigning_slave);
 			}
 		}
+		return;
 	}
 
 	if (cob_id == selex_bss_app.base.sdo_server.rx_address) {
@@ -208,3 +190,13 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 	}
 }
 
+static void bs_app_update_io_cab_state(Cabinet_App* p_app){
+	if(cab_id == p_app->bss.cab_num){
+		cab_id = 0;
+	}
+	cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);
+	cab_id++;
+#if ENABLE_CHARGER
+	cab_app_update_charge(p_app, sys_timestamp);
+#endif
+}
