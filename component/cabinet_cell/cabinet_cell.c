@@ -87,6 +87,7 @@ void cab_cell_update_led_state(Cabinet* p_cab){
 void cab_cell_reset(Cabinet* p_cab){
 	sw_off(&p_cab->node_id_sw);
 	bp_reset_data(p_cab->bp);
+	p_cab->op_state = CAB_CELL_ST_EMPTY;
 }
 
 void cab_cell_reset_io(Cabinet* p_cab){

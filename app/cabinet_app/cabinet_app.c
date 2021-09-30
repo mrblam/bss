@@ -445,7 +445,7 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 	}
 }
 
-void bs_app_update_connected_cab_state(Cabinet_App* p_app){
+void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 	for(uint8_t id = 0; id < p_app->bss.cab_num; id++){
 		if((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)
 				&& (p_app->base.pdo_sync_timestamp)
@@ -454,6 +454,11 @@ void bs_app_update_connected_cab_state(Cabinet_App* p_app){
 
 			if(p_app->bss.cabs[id].bp->base.inactive_time_ms > BP_INACTIVE_TIMEOUT_mS){
 				cab_cell_reset(&p_app->bss.cabs[id]);
+				for(uint8_t i = 0; i < p_app->bss.charger_num; i++){
+					if(p_app->bss.ac_chargers[i].charging_cabin != &p_app->bss.cabs[id]) continue;
+					sw_off(&p_app->bss.ac_chargers[i].charging_cabin->charger);
+					p_app->bss.ac_chargers[id].charging_cabin = NULL;
+				}
 			}
 		}
 	}

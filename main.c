@@ -13,7 +13,7 @@ Cabinet_App selex_bss_app;
 RS485_Master rs485m;
 
 static void can_receive_handle(CAN_Hw *p_hw);
-static void bs_app_update_io_cab_state(Cabinet_App*);
+static void cab_app_update_io_cab_state(Cabinet_App*);
 
 static Cabinet 		bss_cabinets[CABINET_INIT];
 static CO_Slave*	bp_slaves[CABINET_INIT];
@@ -101,13 +101,14 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
-			bs_app_update_connected_cab_state(&selex_bss_app);
-			bs_app_update_io_cab_state(&selex_bss_app);
+			cab_app_update_connected_cab_state(&selex_bss_app);
+			cab_app_update_io_cab_state(&selex_bss_app);
 		}
 
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+		//cab_app_update_charge(&selex_bss_app, sys_timestamp);
 		break;
 	case BSS_ST_INIT:
 	case BSS_ST_FAIL:
@@ -190,7 +191,7 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 	}
 }
 
-static void bs_app_update_io_cab_state(Cabinet_App* p_app){
+static void cab_app_update_io_cab_state(Cabinet_App* p_app){
 	if(cab_id == p_app->bss.cab_num){
 		cab_id = 0;
 	}
