@@ -46,6 +46,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 		bss_cabinets[i].bp->soc = 0;
 		bss_cabinets[i].bp->cycle = 0;
 		bss_cabinets[i].bp->state = BP_ST_INIT;
+		bss_cabinets[i].bp->is_data_available = 0;
 		for (uint8_t j = 0; j < 8; j++)	bss_cabinets[i].bp->temp[j] = 0;
 		bss_cabinets[i].is_changed = 0;
 		cab_cell_init(&bss_cabinets[i]);
@@ -108,7 +109,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
-		//cab_app_update_charge(&selex_bss_app, sys_timestamp);
 		break;
 	case BSS_ST_INIT:
 	case BSS_ST_FAIL:

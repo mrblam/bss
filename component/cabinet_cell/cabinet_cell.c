@@ -115,11 +115,14 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cab->temp,buff);
     *buff++=',';
-    if((p_cab->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED) ||
-    		(p_cab->bp->is_data_available)){
-    	//p_cab->bp->is_data_available = 0;
-        for(uint8_t i = 0; *(p_cab->bp->base.sn + i) != '\0'; i++){
-        	*buff++= *(p_cab->bp->base.sn+i);
+    if(p_cab->bp->base.con_state==CO_SLAVE_CON_ST_CONNECTED){
+    	if(p_cab->bp->is_data_available){
+            for(uint8_t i = 0; *(p_cab->bp->base.sn + i) != '\0'; i++){
+            	*buff++= *(p_cab->bp->base.sn+i);
+            }
+    	}
+        else{
+        	*buff++='0';
         }
     }
     else{
