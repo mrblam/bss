@@ -18,11 +18,13 @@ CAN_master* can_master_construct(void) {
 
 void can_master_init(CAN_master *p_cm, CO_Slave **slaves, const uint32_t slave_num, CAN_Hw *p_hw) {
 	p_cm->node_id_scan_cobid = CAN_NODE_ID_ASSIGN_COBID;
+	p_cm->slave_start_node_id = CABINET_START_NODE_ID;
 	p_cm->slaves = slaves;
 	p_cm->p_hw = p_hw;
 	p_cm->sdo_server.state = SDO_ST_IDLE;
 	p_cm->sdo_server.is_new_msg = 0;
 	p_cm->slave_num = slave_num;
+	p_cm->assign_state = CM_ASSIGN_ST_DONE;
 }
 
 static void co_send_sync(CAN_master *p_cm) {

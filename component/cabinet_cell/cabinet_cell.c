@@ -9,7 +9,11 @@
 
 static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff);
 
-void cab_cell_init(Cabinet* p_cab){
+void cab_cell_init(Cabinet* p_cab, uint8_t id){
+	p_cab->op_state = CAB_CELL_ST_INIT;
+	p_cab->cab_id = id;
+	p_cab->is_changed = 0;
+	p_cab->bp = bp_construct(id);
 	p_cab->data_serialize = cab_cell_data_serialze_impl;
 }
 
@@ -54,12 +58,21 @@ void cab_cell_update_io_state(Cabinet* p_cab){
 
 void cab_cell_open_door(Cabinet* p_cab){
 	cab_door_open(&p_cab->door);
-#if 0
-	if(p_cab->door.state == DOOR_ST_OPEN){
-		cab_cell_set_led_color(p_cab, BLINK);
-	}
-#endif
 	p_cab->door.state = DOOR_ST_OPEN;
+}
+
+void cab_cell_update_led_state(Cabinet* p_cab){
+       if(p_cab->is_changed == 1){
+               if(p_cab->door.state == DOOR_ST_CLOSE){
+                       cab_cell_set_led_color(p_cab, RED);
+                       cab_cell_set_led_color(p_cab, BLINK);
+               }
+               else if(p_cab->door.state == DOOR_ST_OPEN){
+                       cab_cell_set_led_color(p_cab, BLUE);
+                       cab_cell_set_led_color(p_cab, BLINK);
+               }
+               p_cab->is_changed = 0;
+       }
 }
 
 void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
@@ -67,20 +80,6 @@ void cab_cell_update_door_state(Cabinet* p_cab, DOOR_STATE new_state){
 	if(old_state != new_state){
 		p_cab->door.state = new_state;
 		p_cab->is_changed = 1;
-	}
-}
-
-void cab_cell_update_led_state(Cabinet* p_cab){
-	if(p_cab->is_changed == 1){
-		if(p_cab->door.state == DOOR_ST_CLOSE){
-			cab_cell_set_led_color(p_cab, RED);
-			cab_cell_set_led_color(p_cab, BLINK);
-		}
-		else if(p_cab->door.state == DOOR_ST_OPEN){
-			cab_cell_set_led_color(p_cab, BLUE);
-			cab_cell_set_led_color(p_cab, BLINK);
-		}
-		p_cab->is_changed = 0;
 	}
 }
 

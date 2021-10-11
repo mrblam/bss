@@ -62,7 +62,7 @@ struct BP_t{
 	void		(*data_serialize)(BP* p_bp, char* buff);
 };
 
-BP* bp_construct(void);
+BP* bp_construct(uint8_t);
 
 void bp_reset_data(BP* p_bp);
 

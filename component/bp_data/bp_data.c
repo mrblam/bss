@@ -9,12 +9,23 @@
 
 static void bp_data_serialize_impl(BP* p_bp, char* buff);
 
-BP* bp_construct(void){
+BP* bp_construct(uint8_t id){
 	BP* p_bp = (BP*)malloc(sizeof(BP));
 	while(p_bp == NULL);
 
 	p_bp->state = BP_ST_IDLE;
-	p_bp->charge_sw_state=0;
+	p_bp->charge_sw_state = 0;
+	p_bp->vol = 0;
+	p_bp->cur = 0;
+	p_bp->soc = 0;
+	p_bp->soh = 0;
+	p_bp->cycle = 0;
+	p_bp->pos = id;
+	p_bp->status = BP_STT_OK;
+	p_bp->is_changed = 0;
+	p_bp->is_data_available = 0;
+	for(uint8_t i = 0; i < 16; i++) p_bp->cell_vol[i] = 0;
+	for(uint8_t i = 0; i < 8; i++) p_bp->temp[i] = 0;
 	for(uint8_t i = 0; i < 32; i++) p_bp->base.sn[i] = 0;
 
 	p_bp->data_serialize = bp_data_serialize_impl;

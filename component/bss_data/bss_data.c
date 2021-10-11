@@ -10,6 +10,9 @@
 
 #include "bss_data.h"
 
+static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
+					= {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
+
 static void bss_update_io_state(BSS_Data* p_bss);
 static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff);
 
@@ -23,8 +26,17 @@ void bss_init(BSS_Data* p_bss){
 		p_bss->ac_chargers[0].assigned_cab_num = MAX_ASSIGNED_CAB_NUM;
 	}
 	else p_bss->ac_chargers[0].assigned_cab_num = MAX_ASSIGNED_CAB_NUM - 1;
+}
 
-
+void bss_charger_init(BSS_Data* p_bss){
+	for(uint8_t i = 0; i < p_bss->charger_num; i++){
+		p_bss->ac_chargers[i].charging_cabin = NULL;
+		p_bss->ac_chargers[i].input_power.state = SW_ST_OFF;
+		for(uint8_t j = 0; j < p_bss->ac_chargers[i].assigned_cab_num; i++){
+			uint8_t id = id_assign_cabs_charger[i][j];
+			p_bss->ac_chargers[i].assigned_cabs[j] = &p_bss->cabs[id];
+		}
+	}
 }
 
 void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){

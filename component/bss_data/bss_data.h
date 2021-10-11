@@ -63,6 +63,7 @@ struct BSS_Data_t{
 };
 
 void bss_init(BSS_Data* p_bss);
+void bss_charger_init(BSS_Data* p_bss);
 void bss_update_cabinets_state(BSS_Data* p_bss);
 void bss_set_state(BSS_Data* p_bss, BSS_STATE state);
 void bss_update_charge_state(BSS_Data* p_bss);

@@ -18,11 +18,9 @@ static void cab_app_update_io_cab_state(Cabinet_App*);
 static Cabinet 		bss_cabinets[CABINET_INIT];
 static CO_Slave*	bp_slaves[CABINET_INIT];
 static Charger 		bss_chargers[CHARGER_NUM];
-static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
-					= {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
 
 static uint32_t 	sys_timestamp = 0;
-static uint32_t 	sys_tick_ms = 0;
+static uint32_t 	sys_tick_ms = APP_STATE_MACHINE_UPDATE_TICK_mS;
 static uint32_t 	com_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
@@ -36,62 +34,32 @@ void cab_app_init(Cabinet_App *p_ca) {
 	bss_init(&p_ca->bss);
 	peripheral_init(p_ca);
 	for (int i = 0; i < CABINET_INIT; i++) {
-		bss_cabinets[i].op_state = CAB_CELL_ST_INIT;
-		bss_cabinets[i].cab_id = i;
-		bss_cabinets[i].bp = bp_construct();
-		bss_cabinets[i].bp->pos = i;
-		bss_cabinets[i].bp->vol = 0;
-		bss_cabinets[i].bp->cur = 0;
-		bss_cabinets[i].bp->soc = 0;
-		bss_cabinets[i].bp->soc = 0;
-		bss_cabinets[i].bp->cycle = 0;
-		bss_cabinets[i].bp->state = BP_ST_INIT;
-		bss_cabinets[i].bp->is_data_available = 0;
-		for (uint8_t j = 0; j < 8; j++)	bss_cabinets[i].bp->temp[j] = 0;
-		bss_cabinets[i].is_changed = 0;
-		cab_cell_init(&bss_cabinets[i]);
-		while (bss_cabinets[i].bp == NULL);
+		cab_cell_init(&bss_cabinets[i], i);
 		bp_slaves[i] = (CO_Slave*) (bss_cabinets[i].bp);
 		co_slave_set_con_state(bp_slaves[i], CO_SLAVE_CON_ST_DISCONNECT);
 		bp_slaves[i]->node_id = CABINET_START_NODE_ID + i;
 		bp_slaves[i]->sdo_server_address = 0x580 + bp_slaves[i]->node_id;
 		bp_slaves[i]->inactive_time_ms = 0;
 	}
-
 	/* CHARGER INIT */
-	for(uint8_t i = 0; i < p_ca->bss.charger_num; i++){
-		p_ca->bss.ac_chargers[i].charging_cabin = NULL;
-		p_ca->bss.ac_chargers[i].input_power.state = SW_ST_OFF;
-		for(uint8_t j = 0; j < p_ca->bss.ac_chargers[i].assigned_cab_num; j++){
-			p_ca->bss.ac_chargers[i].assigned_cabs[j] = &bss_cabinets[id_assign_cabs_charger[i][j]];
-		}
-	}
+	bss_charger_init(&p_ca->bss);
 
-	p_ca->base.slave_start_node_id = CABINET_START_NODE_ID;
 	can_master_init((CAN_master*) p_ca, bp_slaves, CABINET_CELL_NUM, &can_port);
-	p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
-
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
 }
 
 int main(void) {
 	__disable_irq();
 
-	board_init();
-
-	sys_tick_ms = 1000 / SYSTICK_FREQ_Hz;
-	sys_timestamp = 0;
 	check_hmi_msg_timestamp = com_timestamp + 200;
-
+	board_init();
 	cab_app_init(&selex_bss_app);
-	cab_app_set_state(&selex_bss_app, CAB_APP_ST_SETUP);
 
 	__enable_irq();
 
 	for (uint8_t i = 0; i < selex_bss_app.bss.cab_num; i++) {
 		cab_cell_reset_io(&selex_bss_app.bss.cabs[i]);
 	}
-
 	while (1);
 }
 
@@ -105,22 +73,19 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {
 			cab_app_update_connected_cab_state(&selex_bss_app);
 			cab_app_update_io_cab_state(&selex_bss_app);
 		}
-
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		break;
 	case BSS_ST_INIT:
 	case BSS_ST_FAIL:
-	default:
 		break;
 	}
-
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 }
 
 void TIM3_IRQHandler(void) {
-	com_timestamp += 10;
+	com_timestamp += sys_tick_ms;
 
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
@@ -170,17 +135,14 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 			selex_bss_app.base.p_hw->can_tx.DLC = 0;
 			can_send(selex_bss_app.base.p_hw, selex_bss_app.base.p_hw->tx_data);
 			selex_bss_app.base.assign_state = CM_ASSIGN_ST_START;
-
 		}
 		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_SLAVE_SELECT) {
 			selex_bss_app.base.assign_state = CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;
 		}
 		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM) {
 			/* slave confirm assign id success*/
-			if (p_hw->rx_data[0] == selex_bss_app.base.assigning_slave->node_id) {
-				/* finish assign for current slave and move to next slave */
-				cm_start_authorize_slave((CAN_master*) &selex_bss_app, selex_bss_app.base.assigning_slave);
-			}
+			if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
+			cm_start_authorize_slave((CAN_master*) &selex_bss_app, selex_bss_app.base.assigning_slave);
 		}
 		return;
 	}
@@ -197,6 +159,7 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app){
 	}
 	cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);
 	cab_id++;
+
 #if ENABLE_CHARGER
 	cab_app_update_charge(p_app, sys_timestamp);
 #endif

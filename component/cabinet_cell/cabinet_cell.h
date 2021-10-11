@@ -57,7 +57,7 @@ struct Cabinet_t{
 	void (*data_serialize)(Cabinet* p_cab, char* buff);
 };
 
-void cab_cell_init(Cabinet* p_cab);
+void cab_cell_init(Cabinet* , uint8_t);
 void cab_cell_reset(Cabinet* p_cab);
 void cab_cell_reset_io(Cabinet* p_cab);
 void cab_cell_update_state(Cabinet* p_cab);
