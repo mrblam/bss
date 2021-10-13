@@ -439,6 +439,9 @@ static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint
 static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id) {
 	(void) p_cm;
 	/* return battery to user */
+	if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
+		selex_bss_app.base.pdo_sync_timestamp = sys_timestamp + 100;
+	}
 	cab_cell_update_state(&selex_bss_app.bss.cabs[id]);
 	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
 }

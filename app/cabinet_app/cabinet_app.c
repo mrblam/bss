@@ -46,7 +46,10 @@ void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 	}
 #endif
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
-	cab_cell_reset(&p_ca->bss.cabs[cab_id]);
+	sw_off(&p_ca->bss.cabs[cab_id].node_id_sw);
+	bp_reset_data(p_ca->bss.cabs[cab_id].bp);
+	if(p_ca->bss.cabs[cab_id].op_state == CAB_CELL_ST_INIT) return;
+	p_ca->bss.cabs[cab_id].op_state = CAB_CELL_ST_EMPTY;
 }
 
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
@@ -172,12 +175,9 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 	case STATE:
 		bss_set_state(&p_ca->bss, (BSS_STATE)state);
 		if(p_ca->bss.state == BSS_ST_ACTIVE){
-			p_ca->charge_timestamp = timestamp + 10000;
-#if 0
 			if(p_ca->base.pdo_sync_timestamp == 0){
 				p_ca->base.pdo_sync_timestamp = timestamp + 20;
 			}
-#endif
 		}
 		p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
@@ -448,8 +448,7 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 	for(uint8_t id = 0; id < p_app->bss.cab_num; id++){
 		if((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)
-				&& (p_app->base.pdo_sync_timestamp)
-				&& (p_app->bss.cabs[id].bp->base.inactive_time_ms != 0)){
+				&& (p_app->base.pdo_sync_timestamp)){
 			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
 
 			if(p_app->bss.cabs[id].bp->base.inactive_time_ms <= BP_INACTIVE_TIMEOUT_mS) continue;

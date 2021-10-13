@@ -13,6 +13,7 @@
 #include "rs485_master.h"
 
 extern Cabinet_App		selex_bss_app;
+extern uint32_t 	sys_timestamp;
 extern RS485_Master 	rs485m;
 
 void peripheral_init(Cabinet_App* p_ca);

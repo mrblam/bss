@@ -19,7 +19,7 @@ static Cabinet 		bss_cabinets[CABINET_INIT];
 static CO_Slave*	bp_slaves[CABINET_INIT];
 static Charger 		bss_chargers[CHARGER_NUM];
 
-static uint32_t 	sys_timestamp = 0;
+uint32_t 	sys_timestamp = 0;
 static uint32_t 	sys_tick_ms = APP_STATE_MACHINE_UPDATE_TICK_mS;
 static uint32_t 	com_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;

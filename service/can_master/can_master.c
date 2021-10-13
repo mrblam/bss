@@ -48,15 +48,17 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 	}
 
 	/* Send Sync request msg every 2s */
-	if((p_cm->pdo_sync_timestamp == timestamp) && (p_cm->pdo_sync_timestamp != 0)){
+	if((p_cm->pdo_sync_timestamp <= timestamp) && (p_cm->pdo_sync_timestamp != 0)){
 		co_send_sync(p_cm);
+#if 0
 		for(uint8_t i = 0; i < p_cm->slave_num; i++){
 			if((p_cm->slaves[i]->inactive_time_ms == 0)
 					&&(p_cm->slaves[i]->con_state == CO_SLAVE_CON_ST_CONNECTED)){
 				p_cm->slaves[i]->inactive_time_ms += 10;
 			}
 		}
-		p_cm->pdo_sync_timestamp += 3000;
+#endif
+		p_cm->pdo_sync_timestamp = timestamp + 3000;
 	}
 }
 

@@ -32,7 +32,7 @@ void bss_charger_init(BSS_Data* p_bss){
 	for(uint8_t i = 0; i < p_bss->charger_num; i++){
 		p_bss->ac_chargers[i].charging_cabin = NULL;
 		p_bss->ac_chargers[i].input_power.state = SW_ST_OFF;
-		for(uint8_t j = 0; j < p_bss->ac_chargers[i].assigned_cab_num; i++){
+		for(uint8_t j = 0; j < p_bss->ac_chargers[i].assigned_cab_num; j++){
 			uint8_t id = id_assign_cabs_charger[i][j];
 			p_bss->ac_chargers[i].assigned_cabs[j] = &p_bss->cabs[id];
 		}
