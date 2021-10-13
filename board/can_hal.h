@@ -10,6 +10,9 @@
 #include "can_hardware.h"
 #include "compiler_optimize.h"
 
+#define HAL_CAN_ENABLE_IRQ			CAN_ENABLE_IRQ
+#define HAL_CAN_DISABLE_IRQ			CAN_DISABLE_IRQ
+
 void can_hardware_init(void) WEAK;
 void can_send(CAN_Hw* p_hw, uint8_t* buff) WEAK;
 void can_receive(CAN_Hw* p_hw, uint8_t* buff) WEAK;

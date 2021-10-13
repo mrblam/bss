@@ -29,7 +29,7 @@ void can_master_init(CAN_master *p_cm, CO_Slave **slaves, const uint32_t slave_n
 
 static void co_send_sync(CAN_master *p_cm) {
 	p_cm->p_hw->can_tx.DLC = 0;
-	p_cm->p_hw->can_tx.StdId = 0x80;
+	p_cm->p_hw->can_tx.StdId = CAN_REQ_SYNC_BP_DATA_COBID;
 	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 }
 
@@ -44,21 +44,14 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 	if (p_cm->sdo_server.is_new_msg == 1) {
 		can_master_process_sdo(p_cm, timestamp);
 		p_cm->sdo_server.is_new_msg = 0;
+		HAL_CAN_ENABLE_IRQ;
 		return;
 	}
 
 	/* Send Sync request msg every 2s */
 	if((p_cm->pdo_sync_timestamp <= timestamp) && (p_cm->pdo_sync_timestamp != 0)){
 		co_send_sync(p_cm);
-#if 0
-		for(uint8_t i = 0; i < p_cm->slave_num; i++){
-			if((p_cm->slaves[i]->inactive_time_ms == 0)
-					&&(p_cm->slaves[i]->con_state == CO_SLAVE_CON_ST_CONNECTED)){
-				p_cm->slaves[i]->inactive_time_ms += 10;
-			}
-		}
-#endif
-		p_cm->pdo_sync_timestamp = timestamp + 3000;
+		p_cm->pdo_sync_timestamp = timestamp + PDO_READ_BP_DATA_TIME_mS;
 	}
 }
 
@@ -71,12 +64,7 @@ void can_master_disable_pdo(CAN_master* p_cm){
 
 static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 	(void)timestamp;
-#if 0
-	if (p_cm->sdo_server.timeout >= timestamp) {
-		p_cm->sdo_server.state = SDO_ST_FAIL;
-		return;
-	}
-#endif
+
 	uint8_t cs = p_cm->p_hw->rx_data[0];
 	uint32_t mux;
 	uint32_t dlc = p_cm->p_hw->can_tx.DLC;
@@ -168,7 +156,7 @@ void can_master_start_assign_next_slave(CAN_master *p_cm,const uint32_t timestam
 	for (int i = 0; i < 32; i++) {
 		p_cm->assigning_slave->sn[i] = 0;
 	}
-	p_cm->assign_timeout=timestamp+200;
+	p_cm->assign_timeout=timestamp + WAIT_BP_ASSIGN_REQ_TIMEOUT_mS;
 	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
 	can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
 }
@@ -181,7 +169,7 @@ void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint
 	for(uint8_t i = 0; i < 32; i++){
 		p_cm->assigning_slave->sn[i] = 0;
 	}
-	p_cm->assign_timeout = timestamp + 200;
+	p_cm->assign_timeout = timestamp + WAIT_BP_ASSIGN_REQ_TIMEOUT_mS;
 	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
 	can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 }
@@ -198,8 +186,8 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id) {
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
 		uint8_t *rx_buff, const uint32_t timeout) {
 	p_cm->sdo_server.timeout = timeout;
-	p_cm->sdo_server.tx_address = 0x580 + node_id;
-	p_cm->sdo_server.rx_address = 0x600 + node_id;
+	p_cm->sdo_server.tx_address = CO_CAN_ID_TSDO + node_id;
+	p_cm->sdo_server.rx_address = CO_CAN_ID_RSDO + node_id;
 	p_cm->sdo_server.object_mux = mux;
 	p_cm->sdo_server.buff_offset = 0;
 	p_cm->sdo_server.rx_data_buff = rx_buff;
@@ -216,8 +204,8 @@ void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t nod
 void co_sdo_write_object(CAN_master *p_cm, const uint32_t mux,const uint32_t node_id,
 		uint8_t *tx_buff, const uint32_t len, const uint32_t timeout) {
 	p_cm->sdo_server.timeout = timeout;
-	p_cm->sdo_server.tx_address = 0x580 + node_id;
-	p_cm->sdo_server.rx_address = 0x600 + node_id;
+	p_cm->sdo_server.tx_address = CO_CAN_ID_TSDO + node_id;
+	p_cm->sdo_server.rx_address = CO_CAN_ID_RSDO + node_id;
 	p_cm->sdo_server.object_mux = mux;
 	p_cm->sdo_server.buff_offset = 0;
 	p_cm->sdo_server.object_data_len = len;
@@ -251,10 +239,10 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 		p_cm->p_hw->can_tx.DLC = 1;
 		p_cm->p_hw->tx_data[0] = p_cm->assigning_slave->node_id;
 		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
-		p_cm->assign_timeout = timestamp + 2000;
+		p_cm->assign_timeout = timestamp + SLAVE_SELECT_CONFIRM_TIMEOUT_mS;
 		break;
 	case CM_ASSIGN_ST_AUTHORIZING:
-		can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
+		can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 		if (p_cm->sdo_server.state == SDO_ST_FAIL){
 			p_cm->assign_state = CM_ASSIGN_ST_FAIL;
 			p_cm->sdo_server.state = SDO_ST_IDLE;

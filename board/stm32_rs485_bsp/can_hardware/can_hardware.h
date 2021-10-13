@@ -7,6 +7,9 @@
 #include "core_hw.h"
 #include "interrupt_hw.h"
 
+#define CAN_ENABLE_IRQ		    HAL_NVIC_EnableIRQ(USB_LP_CAN1_RX0_IRQn)
+#define CAN_DISABLE_IRQ			HAL_NVIC_DisableIRQ(USB_LP_CAN1_RX0_IRQn)
+
 typedef struct CAN_Hw_t CAN_Hw;
 struct CAN_Hw_t{
 	CAN_HandleTypeDef 	can_module;

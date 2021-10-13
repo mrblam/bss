@@ -51,7 +51,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 int main(void) {
 	__disable_irq();
 
-	check_hmi_msg_timestamp = com_timestamp + 200;
+	check_hmi_msg_timestamp = com_timestamp + CHECK_HMI_MSG_TIME_mS;
 	board_init();
 	cab_app_init(&selex_bss_app);
 
@@ -92,7 +92,7 @@ void TIM3_IRQHandler(void) {
 
 	/* Process HMI protocol */
 	if(check_hmi_msg_timestamp == com_timestamp){
-		check_hmi_msg_timestamp = com_timestamp + 200;
+		check_hmi_msg_timestamp = com_timestamp + CHECK_HMI_MSG_TIME_mS;
 		if(selex_bss_app.is_new_msg){
 			cab_app_check_buffer(&selex_bss_app);
 		}
@@ -150,6 +150,7 @@ static void can_receive_handle(CAN_Hw *p_hw) {
 	if (cob_id == selex_bss_app.base.sdo_server.rx_address) {
 		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
 		selex_bss_app.base.sdo_server.is_new_msg = 1;
+		HAL_CAN_DISABLE_IRQ;
 	}
 }
 

@@ -15,6 +15,7 @@
 #include "can_hal.h"
 
 #define CAN_NODE_ID_ASSIGN_COBID						0x70
+#define CAN_REQ_SYNC_BP_DATA_COBID						0x80
 #define SLAVE_SERIAL_NUMBER_OBJECT_INDEX				0x2101
 #define BMS_MAINSWITCH_INDEX							0x2109
 

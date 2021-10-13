@@ -21,32 +21,24 @@ static uint8_t cab_app_get_obj_state(Cabinet_App* p_ca, const uint8_t msg_id);
 
 void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
 	if(p_ca->base.sdo_server.state != SDO_ST_IDLE) return;
+
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 3;
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
-			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + 1000);
+			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
 }
 
 void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
 	if(p_ca->base.sdo_server.state != SDO_ST_IDLE) return;
+
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 0;
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
-			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + 1000);
+			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
 }
 
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
-#if 0
-	for(uint8_t i = 0; i < p_ca->bss.charger_num; i++){
-		if(&p_ca->bss.cabs[cab_id] == p_ca->bss.ac_chargers[i].charging_cabin){
-			sw_off(&p_ca->bss.cabs[cab_id].charger);
-			p_ca->bss.ac_chargers[i].charging_cabin = NULL;
-			break;
-		}
-	}
-#endif
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
-	sw_off(&p_ca->bss.cabs[cab_id].node_id_sw);
 	bp_reset_data(p_ca->bss.cabs[cab_id].bp);
 	if(p_ca->bss.cabs[cab_id].op_state == CAB_CELL_ST_INIT) return;
 	p_ca->bss.cabs[cab_id].op_state = CAB_CELL_ST_EMPTY;

@@ -9,6 +9,7 @@
 #include "cabinet_app.h"
 #include "cabinet_hw_hal.h"
 
+#if 0
 static const uint16_t ntc_lookups[] = {
 	    58747,//-10
 	    55498,//-9
@@ -122,6 +123,7 @@ static const uint16_t ntc_lookups[] = {
 	    721,//99
 	    700,//100
 };
+#endif
 
 static void node_id1_sw_on( Switch* p_cm);
 static void node_id2_sw_on( Switch* p_cm);
