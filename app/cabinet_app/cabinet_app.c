@@ -9,6 +9,7 @@
 #include "uart_hw_hal.h"
 
 static char tx_buff[200];
+static uint32_t charge_no_cur_timestamp[2] = {0, 0};
 
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca);
 static void cab_app_reset_buffer(Cabinet_App* p_ca);
@@ -25,7 +26,8 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 3;
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
-			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
+			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4,
+			timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
 }
 
 void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
@@ -34,7 +36,8 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 0;
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
-			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
+			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4,
+			timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
 }
 
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
@@ -399,12 +402,15 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 
 		if(p_ca->bss.ac_chargers[id].charging_cabin != NULL){
 			/* Process BP Fully Charged */
-			if(p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_STOP_CHARGER_THRESHOLD){
+			if((p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_STOP_CHARGER_THRESHOLD)
+					|| (charge_no_cur_timestamp[id] >= 10000)){
 				cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
 				if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
+					p_ca->base.sdo_server.state = SDO_ST_IDLE;
 					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
 					p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+					charge_no_cur_timestamp[id] = 0;
 				}
 				else if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)
 					p_ca->base.sdo_server.state = SDO_ST_IDLE;
@@ -414,12 +420,20 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 				sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 				p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_EMPTY;
 				p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+				charge_no_cur_timestamp[id] = 0;
 			}
 			/* Process Active charging cabin */
 			else{
-				if(cab_cell_get_op_state(p_ca->bss.ac_chargers[id].charging_cabin) == CAB_CELL_ST_CHARGING) continue;
+				if(cab_cell_get_op_state(p_ca->bss.ac_chargers[id].charging_cabin) == CAB_CELL_ST_CHARGING){
+					if(p_ca->bss.ac_chargers[id].charging_cabin->bp->cur < 100) charge_no_cur_timestamp[id] += 10;
+					else charge_no_cur_timestamp[id] = 0;
+					continue;
+				}
 				cab_app_active_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
+				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.node_id !=
+						p_ca->base.sdo_server.node_id_processing) continue;
 				if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
+					p_ca->base.sdo_server.state = SDO_ST_IDLE;
 					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_CHARGING;
 				}
 				else if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)

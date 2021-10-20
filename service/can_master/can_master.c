@@ -82,6 +82,7 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 
 		if (mux != p_cm->sdo_server.object_mux) {
 			p_cm->sdo_server.state = SDO_ST_FAIL;
+			p_cm->pdo_sync_timestamp = timestamp + 100;
 			return;
 		}
 
@@ -110,7 +111,9 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 		break;
 	case SDO_CS_FINISH_READ:
+		p_cm->sdo_server.timeout = 0;
 		p_cm->sdo_server.state=SDO_ST_SUCCESS;
+		p_cm->pdo_sync_timestamp = timestamp + 100;
 		break;
 	case SDO_CS_INIT_WRITE:
 		mux = (((uint32_t) (p_cm->p_hw->rx_data[1])) << 16)
@@ -118,6 +121,7 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 				+ (uint32_t) (p_cm->p_hw->rx_data[3]);
 		if (mux != p_cm->sdo_server.object_mux) {
 			p_cm->sdo_server.state = SDO_ST_FAIL;
+			p_cm->pdo_sync_timestamp = timestamp + 100;
 			return;
 		}
 
@@ -137,12 +141,16 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 		p_cm->sdo_server.buff_offset += dlc - 1;
 		if (p_cm->sdo_server.buff_offset != p_cm->sdo_server.object_data_len) {
 			p_cm->sdo_server.state = SDO_ST_FAIL;
+			p_cm->pdo_sync_timestamp = timestamp + 100;
 		} else {
+			p_cm->sdo_server.timeout = 0;
 			p_cm->sdo_server.state = SDO_ST_SUCCESS;
+			p_cm->pdo_sync_timestamp = timestamp + 100;
 		}
 		break;
 	case SDO_CS_ABORT:
 		p_cm->sdo_server.state = SDO_ST_FAIL;
+		p_cm->pdo_sync_timestamp = timestamp + 100;
 		break;
 	}
 }
@@ -185,6 +193,8 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id) {
 
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
 		uint8_t *rx_buff, const uint32_t timeout) {
+	p_cm->pdo_sync_timestamp = 0;
+	p_cm->sdo_server.node_id_processing = node_id;
 	p_cm->sdo_server.timeout = timeout;
 	p_cm->sdo_server.tx_address = CO_CAN_ID_TSDO + node_id;
 	p_cm->sdo_server.rx_address = CO_CAN_ID_RSDO + node_id;
@@ -203,6 +213,8 @@ void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t nod
 
 void co_sdo_write_object(CAN_master *p_cm, const uint32_t mux,const uint32_t node_id,
 		uint8_t *tx_buff, const uint32_t len, const uint32_t timeout) {
+	p_cm->pdo_sync_timestamp = 0;
+	p_cm->sdo_server.node_id_processing = node_id;
 	p_cm->sdo_server.timeout = timeout;
 	p_cm->sdo_server.tx_address = CO_CAN_ID_TSDO + node_id;
 	p_cm->sdo_server.rx_address = CO_CAN_ID_RSDO + node_id;

@@ -59,6 +59,7 @@ struct CO_SDO_SERVER_t{
         uint32_t buff_offset;
         uint32_t object_data_len;
         uint8_t is_new_msg;
+        uint32_t node_id_processing;
 };
 
 typedef struct CO_ReadPDO_t CO_ReadPDO;
