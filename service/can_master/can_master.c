@@ -7,6 +7,8 @@
 
 #include "can_master.h"
 
+uint8_t reassign_attemp_cnt = 0;
+
 static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_cm);
 static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp);
 
@@ -263,12 +265,19 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 			co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_AUTHORIZING);
 			p_cm->on_slave_assign_success(p_cm,	p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 			p_cm->pdo_sync_timestamp = timestamp + 20;
+			reassign_attemp_cnt = 0;
 			p_cm->sdo_server.state = SDO_ST_IDLE;
 		}
 		break;
 	case CM_ASSIGN_ST_DONE:
 		break;
 	case CM_ASSIGN_ST_FAIL:
+		if(reassign_attemp_cnt < 3){
+			p_cm->reassign_attemp(p_cm);
+			reassign_attemp_cnt++;
+			break;
+		}
+
         p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
         co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_DISCONNECT);
 		p_cm->assign_state = CM_ASSIGN_ST_DONE;

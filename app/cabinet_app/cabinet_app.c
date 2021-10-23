@@ -148,6 +148,7 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 		if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
 			can_master_disable_pdo((CAN_master*)p_ca);
 			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[state], timestamp);
+			reassign_attemp_cnt = 0;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;

@@ -101,8 +101,11 @@ struct CAN_master_t{
 	CAN_Master_Slave_Select slave_deselect;
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
 	void (*on_slave_assign_fail)(const CAN_master* const p_cm,uint32_t slave_id);
+	void (*reassign_attemp)(CAN_master* p_cm);
 	void (*rpdo_process)(const CAN_master* const p_cm);
 };
+
+extern uint8_t reassign_attemp_cnt;
 
 void can_master_init(CAN_master* p_cm,CO_Slave** slaves, const uint32_t slave_num,CAN_Hw* p_hw);
 void can_master_process(CAN_master* p_cm,const uint32_t timestamp);

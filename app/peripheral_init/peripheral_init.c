@@ -332,6 +332,7 @@ static void can_master_slave_select_impl(const CAN_master *p_cm, const uint32_t 
 static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_t id);
 static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id);
 static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_t id);
+static void reassign_attemp_handle(CAN_master* p_cm);
 
 static sw_act door_sw_interface[] = {door1_switch_on, door2_switch_on, door3_switch_on, door4_switch_on, door5_switch_on,
 								door6_switch_on, door7_switch_on, door8_switch_on, door9_switch_on, door10_switch_on,
@@ -409,6 +410,7 @@ void peripheral_init(Cabinet_App* p_ca){
 	p_ca->base.slave_deselect = can_master_slave_deselect_impl;
 	p_ca->base.on_slave_assign_fail = bp_assign_id_fail_handle;
 	p_ca->base.on_slave_assign_success = bp_assign_id_success_handle;
+	p_ca->base.reassign_attemp = reassign_attemp_handle;
 }
 
 #if 0
@@ -446,6 +448,13 @@ static void bp_assign_id_fail_handle(const CAN_master *const p_cm, const uint32_
 	}
 	cab_cell_update_state(&selex_bss_app.bss.cabs[id]);
 	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));
+}
+
+static void reassign_attemp_handle(CAN_master* p_cm){
+	(void)p_cm;
+	can_master_start_assign_slave((CAN_master*)&selex_bss_app,
+			selex_bss_app.base.assigning_slave,
+			sys_timestamp);
 }
 
 /* --------------------------------------------------------------------------------- */
