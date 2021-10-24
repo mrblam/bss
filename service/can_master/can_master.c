@@ -272,7 +272,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 	case CM_ASSIGN_ST_DONE:
 		break;
 	case CM_ASSIGN_ST_FAIL:
-		if(reassign_attemp_cnt < 3){
+		if(reassign_attemp_cnt < 20){
 			p_cm->reassign_attemp(p_cm);
 			reassign_attemp_cnt++;
 			break;
