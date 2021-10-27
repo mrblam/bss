@@ -92,7 +92,6 @@ void cab_cell_reset(Cabinet* p_cab){
 void cab_cell_reset_io(Cabinet* p_cab){
 	sw_off(&p_cab->node_id_sw);
 	sw_off(&p_cab->charger);
-	sw_off(&p_cab->cell_fan);
 	cab_cell_set_led_color(p_cab, NONE);
 }
 

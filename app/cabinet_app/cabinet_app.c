@@ -43,6 +43,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
 	bp_reset_data(p_ca->bss.cabs[cab_id].bp);
+	p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 	if(p_ca->bss.cabs[cab_id].op_state == CAB_CELL_ST_INIT) return;
 	p_ca->bss.cabs[cab_id].op_state = CAB_CELL_ST_EMPTY;
 }
@@ -224,6 +225,7 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 	switch(sub_obj){
 	case DOOR:
 		if(state == SW_ST_ON){
+			p_ca->bss.cabs[id].door.state = DOOR_ST_OPEN;
 			cab_app_delivery_bp(p_ca, id);
 		}
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;

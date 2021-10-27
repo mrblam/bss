@@ -272,15 +272,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 	case CM_ASSIGN_ST_DONE:
 		break;
 	case CM_ASSIGN_ST_FAIL:
-		if(reassign_attemp_cnt < 20){
-			p_cm->reassign_attemp(p_cm);
-			reassign_attemp_cnt++;
-			break;
-		}
-
         p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
-        co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_DISCONNECT);
-		p_cm->assign_state = CM_ASSIGN_ST_DONE;
 		break;
 	}
 }

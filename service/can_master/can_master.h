@@ -100,7 +100,7 @@ struct CAN_master_t{
 	CAN_Master_Slave_Select slave_select;
 	CAN_Master_Slave_Select slave_deselect;
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
-	void (*on_slave_assign_fail)(const CAN_master* const p_cm,uint32_t slave_id);
+	void (*on_slave_assign_fail)(CAN_master* p_cm,uint32_t slave_id);
 	void (*reassign_attemp)(CAN_master* p_cm);
 	void (*rpdo_process)(const CAN_master* const p_cm);
 };
