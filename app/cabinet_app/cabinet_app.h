@@ -82,6 +82,8 @@ struct Cabinet_App_t{
 	uint32_t			charge_timestamp;
 };
 
+extern uint32_t sys_timestamp;
+
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id);
 void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca);
 void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca, uint8_t cab_id);

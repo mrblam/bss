@@ -566,6 +566,11 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 		break;
 	case BP_TEMP_TPDO_COBID:
 		CO_memcpy(selex_bss_app.bss.cabs[bp_id].bp->temp, p_cm->p_hw->rx_data, 8);
+		for(uint8_t i = 0; i < 8; i++){
+			if(selex_bss_app.bss.cabs[bp_id].bp->temp[i] > 110){
+				selex_bss_app.bss.cabs[bp_id].bp->temp[i] = 0;
+			}
+		}
 		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
 	default:

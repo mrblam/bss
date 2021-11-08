@@ -10,6 +10,7 @@
 
 static char tx_buff[200];
 static uint32_t charge_no_cur_timestamp[2] = {0, 0};
+uint32_t 	sys_timestamp = 0;
 
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca);
 static void cab_app_reset_buffer(Cabinet_App* p_ca);
@@ -146,13 +147,13 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 
 	switch(sub_obj){
 	case BSS_ID_ASSIGN:
-		if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
+		//if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
 			can_master_disable_pdo((CAN_master*)p_ca);
 			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[state], timestamp);
 			reassign_attemp_cnt = 0;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		}
-		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+//		}
+//		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 
 		break;
 	case BSS_AUTHORIZE:
