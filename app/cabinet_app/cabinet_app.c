@@ -408,16 +408,30 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 			/* Process BP Fully Charged */
 			if((p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_STOP_CHARGER_THRESHOLD)
 					|| (charge_no_cur_timestamp[id] >= 10000)){
-				cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
-				if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
-					p_ca->base.sdo_server.state = SDO_ST_IDLE;
+
+				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_OVER_CHARGE_THRESHOLD){
 					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
-					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
-					p_ca->bss.ac_chargers[id].charging_cabin = NULL;
-					charge_no_cur_timestamp[id] = 0;
+					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
+					if((sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS)
+							|| (sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)){
+						p_ca->base.sdo_server.state = SDO_ST_IDLE;
+						p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
+						p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+						charge_no_cur_timestamp[id] = 0;
+					}
 				}
-				else if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)
-					p_ca->base.sdo_server.state = SDO_ST_IDLE;
+				else{
+					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
+					if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
+						p_ca->base.sdo_server.state = SDO_ST_IDLE;
+						sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
+						p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
+						p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+						charge_no_cur_timestamp[id] = 0;
+					}
+					else if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)
+						p_ca->base.sdo_server.state = SDO_ST_IDLE;
+				}
 			}
 			/* Process BP Disconnected */
 			else if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.con_state == CO_SLAVE_CON_ST_DISCONNECT){

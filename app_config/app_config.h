@@ -27,6 +27,7 @@
 
 #define BP_START_CHARGE_THRESHOLD				64000
 #define BP_STOP_CHARGER_THRESHOLD				65000
+#define BP_OVER_CHARGE_THRESHOLD				65000
 
 #define AVAILABLE_HMI_MSG_NUM					3
 
@@ -34,7 +35,7 @@
 #define ADC_RESOLUTION							4095
 
 #define ENABLE_CELL_FAN							0
-#define ENABLE_IWDG_TIMER						0
+#define ENABLE_IWDG_TIMER						1
 #define ENABLE_CHARGER							1
 
 #define CABINET_START_NODE_ID					5
