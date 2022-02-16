@@ -14,6 +14,8 @@
 #include "CO.h"
 #include "can_hal.h"
 
+#define SDO_READ_SN_TIMEOUT_mS							1000
+
 #define CAN_NODE_ID_ASSIGN_COBID						0x70
 #define CAN_REQ_SYNC_BP_DATA_COBID						0x80
 #define SLAVE_SERIAL_NUMBER_OBJECT_INDEX				0x2101
@@ -59,6 +61,7 @@ struct CO_SDO_SERVER_t{
         uint32_t buff_offset;
         uint32_t object_data_len;
         uint8_t is_new_msg;
+        uint32_t node_id_processing;
 };
 
 typedef struct CO_ReadPDO_t CO_ReadPDO;
@@ -99,16 +102,19 @@ struct CAN_master_t{
 	CAN_Master_Slave_Select slave_select;
 	CAN_Master_Slave_Select slave_deselect;
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
-	void (*on_slave_assign_fail)(const CAN_master* const p_cm,uint32_t slave_id);
+	void (*on_slave_assign_fail)(CAN_master* p_cm,uint32_t slave_id);
+	void (*reassign_attemp)(CAN_master* p_cm);
 	void (*rpdo_process)(const CAN_master* const p_cm);
 };
+
+extern uint8_t reassign_attemp_cnt;
 
 void can_master_init(CAN_master* p_cm,CO_Slave** slaves, const uint32_t slave_num,CAN_Hw* p_hw);
 void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_start_assign_next_slave(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp);
-void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id);
-void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave);
+void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id, uint32_t timestamp);
+void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave, uint32_t timestamp);
 void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp);
 void co_sdo_read_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,uint8_t* rx_buff,const uint32_t timeout);
 void co_sdo_write_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,

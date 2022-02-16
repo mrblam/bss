@@ -9,6 +9,8 @@
 #include "uart_hw_hal.h"
 
 static char tx_buff[200];
+static uint32_t charge_no_cur_timestamp[2] = {0, 0};
+uint32_t 	sys_timestamp = 0;
 
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App* p_ca);
 static void cab_app_reset_buffer(Cabinet_App* p_ca);
@@ -25,7 +27,8 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 3;
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
-			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
+			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4,
+			timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
 }
 
 void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
@@ -34,12 +37,14 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 0;
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
-			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4, timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
+			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4,
+			timestamp + SDO_SET_BMS_MAIN_SW_TIMEOUT_mS);
 }
 
 void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 	cab_cell_open_door(&p_ca->bss.cabs[cab_id]);
 	bp_reset_data(p_ca->bss.cabs[cab_id].bp);
+	p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 	if(p_ca->bss.cabs[cab_id].op_state == CAB_CELL_ST_INIT) return;
 	p_ca->bss.cabs[cab_id].op_state = CAB_CELL_ST_EMPTY;
 }
@@ -142,12 +147,13 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 
 	switch(sub_obj){
 	case BSS_ID_ASSIGN:
-		if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
+		//if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
 			can_master_disable_pdo((CAN_master*)p_ca);
 			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[state], timestamp);
+			reassign_attemp_cnt = 0;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		}
-		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+//		}
+//		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 
 		break;
 	case BSS_AUTHORIZE:
@@ -220,6 +226,7 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 	switch(sub_obj){
 	case DOOR:
 		if(state == SW_ST_ON){
+			p_ca->bss.cabs[id].door.state = DOOR_ST_OPEN;
 			cab_app_delivery_bp(p_ca, id);
 		}
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
@@ -399,27 +406,52 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 
 		if(p_ca->bss.ac_chargers[id].charging_cabin != NULL){
 			/* Process BP Fully Charged */
-			if(p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_STOP_CHARGER_THRESHOLD){
-				cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
-				if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
+			if((p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_STOP_CHARGER_THRESHOLD)
+					|| (charge_no_cur_timestamp[id] >= 10000)){
+
+				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_OVER_CHARGE_THRESHOLD){
 					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
-					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
-					p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
+					if((sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS)
+							|| (sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)){
+						p_ca->base.sdo_server.state = SDO_ST_IDLE;
+						p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
+						p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+						charge_no_cur_timestamp[id] = 0;
+					}
 				}
-				else if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)
-					p_ca->base.sdo_server.state = SDO_ST_IDLE;
+				else{
+					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
+					if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
+						p_ca->base.sdo_server.state = SDO_ST_IDLE;
+						sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
+						p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
+						p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+						charge_no_cur_timestamp[id] = 0;
+					}
+					else if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)
+						p_ca->base.sdo_server.state = SDO_ST_IDLE;
+				}
 			}
 			/* Process BP Disconnected */
 			else if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.con_state == CO_SLAVE_CON_ST_DISCONNECT){
 				sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 				p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_EMPTY;
 				p_ca->bss.ac_chargers[id].charging_cabin = NULL;
+				charge_no_cur_timestamp[id] = 0;
 			}
 			/* Process Active charging cabin */
 			else{
-				if(cab_cell_get_op_state(p_ca->bss.ac_chargers[id].charging_cabin) == CAB_CELL_ST_CHARGING) continue;
+				if(cab_cell_get_op_state(p_ca->bss.ac_chargers[id].charging_cabin) == CAB_CELL_ST_CHARGING){
+					if(p_ca->bss.ac_chargers[id].charging_cabin->bp->cur < 100) charge_no_cur_timestamp[id] += 10;
+					else charge_no_cur_timestamp[id] = 0;
+					continue;
+				}
 				cab_app_active_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
+				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.node_id !=
+						p_ca->base.sdo_server.node_id_processing) continue;
 				if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
+					p_ca->base.sdo_server.state = SDO_ST_IDLE;
 					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_CHARGING;
 				}
 				else if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_FAIL)
