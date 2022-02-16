@@ -63,7 +63,7 @@ int main(void) {
 	while (1);
 }
 
-void HAL_STATE_MACHINE_UPDATE_TICK(void) {
+void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
 	sys_timestamp += sys_tick_ms;
 
 	switch(selex_bss_app.bss.state){
