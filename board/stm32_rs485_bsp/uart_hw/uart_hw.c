@@ -71,27 +71,27 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle){
 		HAL_NVIC_EnableIRQ(USART1_IRQn);
 	}
 	else if(uartHandle->Instance == HMI_PORT_COM){
-	    /* USART2 clock enable */
-	    __HAL_RCC_USART2_CLK_ENABLE();
+	    /* USART3 clock enable */
+	    __HAL_RCC_USART3_CLK_ENABLE();
 
-	    __HAL_RCC_GPIOA_CLK_ENABLE();
-	    /**USART2 GPIO Configuration
-	    PA2     ------> USART2_TX
-	    PA3     ------> USART2_RX
+	    __HAL_RCC_GPIOB_CLK_ENABLE();
+	    /**USART3 GPIO Configuration
+	    PB10     ------> USART3_TX
+	    PB11     ------> USART3_RX
 	    */
-	    GPIO_InitStruct.Pin = GPIO_PIN_2;
+	    GPIO_InitStruct.Pin = GPIO_PIN_10;
 	    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-	    GPIO_InitStruct.Pin = GPIO_PIN_3;
+	    GPIO_InitStruct.Pin = GPIO_PIN_11;
 	    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	    GPIO_InitStruct.Pull = GPIO_NOPULL;
-	    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-		/* USART2 interrupt Init */
-		HAL_NVIC_SetPriority(USART2_IRQn, UART_RX_HMI_IRQN_PRIORITY, 0);
-		HAL_NVIC_EnableIRQ(USART2_IRQn);
+		/* USART3 interrupt Init */
+		HAL_NVIC_SetPriority(USART3_IRQn, UART_RX_HMI_IRQN_PRIORITY, 0);
+		HAL_NVIC_EnableIRQ(USART3_IRQn);
 	}
 }
 
@@ -115,7 +115,7 @@ void USART1_IRQHandler(void){
 	}
 }
 
-void USART2_IRQHandler(void){
+void USART3_IRQHandler(void){
 	HAL_UART_IRQHandler(&hmi_com.uart_module);
 	uart_receives(&hmi_com, (char*)&hmi_com.rx_data);
 	if(hmi_com.receive_handle != NULL){

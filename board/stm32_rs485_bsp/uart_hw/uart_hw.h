@@ -19,7 +19,7 @@ extern UART_hw hmi_com;
 extern UART_hw rs485_com;
 
 #define RS485_PORT_COM		USART1
-#define HMI_PORT_COM		USART2
+#define HMI_PORT_COM		USART3
 
 #define UART_BAUDRATE		115200
 
