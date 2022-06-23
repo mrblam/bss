@@ -13,7 +13,7 @@ void uart_hw_init(void){
 
 static void uart_hmi_hw_init(void){
 	hmi_com.uart_module.Instance = HMI_PORT_COM;
-	hmi_com.uart_module.Init.BaudRate = UART_BAUDRATE;
+	hmi_com.uart_module.Init.BaudRate = UART_BAUDRATE_HMI;
 	hmi_com.uart_module.Init.WordLength = UART_WORDLENGTH_8B;
 	hmi_com.uart_module.Init.StopBits = UART_STOPBITS_1;
 	hmi_com.uart_module.Init.Parity = UART_PARITY_NONE;
@@ -29,7 +29,7 @@ static void uart_hmi_hw_init(void){
 
 static void uart_rs485_hw_init(void){
 	rs485_com.uart_module.Instance = RS485_PORT_COM;
-	rs485_com.uart_module.Init.BaudRate = UART_BAUDRATE;
+	rs485_com.uart_module.Init.BaudRate = UART_BAUDRATE_SLAVE;
 	rs485_com.uart_module.Init.WordLength = UART_WORDLENGTH_8B;
 	rs485_com.uart_module.Init.StopBits = UART_STOPBITS_1;
 	rs485_com.uart_module.Init.Parity = UART_PARITY_NONE;
