@@ -47,27 +47,27 @@ typedef enum SDO_STATE_t{
 }SDO_STATE;
 
 struct CO_SDO_SERVER_t{
-        uint32_t timeout;
-        SDO_STATE state;
-        uint16_t rx_index;
-        uint16_t tx_index;
-        uint32_t tx_address;
-        uint32_t rx_address;
-        uint32_t object_mux;
-        uint8_t* rx_data_buff;
-        uint8_t* tx_data_buff;
-        uint8_t tx_msg_data[8];
-        uint8_t rx_msg_data[8];
-        uint32_t buff_offset;
-        uint32_t object_data_len;
-        uint8_t is_new_msg;
-        uint32_t node_id_processing;
-};
+	uint32_t 		timeout;
+	SDO_STATE 		state;
+	uint16_t 		rx_index;
+	uint16_t 		tx_index;
+	uint32_t 		tx_address;
+	uint32_t 		rx_address;
+	uint32_t 		object_mux;
+	uint8_t* 		rx_data_buff;
+	uint8_t* 		tx_data_buff;
+	uint8_t 		tx_msg_data[8];
+	uint8_t 		rx_msg_data[8];
+	uint32_t 		buff_offset;
+	uint32_t 		object_data_len;
+	uint8_t 		is_new_msg;
+	uint32_t 		node_id_processing;
+	};
 
 typedef struct CO_ReadPDO_t CO_ReadPDO;
 struct CO_ReadPDO_t{
-	uint32_t cob_id;
-    uint8_t is_new_msg;
+	uint32_t 		cob_id;
+    uint8_t 		is_new_msg;
 };
 
 typedef struct CAN_master_t CAN_master;
@@ -86,21 +86,21 @@ typedef enum CM_ASSIGN_STATE{
 } CM_ASSIGN_STATE;
 
 struct CAN_master_t{
-	uint8_t is_active;
-	uint32_t slave_num;
-	uint32_t slave_start_node_id;
-	uint32_t node_id_scan_cobid;
-	CM_ASSIGN_STATE	assign_state;
-	uint32_t assign_timeout;
-	CO_Slave**		slaves;
-	CO_Slave* assigning_slave;
-	CO_Slave* authorizing_slave;
-	uint16_t 		time_stamp;
-	CO_SDO_SERVER 	sdo_server;
-	uint32_t pdo_sync_timestamp;
-	CAN_Hw* p_hw;
-	CAN_Master_Slave_Select slave_select;
-	CAN_Master_Slave_Select slave_deselect;
+	uint8_t 					is_active;
+	uint32_t 					slave_num;
+	uint32_t 					slave_start_node_id;
+	uint32_t 					node_id_scan_cobid;
+	CM_ASSIGN_STATE				assign_state;
+	uint32_t 					assign_timeout;
+	CO_Slave**					slaves;
+	CO_Slave* 					assigning_slave;
+	CO_Slave* 					authorizing_slave;
+	uint16_t 					time_stamp;
+	CO_SDO_SERVER 				sdo_server;
+	uint32_t 					pdo_sync_timestamp;
+	CAN_Hw*						p_hw;
+	CAN_Master_Slave_Select 	slave_select;
+	CAN_Master_Slave_Select 	slave_deselect;
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
 	void (*on_slave_assign_fail)(CAN_master* p_cm,uint32_t slave_id);
 	void (*reassign_attemp)(CAN_master* p_cm);

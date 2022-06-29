@@ -89,7 +89,7 @@ static void can_hardware_init_tx(void){
 	can_port.can_tx.IDE = CAN_ID_STD;
 	can_port.can_tx.TransmitGlobalTime = DISABLE;
 }
-
+#if 0
 void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -114,6 +114,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   }
 }
+#endif
 
 static void can_send_impl(CAN_Hw* p_hw){
 	HAL_CAN_AddTxMessage(&p_hw->can_module, &p_hw->can_tx, p_hw->tx_data, &p_hw->tx_mailbox);

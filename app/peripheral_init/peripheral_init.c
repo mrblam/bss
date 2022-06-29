@@ -441,8 +441,9 @@ static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint
 }
 
 static void bp_assign_id_fail_handle(CAN_master *p_cm, const uint32_t id) {
-	if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
-		if(reassign_attemp_cnt < 5){
+	if(selex_bss_app.bss.state == BSS_ST_ACTIVE)
+	{
+		if(reassign_attemp_cnt < 3){
 			p_cm->reassign_attemp(p_cm);
 			return;
 		}
