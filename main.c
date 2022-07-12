@@ -40,6 +40,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 		bp_slaves[i]->sdo_server_address = 0x580 + bp_slaves[i]->node_id;
 		bp_slaves[i]->inactive_time_ms = 0;
 	}
+
 	/* CHARGER INIT */
 	bss_charger_init(&p_ca->bss);
 
