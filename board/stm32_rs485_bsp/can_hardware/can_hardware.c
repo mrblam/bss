@@ -89,7 +89,7 @@ static void can_hardware_init_tx(void){
 	can_port.can_tx.IDE = CAN_ID_STD;
 	can_port.can_tx.TransmitGlobalTime = DISABLE;
 }
-#if 0
+#if 1
 void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
