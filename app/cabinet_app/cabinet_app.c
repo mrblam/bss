@@ -7,7 +7,7 @@
 
 #include "cabinet_app.h"
 #include "uart_hw_hal.h"
-
+#include "master_hw_hal.h"
 static char tx_buff[200];
 static uint32_t charge_no_cur_timestamp[2] = {0, 0};
 uint32_t 	sys_timestamp = 0;
@@ -410,6 +410,11 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 					|| (charge_no_cur_timestamp[id] >= 10000)){
 
 				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_OVER_CHARGE_THRESHOLD){
+					if(id == 1){
+						BSS_CTRL_CHARGER1_LOW;
+					}else{
+						BSS_CTRL_CHARGER2_LOW;
+					}
 					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
 					if((sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS)
@@ -424,6 +429,11 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
 					if(sdo_server_get_state(&p_ca->base.sdo_server) == SDO_ST_SUCCESS){
 						p_ca->base.sdo_server.state = SDO_ST_IDLE;
+						if(id == 1){
+							BSS_CTRL_CHARGER1_LOW;
+						}else{
+							BSS_CTRL_CHARGER2_LOW;
+						}
 						sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 						p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
 						p_ca->bss.ac_chargers[id].charging_cabin = NULL;
@@ -435,6 +445,11 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 			}
 			/* Process BP Disconnected */
 			else if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.con_state == CO_SLAVE_CON_ST_DISCONNECT){
+				if(id == 1){
+					BSS_CTRL_CHARGER1_LOW;
+				}else{
+					BSS_CTRL_CHARGER2_LOW;
+				}
 				sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 				p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_EMPTY;
 				p_ca->bss.ac_chargers[id].charging_cabin = NULL;
@@ -463,6 +478,11 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 			Cabinet* cab = bss_get_cab_need_charge(&p_ca->bss, id);
 			if(cab == NULL) continue;
 			p_ca->bss.ac_chargers[id].charging_cabin = cab;
+			if(id == 1){
+				BSS_CTRL_CHARGER1_HIGH;
+			}else{
+				BSS_CTRL_CHARGER2_HIGH;
+			}
 			//sw_on(&p_ca->bss.ac_chargers[id].input_power);
 			sw_on(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 		}
@@ -479,6 +499,11 @@ void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 			cab_cell_reset(&p_app->bss.cabs[id]);
 			for(uint8_t i = 0; i < p_app->bss.charger_num; i++){
 				if(p_app->bss.ac_chargers[i].charging_cabin != &p_app->bss.cabs[id]) continue;
+				if(i == 1){
+					BSS_CTRL_CHARGER1_LOW;
+				}else{
+					BSS_CTRL_CHARGER2_LOW;
+				}
 				sw_off(&p_app->bss.ac_chargers[i].charging_cabin->charger);
 				p_app->bss.ac_chargers[id].charging_cabin = NULL;
 			}
