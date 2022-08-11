@@ -48,6 +48,9 @@ void bss_led_init(void)
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 		HAL_GPIO_Init(BSS_LED_PORT, &GPIO_InitStruct);
+		/**/
+		BSS_CTRL_LED1_HIGH;
+		BSS_CTRL_LED2_HIGH;
 }
 void bss_fan_init(void)
 {
