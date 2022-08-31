@@ -10,7 +10,7 @@
 
 #include "stdlib.h"
 #include "stdint.h"
-#include "linked_list.h"
+//#include "linked_list.h"
 #include "CO.h"
 #include "can_hal.h"
 

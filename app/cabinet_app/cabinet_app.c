@@ -483,7 +483,7 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp){
 		}
 		else
 		{
-			Cabinet* cab = bss_get_cab_need_charge(&p_ca->bss, id);
+	 		Cabinet* cab = bss_get_cab_need_charge(&p_ca->bss, id);
 			if(cab == NULL) continue;
 			p_ca->bss.ac_chargers[id].charging_cabin = cab;
 			if(id == 1)

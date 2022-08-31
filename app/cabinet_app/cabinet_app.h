@@ -15,7 +15,6 @@
 #include "can_master.h"
 #include "cabinet_cell.h"
 #include "ioe.h"
-#include "linked_list.h"
 #include "bss_data.h"
 #include "rs485_master.h"
 
