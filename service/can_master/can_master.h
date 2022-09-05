@@ -4,7 +4,11 @@
  *  Created on: Apr 1, 2021
  *      Author: KhanhDinh
  */
-
+/*
+ * SDO : Serial number,on/off BP
+ * PDO : SYNC data BP(Voltage,Current,)
+ * CAN normal ; assign ID BP (5 + 1,2,3,4)
+ * */
 #ifndef SERVICE_CAN_MASTER_CAN_MASTER_H_
 #define SERVICE_CAN_MASTER_CAN_MASTER_H_
 

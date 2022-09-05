@@ -44,7 +44,7 @@ INCLUDES+=service/can_master \
 	
 INCLUDES+= util/string
 
-USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen_clib 
+USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen
 USER_LIBS=CANopen
 
 LIB_INCLUDES:=libs
@@ -149,7 +149,7 @@ clean:
 	rm -f $(TARGET).lst
 
 libs:
-	make -C libs/selex-libc/canopen_clib all
+	make -C libs/selex-libc/canopen all
 test_suit:
 	make -C libs/selex-libc/test-suit/ -f test_suit.mk all
 test_suit_clean:

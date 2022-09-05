@@ -12,11 +12,13 @@ uint8_t reassign_attemp_cnt = 0;
 static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_cm);
 static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp);
 
+#if 0
 CAN_master* can_master_construct(void) {
 	CAN_master *p_cm = (CAN_master*) malloc(sizeof(CAN_master));
 	while (p_cm == NULL);
 	return p_cm;
 }
+#endif
 
 void can_master_init(CAN_master *p_cm, CO_Slave **slaves, const uint32_t slave_num, CAN_Hw *p_hw) {
 	p_cm->node_id_scan_cobid = CAN_NODE_ID_ASSIGN_COBID;
@@ -199,11 +201,12 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timesta
 
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
 		uint8_t *rx_buff, const uint32_t timeout) {
+#if 1
 	p_cm->pdo_sync_timestamp = 0;
 	p_cm->sdo_server.node_id_processing = node_id;
 	p_cm->sdo_server.timeout = timeout;
-	p_cm->sdo_server.tx_address = CO_CAN_ID_TSDO + node_id;
-	p_cm->sdo_server.rx_address = CO_CAN_ID_RSDO + node_id;
+	p_cm->sdo_server.tx_address = CO_CAN_ID_SDO_SRV + node_id;
+	p_cm->sdo_server.rx_address = CO_CAN_ID_SDO_CLI + node_id;
 	p_cm->sdo_server.object_mux = mux;
 	p_cm->sdo_server.buff_offset = 0;
 	p_cm->sdo_server.rx_data_buff = rx_buff;
@@ -215,15 +218,17 @@ void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t nod
 	p_cm->p_hw->tx_data[3] = (uint8_t) ((p_cm->sdo_server.object_mux & 0x000000ff));
 	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 	p_cm->sdo_server.state = SDO_ST_SENT;
+#endif
 }
 
 void co_sdo_write_object(CAN_master *p_cm, const uint32_t mux,const uint32_t node_id,
 		uint8_t *tx_buff, const uint32_t len, const uint32_t timeout) {
+#if 1
 	p_cm->pdo_sync_timestamp = 0;
 	p_cm->sdo_server.node_id_processing = node_id;
 	p_cm->sdo_server.timeout = timeout;
-	p_cm->sdo_server.tx_address = CO_CAN_ID_TSDO + node_id;
-	p_cm->sdo_server.rx_address = CO_CAN_ID_RSDO + node_id;
+	p_cm->sdo_server.tx_address = CO_CAN_ID_SDO_SRV + node_id;
+	p_cm->sdo_server.rx_address = CO_CAN_ID_SDO_CLI + node_id;
 	p_cm->sdo_server.object_mux = mux;
 	p_cm->sdo_server.buff_offset = 0;
 	p_cm->sdo_server.object_data_len = len;
@@ -236,6 +241,7 @@ void co_sdo_write_object(CAN_master *p_cm, const uint32_t mux,const uint32_t nod
 	p_cm->p_hw->tx_data[3] = (uint8_t) ((p_cm->sdo_server.object_mux & 0x000000ff));
 	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 	p_cm->sdo_server.state = SDO_ST_SENT;
+#endif
 }
 
 void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timestamp) {
