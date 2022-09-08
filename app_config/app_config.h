@@ -41,6 +41,8 @@
 
 #define CABINET_START_NODE_ID					5
 
+
+#define NEW_CANOPEN_LIB							1			// 1 : use new canopen_lib
 typedef enum CABIN_ID{
 	CAB1 = 0,
 	CAB2 = 1,

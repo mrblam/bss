@@ -79,6 +79,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
 
 		break;
 	case BSS_ST_INIT:
+		selex_bss_app.bss.state = BSS_ST_ACTIVE;
+		break;
 	case BSS_ST_FAIL:
 		break;
 	}
@@ -115,49 +117,60 @@ void TIM3_IRQHandler(void) {
 
 /* ------------------------------------------------------------------------------ */
 
-static void can_receive_handle(CAN_Hw *p_hw) {
+static void can_receive_handle(CAN_Hw *p_hw)
+{
+#if 0
+	app_co_can_receive_handle(p_can_hw->RxHeader.Identifier, p_can_hw->rx_msg_data);
+#endif
 	uint32_t cob_id = p_hw->can_rx.StdId;
 
-	switch(p_hw->can_rx.StdId & 0xFFFFFF80){
-	case CO_CAN_ID_TPDO_1:
-	case CO_CAN_ID_TPDO_2:
-	case CO_CAN_ID_TPDO_3:
-	case CO_CAN_ID_TPDO_4:
+	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
+	{
+		case CO_CAN_ID_TPDO_1:
+		case CO_CAN_ID_TPDO_2:
+		case CO_CAN_ID_TPDO_3:
+		case CO_CAN_ID_TPDO_4:
 		selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
-		break;
-	default:
-		break;
+			break;
+		default:
+			break;
 	}
 
 	/* if assign request message */
-	if (cob_id == selex_bss_app.base.node_id_scan_cobid) {
-		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST) {
+	if (cob_id == selex_bss_app.base.node_id_scan_cobid) // bp send can_id = 0x70
+	{
+		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST)
+		{
 			selex_bss_app.base.p_hw->can_tx.StdId = selex_bss_app.base.node_id_scan_cobid;
 			selex_bss_app.base.p_hw->can_tx.DLC = 0;
 			can_send(selex_bss_app.base.p_hw, selex_bss_app.base.p_hw->tx_data);
 			selex_bss_app.base.assign_state = CM_ASSIGN_ST_START;
 		}
-		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_SLAVE_SELECT) {
+		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_SLAVE_SELECT)
+		{
 			selex_bss_app.base.assign_state = CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;
 		}
-		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM) {
+		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM)
+		{
 			/* slave confirm assign id success*/
 			if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
-			cm_start_authorize_slave((CAN_master*) &selex_bss_app,
-					selex_bss_app.base.assigning_slave, sys_timestamp);
+			cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp);
 		}
 		return;
 	}
 
-	if (cob_id == selex_bss_app.base.sdo_server.rx_address) {
+	if (cob_id == selex_bss_app.base.sdo_server.rx_address)
+	{
 		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
 		selex_bss_app.base.sdo_server.is_new_msg = 1;
 		HAL_CAN_DISABLE_IRQ;
 	}
 }
 
-static void cab_app_update_io_cab_state(Cabinet_App* p_app){
-	if(cab_id == p_app->bss.cab_num){
+static void cab_app_update_io_cab_state(Cabinet_App* p_app)
+{
+	if(cab_id == p_app->bss.cab_num)
+	{
 		cab_id = 0;
 	}
 	cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);

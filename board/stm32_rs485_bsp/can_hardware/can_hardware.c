@@ -120,9 +120,11 @@ static void can_send_impl(CAN_Hw* p_hw){
 	HAL_CAN_AddTxMessage(&p_hw->can_module, &p_hw->can_tx, p_hw->tx_data, &p_hw->tx_mailbox);
 }
 
-void USB_LP_CAN1_RX0_IRQHandler(void){
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
 	HAL_CAN_GetRxMessage(&can_port.can_module, CAN_RX_FIFO0, &can_port.can_rx, can_port.rx_data);
-	if(can_port.receive_handle != NULL){
+	if(can_port.receive_handle != NULL)
+	{
 		can_port.receive_handle(&can_port);
 	}
 	HAL_CAN_IRQHandler(&can_port.can_module);
