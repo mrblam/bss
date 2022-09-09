@@ -79,8 +79,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
 
 		break;
 	case BSS_ST_INIT:
-		selex_bss_app.bss.state = BSS_ST_ACTIVE;
-		break;
 	case BSS_ST_FAIL:
 		break;
 	}

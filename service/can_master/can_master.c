@@ -159,6 +159,7 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 	}
 }
 
+#if 1
 void can_master_start_assign_next_slave(CAN_master *p_cm,const uint32_t timestamp)// not use
 {
 	p_cm->assigning_slave = can_master_get_assign_request_slave(p_cm);
@@ -173,6 +174,7 @@ void can_master_start_assign_next_slave(CAN_master *p_cm,const uint32_t timestam
 	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
 	can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
 }
+#endif
 
 void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint32_t timestamp){
 	co_slave_set_con_state(slave, CO_SLAVE_CON_ST_ASSIGNING);

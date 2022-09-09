@@ -320,8 +320,11 @@ static void ntc_sensor_get_adc_value(NTC* p_ntc);
 
 static void rs485_set_tx_mode(RS485_Master* p_485m);
 static void rs485_set_rx_mode(RS485_Master* p_485m);
+
 static void rs485_receive_handle_impl(UART_hw* p_hw);
 static void hmi_receive_handle_impl(UART_hw* p_hw);
+static void debug_receive_handle_impl(UART_hw* p_hw);
+
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
 
 static void can_master_rpdo_process_impl(const CAN_master* const p_cm);
@@ -404,6 +407,7 @@ void peripheral_init(Cabinet_App* p_ca){
 	rs485m.parse_slave_msg_handle = rs485_parse_slave_msg_handle_impl;
 
 	hmi_com.receive_handle = hmi_receive_handle_impl;
+	debug_com.receive_handle = debug_receive_handle_impl;
 
 	p_ca->base.rpdo_process = can_master_rpdo_process_impl;
 	p_ca->base.slave_select = can_master_slave_select_impl;
@@ -507,6 +511,21 @@ static void hmi_receive_handle_impl(UART_hw* p_hw){
 		selex_bss_app.rx_data[selex_bss_app.rx_index] = p_hw->rx_data;
 		selex_bss_app.rx_index++;
 	}
+}
+static void debug_receive_handle_impl(UART_hw* p_hw){
+#if 1
+	if(p_hw->rx_data == '*'){
+		selex_bss_app.is_new_msg = 1;
+	}
+	if(selex_bss_app.rx_index == 32){
+		selex_bss_app.rx_index = 0;
+		return;
+	}
+	if(p_hw->rx_data != '\0'){
+		selex_bss_app.rx_data[selex_bss_app.rx_index] = p_hw->rx_data;
+		selex_bss_app.rx_index++;
+	}
+#endif
 }
 
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){

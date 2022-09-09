@@ -75,7 +75,7 @@ DEFS:=
 #--------------------------------------------------------
 
 OPTIMIZE=-O0
-#OPTIMIZE=-O3
+#OPTIMIZE=-Og
 
 # Option arguments for C compiler.
 CFLAGS+= $(INCLUDES)
