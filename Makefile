@@ -10,7 +10,7 @@ include $(PROJ_ROOT)/board/$(BOARD_TYPE)/$(BOARD_TYPE).mk
 include $(PROJ_ROOT)/gcc.mk
 
 SRCS:=board/board.c
-SRCS+=app/cabinet_app/cabinet_app.c  app/peripheral_init/peripheral_init.c
+SRCS+=app/cabinet_app/cabinet_app.c  app/canopen_app/app_co_init/app_co_init.c  app/canopen_app/app_co_od/app_co_comm_od.c  app/canopen_app/app_co_od/app_co_manu_od.c  app/canopen_app/app_co_od/app_co_od.c  app/canopen_app/app_co_storage_init.c  app/peripheral_init/peripheral_init.c
 SRCS+=component/adc_sensor/adc_sensor.c \
 	component/bp_data/bp_data.c \
 	component/bss_data/bss_data.c \
@@ -29,7 +29,7 @@ BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
 
 #INCLUDES:=. app_config board service component util app
-INCLUDES:=app/cabinet_app  app/peripheral_init app_config board component
+INCLUDES:=app/cabinet_app app/canopen_app/app_co_init app/canopen_app/app_co_od app/canopen_app/app_co_storage_init app/peripheral_init app_config board component
 INCLUDES+=component/adc_sensor \
 	component/bp_data \
 	component/bss_data \

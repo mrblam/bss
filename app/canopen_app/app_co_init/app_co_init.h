@@ -11,7 +11,7 @@
 #include "app_co_storage_init.h"
 #include "app_co_od.h"
 #include "CO.h"
-#include "motor_controller.h"
+
 
 extern void* tpdo_build_data_impl[TPDO_NUMBER];
 

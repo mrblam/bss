@@ -16,7 +16,7 @@
  *					Set default value for CAN communication
  ************************************************************************************/
 #define	NODE_ID_DEFAULT		0x05
-#define CO_DEVICE			xxx		//<< canopen object
+#define CO_DEVICE			selex_bss_app.base.base		//<< canopen object
 
 /* Identity */
 #define VENDER_ID			0x00000000	//<< option
@@ -29,7 +29,7 @@
 #define SW_VERSION			0x00000000	//<< option
 
 /* */
-#define CO_CF_1008_DEVICE_NAME	"SELEX_XXX"
+#define CO_CF_1008_DEVICE_NAME	"SELEX_BSS"
 #define CO_CF_1008_DEVICE_NAME_SIZE		(sizeof(CO_CF_1008_DEVICE_NAME))
 
 /* Synchronous schedule */

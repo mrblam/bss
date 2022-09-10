@@ -75,6 +75,7 @@ void app_co_can_receive_handle(const uint32_t can_id, uint8_t* data)
 	if(CO_can_receive_basic_handle(&CO_DEVICE, can_id, data)) ;
 
 	/* USER CODE BEGIN */
+#if 0
 	uint32_t cob_id = p_hw->can_rx.StdId;
 
 		switch(p_hw->can_rx.StdId & 0xFFFFFF80)
@@ -118,6 +119,7 @@ void app_co_can_receive_handle(const uint32_t can_id, uint8_t* data)
 			selex_bss_app.base.sdo_server.is_new_msg = 1;
 			HAL_CAN_DISABLE_IRQ;
 		}
+#endif
 	/* USER CODE END */
 }
 

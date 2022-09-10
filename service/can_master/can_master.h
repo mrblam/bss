@@ -90,6 +90,7 @@ typedef enum CM_ASSIGN_STATE{
 } CM_ASSIGN_STATE;
 
 struct CAN_master_t{
+	CO 							base; // new
 	uint8_t 					is_active;
 	uint32_t 					slave_num;
 	uint32_t 					slave_start_node_id;
