@@ -46,6 +46,9 @@ void cab_app_init(Cabinet_App *p_ca) {
 
 	can_master_init((CAN_master*) p_ca, bp_slaves, CABINET_CELL_NUM, &can_port);
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
+
+	/*CANOpen Init */
+	app_co_init();
 }
 
 int main(void) {
@@ -152,7 +155,7 @@ static void can_receive_handle(CAN_Hw *p_hw)
 		{
 			/* slave confirm assign id success*/
 			if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
-			cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp);
+			cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp); // den day
 		}
 		return;
 	}
