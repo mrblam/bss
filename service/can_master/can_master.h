@@ -42,6 +42,15 @@ typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 #define BP_LOW_CELLS_VOL_TPDO_COBID                     CO_CAN_ID_TPDO_2
 #define BP_HIGH_CELLS_VOL_TPDO_COBID                    CO_CAN_ID_TPDO_3
 #define BP_TEMP_TPDO_COBID                              CO_CAN_ID_TPDO_4
+//
+//uint8_t serial_number_var[10];
+//CO_Sub_Object serial_number_sobj =
+//	{
+//			.p_data = serial_number_var,	//<< Address variable receiving data
+//			.attr	= ODA_SDO_RW,			//<< [skip] set ODA_SDO_RW
+//			.len	= 10,					//<< Maximum data size that can be received
+//			.p_ext	= NULL					//<< [option], set NULL if not used
+//	};
 
 typedef enum SDO_STATE_t{
 	SDO_ST_IDLE 	= 0,
@@ -110,6 +119,7 @@ struct CAN_master_t{
 	void (*on_slave_assign_fail)(CAN_master* p_cm,uint32_t slave_id);
 	void (*reassign_attemp)(CAN_master* p_cm);
 	void (*rpdo_process)(const CAN_master* const p_cm);
+	void 				(*read_serial_number_bp)(void);
 };
 
 extern uint8_t reassign_attemp_cnt;
@@ -126,6 +136,7 @@ void co_sdo_write_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node
 		uint8_t* tx_buff,const uint32_t len,const uint32_t timeout);
 void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint32_t timestamp);
 void can_master_disable_pdo(CAN_master* p_cm);
+void can_set_read_sn_func_pointer(CAN_master* p_cm,void (*read_serial_number_bp)(void));
 
 static inline void can_master_slave_select(const CAN_master* p_cm, const uint32_t id){
 	p_cm->slave_select(p_cm,id);

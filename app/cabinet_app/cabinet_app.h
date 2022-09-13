@@ -20,6 +20,8 @@
 
 typedef struct Cabinet_App_t Cabinet_App;
 
+extern Cabinet_App selex_bss_app;
+
 typedef enum CABINET_APP_STATE{
 	CAB_APP_ST_SETUP,
 	CAB_APP_ST_STANDBY,

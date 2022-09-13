@@ -20,6 +20,7 @@ struct CAN_Hw_t{
 	uint8_t				rx_data[8];
 	void 				(*can_send)(CAN_Hw* p_hw);
 	void				(*receive_handle)(CAN_Hw* p_hw);
+
 };
 
 extern CAN_Hw	can_port;

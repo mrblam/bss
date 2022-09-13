@@ -11,6 +11,7 @@
 #define APP_APP_CANOPEN_APP_CO_OD_SIMPLY_CONFIG_H_
 
 #include "CO.h"
+#include "cabinet_app.h"
 
 /************************************************************************************
  *					Set default value for CAN communication
@@ -29,7 +30,7 @@
 #define SW_VERSION			0x00000000	//<< option
 
 /* */
-#define CO_CF_1008_DEVICE_NAME	"SELEX_BSS"
+#define CO_CF_1008_DEVICE_NAME			"SELEX_BSS"
 #define CO_CF_1008_DEVICE_NAME_SIZE		(sizeof(CO_CF_1008_DEVICE_NAME))
 
 /* Synchronous schedule */

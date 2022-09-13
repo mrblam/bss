@@ -5,15 +5,25 @@
  *      Author: KhanhDinh
  */
 
-#include "cabinet_app.h"
 #include "board.h"
 #include "peripheral_init.h"
+#include "app_co_init.h"
 
-Cabinet_App selex_bss_app;
+//Cabinet_App selex_bss_app;
 RS485_Master rs485m;
 
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
+static void master_read_serial_number(void);
+
+uint8_t serial_number_var[10];
+CO_Sub_Object serial_number_sobj =
+	{
+			.p_data = serial_number_var,	//<< Address variable receiving data
+			.attr	= ODA_SDO_RW,			//<< [skip] set ODA_SDO_RW
+			.len	= 10,					//<< Maximum data size that can be received
+			.p_ext	= NULL					//<< [option], set NULL if not used
+	};
 
 static Cabinet 		bss_cabinets[CABINET_INIT];
 static CO_Slave*	bp_slaves[CABINET_INIT];
@@ -46,7 +56,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 
 	can_master_init((CAN_master*) p_ca, bp_slaves, CABINET_CELL_NUM, &can_port);
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
-
+	can_set_read_sn_func_pointer((CAN_master*) p_ca,master_read_serial_number);
 	/*CANOpen Init */
 	app_co_init();
 }
@@ -180,4 +190,8 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 #if ENABLE_CHARGER
 	cab_app_update_charge(p_app, sys_timestamp);
 #endif
+}
+static void master_read_serial_number()
+{
+	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
 }

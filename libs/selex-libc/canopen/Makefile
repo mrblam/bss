@@ -6,7 +6,8 @@ CPU=-mcpu=cortex-m4
 OPTIMIZE=-Og
 #FPU=-mfloat-abi=hard -mfpu=fpv4-sp-d16
 #FPU=-mfloat-abi=softfp -mfpu=fpv4-sp-d16
-FPU:=-mfloat-abi=hard -fsingle-precision-constant -mfpu=fpv4-sp-d16
+#FPU:=-mfloat-abi=hard -fsingle-precision-constant -mfpu=fpv4-sp-d16
+FPU:=-mfloat-abi=softfp -fsingle-precision-constant -mfpu=fpv4-sp-d16
 
 # Option arguments for C compiler.
 CFLAGS+=-mthumb ${CPU} ${FPU}

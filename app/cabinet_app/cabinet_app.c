@@ -8,6 +8,10 @@
 #include "cabinet_app.h"
 #include "uart_hw_hal.h"
 #include "master_hw_hal.h"
+
+Cabinet_App selex_bss_app;
+
+
 static char tx_buff[200];
 static uint32_t charge_no_cur_timestamp[2] = {0, 0};
 uint32_t 	sys_timestamp = 0;
@@ -70,10 +74,12 @@ void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){
 void cab_app_send_msg_to_hmi(Cabinet_App* p_ca){
 	(void)p_ca;
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
+	uart_sends(&debug_com, (uint8_t*)tx_buff);
 }
 
 void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp){
-	for(uint8_t i = 0; i < p_ca->hmi_csv.valid_msg_num; i++){
+	for(uint8_t i = 0; i < p_ca->hmi_csv.valid_msg_num; i++)
+	{
 		switch(p_ca->hmi_csv.cmd_code[i]){
 		case HMI_WRITE:
 			cab_app_process_hmi_write_command(p_ca, i, timestamp);
@@ -86,7 +92,8 @@ void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp){
 			break;
 		}
 
-		if(p_ca->hmi_csv.sub_obj[i] != ALL){
+		if(p_ca->hmi_csv.sub_obj[i] != ALL)
+		{
 			cab_app_confirm_hmi_cmd(p_ca, i, tx_buff);
 		}
 		p_ca->hmi_csv.is_new_msg_to_send[i] = 1;

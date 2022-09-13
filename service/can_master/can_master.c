@@ -9,6 +9,8 @@
 
 uint8_t reassign_attemp_cnt = 0;
 
+CAN_master CAN_master_obj;
+
 static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_cm);
 static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp);
 
@@ -189,17 +191,36 @@ void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint
 	can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 }
 
-void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave, uint32_t timestamp) {
+void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave, uint32_t timestamp)
+{
 	p_cm->assign_state = CM_ASSIGN_ST_AUTHORIZING;
 	can_master_read_slave_sn(p_cm, slave->node_id - p_cm->slave_start_node_id, timestamp);
 }
+void can_set_read_sn_func_pointer(CAN_master* p_cm,void (*read_serial_number_bp)(void))
+{
+//	(void)p_cm;
+//	CAN_master_obj.read_serial_number_bp = read_serial_number_bp;
+	p_cm->read_serial_number_bp = read_serial_number_bp;
+}
 
-void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timestamp) {
+void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timestamp)
+{
+
+//	CO_SDOclient_start_upload(p_sdo, server_node_id, index, sub_index, p_rx_obj, allowed_timeout_ms);
+//	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
+#if 0
 	co_sdo_read_object(p_cm,
 			SLAVE_SERIAL_NUMBER_OBJECT_INDEX,
 			p_cm->slaves[cab_id]->node_id,
 			p_cm->slaves[cab_id]->sn,
 			timestamp + SDO_READ_SN_TIMEOUT_mS);
+#else
+		if(p_cm->read_serial_number_bp != NULL)
+				{
+					p_cm->read_serial_number_bp;
+				}
+#endif
+
 }
 
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
@@ -258,6 +279,9 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 	    break;
 	case CM_ASSIGN_ST_START:
 		p_cm->assign_state = CM_ASSIGN_ST_SLAVE_SELECT;
+//		p_cm->p_hw->can_tx.DLC = 0;
+//		p_cm->p_hw->can_tx.StdId = CAN_NODE_ID_ASSIGN_COBID;
+//		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 		can_master_slave_select(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 		break;
 	case CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM:
@@ -285,7 +309,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 	case CM_ASSIGN_ST_DONE:
 		break;
 	case CM_ASSIGN_ST_FAIL:
-        p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
+//        p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
 		break;
 	}
 }

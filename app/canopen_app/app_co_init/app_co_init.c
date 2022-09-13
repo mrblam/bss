@@ -61,7 +61,7 @@ static void tpdo3_build_data_impl(uint8_t* buffer)
 static void tpdo4_build_data_impl(uint8_t* buffer)
 {
 	/* USER CODE BEGIN */
-
+	(void)buffer;
 	/* USER CODE END */
 }
 
@@ -76,49 +76,52 @@ void app_co_can_receive_handle(const uint32_t can_id, uint8_t* data)
 
 	/* USER CODE BEGIN */
 #if 0
-	uint32_t cob_id = p_hw->can_rx.StdId;
+	else
+	{
+		uint32_t cob_id = p_hw->can_rx.StdId;
 
-		switch(p_hw->can_rx.StdId & 0xFFFFFF80)
-		{
-			case CO_CAN_ID_TPDO_1:
-			case CO_CAN_ID_TPDO_2:
-			case CO_CAN_ID_TPDO_3:
-			case CO_CAN_ID_TPDO_4:
-			selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
-				break;
-			default:
-				break;
-		}
+			switch(p_hw->can_rx.StdId & 0xFFFFFF80)
+			{
+				case CO_CAN_ID_TPDO_1:
+				case CO_CAN_ID_TPDO_2:
+				case CO_CAN_ID_TPDO_3:
+				case CO_CAN_ID_TPDO_4:
+				selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
+					break;
+				default:
+					break;
+			}
 
-		/* if assign request message */
-		if (cob_id == selex_bss_app.base.node_id_scan_cobid) // bp send can_id = 0x70
-		{
-			if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST)
+			/* if assign request message */
+			if (cob_id == selex_bss_app.base.node_id_scan_cobid) // bp send can_id = 0x70
 			{
-				selex_bss_app.base.p_hw->can_tx.StdId = selex_bss_app.base.node_id_scan_cobid;
-				selex_bss_app.base.p_hw->can_tx.DLC = 0;
-				can_send(selex_bss_app.base.p_hw, selex_bss_app.base.p_hw->tx_data);
-				selex_bss_app.base.assign_state = CM_ASSIGN_ST_START;
+				if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST)
+				{
+					selex_bss_app.base.p_hw->can_tx.StdId = selex_bss_app.base.node_id_scan_cobid;
+					selex_bss_app.base.p_hw->can_tx.DLC = 0;
+					can_send(selex_bss_app.base.p_hw, selex_bss_app.base.p_hw->tx_data);
+					selex_bss_app.base.assign_state = CM_ASSIGN_ST_START;
+				}
+				else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_SLAVE_SELECT)
+				{
+					selex_bss_app.base.assign_state = CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;
+				}
+				else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM)
+				{
+					/* slave confirm assign id success*/
+					if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
+					cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp);
+				}
+				return;
 			}
-			else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_SLAVE_SELECT)
-			{
-				selex_bss_app.base.assign_state = CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM;
-			}
-			else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM)
-			{
-				/* slave confirm assign id success*/
-				if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
-				cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp);
-			}
-			return;
-		}
 
-		if (cob_id == selex_bss_app.base.sdo_server.rx_address)
-		{
-			CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
-			selex_bss_app.base.sdo_server.is_new_msg = 1;
-			HAL_CAN_DISABLE_IRQ;
-		}
+			if (cob_id == selex_bss_app.base.sdo_server.rx_address)
+			{
+				CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
+				selex_bss_app.base.sdo_server.is_new_msg = 1;
+				HAL_CAN_DISABLE_IRQ;
+			}
+	}
 #endif
 	/* USER CODE END */
 }
