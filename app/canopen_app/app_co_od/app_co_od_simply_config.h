@@ -16,8 +16,8 @@
 /************************************************************************************
  *					Set default value for CAN communication
  ************************************************************************************/
-#define	NODE_ID_DEFAULT		0x05
-#define CO_DEVICE			selex_bss_app.base.base		//<< canopen object
+#define	NODE_ID_DEFAULT		0x01
+#define CO_DEVICE			selex_bss_app.base.CO_base		//<< canopen object
 
 /* Identity */
 #define VENDER_ID			0x00000000	//<< option

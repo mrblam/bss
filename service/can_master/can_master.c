@@ -40,9 +40,8 @@ static void co_send_sync(CAN_master *p_cm) {
 }
 
 void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
-	if((p_cm->sdo_server.timeout <= timestamp)
-			&& (p_cm->sdo_server.timeout != 0)
-			&& (p_cm->sdo_server.state == SDO_ST_SENT)){
+	if((p_cm->sdo_server.timeout <= timestamp) && (p_cm->sdo_server.timeout != 0) && (p_cm->sdo_server.state == SDO_ST_SENT))
+	{/*time out*/
 		p_cm->sdo_server.state = SDO_ST_FAIL;
 		p_cm->sdo_server.timeout = 0;
 	}
@@ -178,7 +177,7 @@ void can_master_start_assign_next_slave(CAN_master *p_cm,const uint32_t timestam
 }
 #endif
 
-void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint32_t timestamp){
+void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint32_t timestamp){ //1
 	co_slave_set_con_state(slave, CO_SLAVE_CON_ST_ASSIGNING);
 //    p_cm->pdo_sync_timestamp = 0;
 	p_cm->assigning_slave = slave;
@@ -217,7 +216,7 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timesta
 #else
 		if(p_cm->read_serial_number_bp != NULL)
 				{
-					p_cm->read_serial_number_bp;
+					p_cm->read_serial_number_bp();
 				}
 #endif
 
@@ -293,23 +292,25 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 		p_cm->assign_timeout = timestamp + SLAVE_SELECT_CONFIRM_TIMEOUT_mS;
 		break;
 	case CM_ASSIGN_ST_AUTHORIZING:
-		can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
-		if (p_cm->sdo_server.state == SDO_ST_FAIL){
+		can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);///luon on khi giao tiep voi pin
+		if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_abort) //fail
+		{
 			p_cm->assign_state = CM_ASSIGN_ST_FAIL;
-			p_cm->sdo_server.state = SDO_ST_IDLE;
+			p_cm->CO_base.sdo_client.status == CO_SDO_RT_idle;
 		}
-		else if (p_cm->sdo_server.state == SDO_ST_SUCCESS){
+		else if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_success)
+		{
 			co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_AUTHORIZING);
 			p_cm->on_slave_assign_success(p_cm,	p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 			p_cm->pdo_sync_timestamp = timestamp + 20;
 			reassign_attemp_cnt = 0;
-			p_cm->sdo_server.state = SDO_ST_IDLE;
+			p_cm->CO_base.sdo_client.status == CO_SDO_RT_idle;
 		}
 		break;
 	case CM_ASSIGN_ST_DONE:
 		break;
 	case CM_ASSIGN_ST_FAIL:
-//        p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
+        p_cm->on_slave_assign_fail(p_cm, p_cm->assigning_slave->node_id-p_cm->slave_start_node_id);
 		break;
 	}
 }

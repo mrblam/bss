@@ -2,12 +2,13 @@ PROJ_ROOT=.
 CC=arm-none-eabi-gcc
 LIB=libCANOpen
 
-CPU=-mcpu=cortex-m4
+CPU=-mcpu=cortex-m3
 OPTIMIZE=-Og
+#OPTIMIZE=-O3
 #FPU=-mfloat-abi=hard -mfpu=fpv4-sp-d16
-#FPU=-mfloat-abi=softfp -mfpu=fpv4-sp-d16
+FPU=-mfloat-abi=softfp -mfpu=fpv4-sp-d16
 #FPU:=-mfloat-abi=hard -fsingle-precision-constant -mfpu=fpv4-sp-d16
-FPU:=-mfloat-abi=softfp -fsingle-precision-constant -mfpu=fpv4-sp-d16
+#FPU:=-mfloat-abi=softfp -fsingle-precision-constant -mfpu=fpv4-sp-d16
 
 # Option arguments for C compiler.
 CFLAGS+=-mthumb ${CPU} ${FPU}

@@ -88,6 +88,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
 		}
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
+		CO_process(&CO_DEVICE,10);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 
 		break;
@@ -98,8 +99,9 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 }
 
-void TIM3_IRQHandler(void) {
+void TIM3_IRQHandler(void) { //// 1ms
 	com_timestamp += sys_tick_ms;
+	/*CO_process*/
 
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
@@ -135,18 +137,18 @@ static void can_receive_handle(CAN_Hw *p_hw)
 #endif
 	uint32_t cob_id = p_hw->can_rx.StdId;
 
-	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
-	{
-		case CO_CAN_ID_TPDO_1:
-		case CO_CAN_ID_TPDO_2:
-		case CO_CAN_ID_TPDO_3:
-		case CO_CAN_ID_TPDO_4:
-		selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
-			break;
-		default:
-			break;
-	}
-
+//	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
+//	{
+//		case CO_CAN_ID_TPDO_1:
+//		case CO_CAN_ID_TPDO_2:
+//		case CO_CAN_ID_TPDO_3:
+//		case CO_CAN_ID_TPDO_4:
+//		selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
+//			break;
+//		default:
+//			break;
+//	}
+	//CO_can_receive_basic_handle(&CO_DEVICE, cob_id, p_hw->rx_data);
 	/* if assign request message */
 	if (cob_id == selex_bss_app.base.node_id_scan_cobid) // bp send can_id = 0x70
 	{
@@ -170,12 +172,12 @@ static void can_receive_handle(CAN_Hw *p_hw)
 		return;
 	}
 
-	if (cob_id == selex_bss_app.base.sdo_server.rx_address)
-	{
-		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
-		selex_bss_app.base.sdo_server.is_new_msg = 1;
-		HAL_CAN_DISABLE_IRQ;
-	}
+//	if (cob_id == selex_bss_app.base.sdo_server.rx_address)
+//	{
+//		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
+//		selex_bss_app.base.sdo_server.is_new_msg = 1;
+//		HAL_CAN_DISABLE_IRQ;
+//	}
 }
 
 static void cab_app_update_io_cab_state(Cabinet_App* p_app)
