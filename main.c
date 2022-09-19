@@ -148,7 +148,7 @@ static void can_receive_handle(CAN_Hw *p_hw)
 //		default:
 //			break;
 //	}
-	//CO_can_receive_basic_handle(&CO_DEVICE, cob_id, p_hw->rx_data);
+	CO_can_receive_basic_handle(&CO_DEVICE, cob_id, p_hw->rx_data);
 	/* if assign request message */
 	if (cob_id == selex_bss_app.base.node_id_scan_cobid) // bp send can_id = 0x70
 	{

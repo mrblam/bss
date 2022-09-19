@@ -31,6 +31,17 @@ static inline void CO_memcpy(uint8_t dest[], const uint8_t src[], const uint16_t
     }
 }
 
+/* Return 1: same, return 0: difference */
+static inline bool CO_memcmp(uint8_t* buff1, uint8_t* buff2, uint16_t len)
+{
+	uint16_t i = 0;
+	for(; i<len; i++)
+	{
+		if(buff1[i] != buff2[i]) return 0;
+	}
+	return 1;
+}
+
 static inline uint16_t CO_getUint16(const uint8_t data[]){
     CO_bytes_t b;
     b.u8[0] = data[0];

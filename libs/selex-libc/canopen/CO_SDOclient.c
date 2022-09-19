@@ -202,7 +202,7 @@ static inline CO_SDO_return_t CO_SDOclient_process_(CO_SDO *p_sdo, const uint16_
 		if(p_sdo->rx_msg.is_new)
 		{
 			CO_SDOtimeout_reset_and_inactivate(p_sdo);
-			if ((p_sdo->rx_msg.data[0] >> 5) == CCS_ABORT)
+			if ((p_sdo->rx_msg.data[0] >> 5) == SCS_ABORT)
 			{
 				/* Receive abort msg from server */
 				p_sdo->rx_abort_code 	= CO_getUint32(&p_sdo->rx_msg.data[4]);
@@ -251,8 +251,8 @@ static inline CO_SDO_return_t CO_SDOclient_process_(CO_SDO *p_sdo, const uint16_
 		default:
 			break;
 		}
+		p_sdo->rx_msg.is_new	= 0;
 	}
-	p_sdo->rx_msg.is_new	= 0;
 	return ret;
 }
 

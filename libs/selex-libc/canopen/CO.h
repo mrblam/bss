@@ -40,16 +40,16 @@
 typedef struct CO_t CO;
 
 struct CO_t{
-	uint32_t	device_type;					//0x1000
-	uint32_t 	status;							//0x1002
-//	uint32_t 	comm_cycle_ms;					//0x1006 Communication cycle period
-//	uint32_t 	sync_window_len_ms;				//0x1007 Synchronous window length
-	uint16_t 	guard_time;						//0x100C
-	uint8_t		life_time_factor;				//0x100D
-	uint32_t 	high_resolution_timestamp;		//0x1013
-//	uint32_t 	consumer_heartbeat_time;		//0x1016
-//	uint32_t 	producer_heartbeat_time;		//0x1017
-	volatile CO_OD_Identity_t* p_identity;		//0x1018
+	uint32_t	device_type;			//0x1000
+	uint32_t 	status;					//0x1002
+//	uint32_t 	comm_cycle_ms;			//0x1006 Communication cycle period
+//	uint32_t 	sync_window_len_ms;		//0x1007 Synchronous window length
+	uint16_t 	guard_time;				//0x100C
+	uint8_t		life_time_factor;		//0x100D
+	uint32_t 	high_resolution_timestamp;	//0x1013
+//	uint32_t 	consumer_heartbeat_time;	//0x1016
+//	uint32_t 	producer_heartbeat_time;	//0x1017
+	volatile CO_OD_Identity_t* p_identity;			//0x1018
 
 	CO_OD* 		p_od;
 //	uint8_t 	node_id;				/**< True in un-configured LSS slave */

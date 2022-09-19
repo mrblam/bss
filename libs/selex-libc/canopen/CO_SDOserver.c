@@ -175,9 +175,9 @@ static inline CO_SDO_return_t CO_SDOserver_process_(CO_SDO *p_sdo, const uint16_
 		default:
 			break;
 		}
+		p_sdo->rx_msg.is_new	= 0;
 	}
 	if(p_sdo->state == CO_SDO_ST_IDLE) ret = CO_SDO_RT_idle;
-	p_sdo->rx_msg.is_new	= 0;
 	return ret;
 
 }

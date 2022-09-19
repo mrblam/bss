@@ -5,8 +5,10 @@
 
 void CO_SDO_abort_and_response(CO_SDO *p_sdo, const uint32_t code)
 {
+	p_sdo->tx_msg.data[0] = (uint8_t)(CCS_ABORT << 5);
 	CO_memcpy(&(p_sdo->tx_msg.data[4]), (uint8_t*) &code, 4);
 	p_sdo->tx_msg.data_len = 8;
+
 	CO_CAN_send(&p_sdo->tx_msg);
 
 	CO_SDO_abort(p_sdo, code);

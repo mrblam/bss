@@ -16,6 +16,7 @@ void CO_TPDO_init(CO_TPDO *p_tpdo,
 	p_tpdo->comm_parameter.transmission_type = p_tpdo_comm_parameter->transmission_type;
 	p_tpdo->comm_parameter.max_inhibit_type_ms = p_tpdo_comm_parameter->max_inhibit_type_ms;
 	p_tpdo->comm_parameter.max_event_time_ms = p_tpdo_comm_parameter->max_event_time_ms;
+	p_tpdo->comm_parameter.sync_mask_reg = p_tpdo_comm_parameter->sync_mask_reg;
 	p_tpdo->comm_parameter.sync_start_value = p_tpdo_comm_parameter->sync_start_value;
 
 	p_tpdo->base.msg.id.cob_id = p_tpdo->comm_parameter.id.cob_id;
