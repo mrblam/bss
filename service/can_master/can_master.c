@@ -304,6 +304,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 			p_cm->on_slave_assign_success(p_cm,	p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 			p_cm->pdo_sync_timestamp = timestamp + 20;
 			reassign_attemp_cnt = 0;
+//			CO_SDO_get_status(&p_c)
 			p_cm->CO_base.sdo_client.status == CO_SDO_RT_idle;
 		}
 		break;

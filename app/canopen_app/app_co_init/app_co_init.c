@@ -7,6 +7,7 @@
 
 #include "app_co_init.h"
 #include <stdbool.h>
+#include "can_hardware.h"
 
 #if 0
 /* Save all communication profile data value in flash to use after reset */
@@ -68,6 +69,9 @@ static void tpdo4_build_data_impl(uint8_t* buffer)
 /* Define can_send message function */
 static void app_co_can_send_impl(CO_CAN_Msg* p_msg)
 {
+	can_port.can_tx.StdId = p_msg->id.can_id;
+	can_port.can_tx.DLC = p_msg->data_len;
+	can_send(&can_port, p_msg->data);
 }
 /* Call in receive can interrupt */
 void app_co_can_receive_handle(const uint32_t can_id, uint8_t* data)

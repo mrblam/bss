@@ -16,12 +16,15 @@ static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 static void master_read_serial_number(void);
 
-uint8_t serial_number_var[10];
+//bool sync_was;
+//static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was);
+
+uint8_t serial_number_var[32];
 CO_Sub_Object serial_number_sobj =
 	{
 			.p_data = serial_number_var,	//<< Address variable receiving data
 			.attr	= ODA_SDO_RW,			//<< [skip] set ODA_SDO_RW
-			.len	= 10,					//<< Maximum data size that can be received
+			.len	= 32,					//<< Maximum data size that can be received
 			.p_ext	= NULL					//<< [option], set NULL if not used
 	};
 
@@ -102,7 +105,9 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
 void TIM3_IRQHandler(void) { //// 1ms
 	com_timestamp += sys_tick_ms;
 	/*CO_process*/
-
+//	static bool tpdo_send_req = false;
+	//sync_was = CO_SYNC_process(&CO_DEVICE.sync, 1, 1);
+	//CO_process_tpdo(&CO_DEVICE, 1, tpdo_send_req);
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 
@@ -197,3 +202,11 @@ static void master_read_serial_number()
 {
 	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
 }
+
+//static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was)
+//{
+//    for (uint8_t i = 0; i < TPDO_NUMBER; i++)
+//    {
+//        CO_TPDO_process(&p_co->tpdos[i],time_diff_ms, sync_was);
+//    }
+//}
