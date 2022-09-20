@@ -29,6 +29,7 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 	if(p_ca->base.sdo_server.state != SDO_ST_IDLE) return;
 
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 3;
+	/*On BP*/
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
 			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4,
@@ -39,6 +40,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 	if(p_ca->base.sdo_server.state != SDO_ST_IDLE) return;
 
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 0;
+	/*Off BP*/
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
 			(uint8_t*)&p_ca->bss.cabs[cab_id].bp->charge_sw_state, 4,

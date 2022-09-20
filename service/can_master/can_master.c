@@ -41,19 +41,22 @@ static void co_send_sync(CAN_master *p_cm) {
 
 void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 	if((p_cm->sdo_server.timeout <= timestamp) && (p_cm->sdo_server.timeout != 0) && (p_cm->sdo_server.state == SDO_ST_SENT))
-	{/*time out*/
+	{
+		/*time out*/
 		p_cm->sdo_server.state = SDO_ST_FAIL;
 		p_cm->sdo_server.timeout = 0;
 	}
 
-	if (p_cm->sdo_server.is_new_msg == 1) {
+	if (p_cm->sdo_server.is_new_msg == 1)
+	{
+
 		can_master_process_sdo(p_cm, timestamp);
 		p_cm->sdo_server.is_new_msg = 0;
 		HAL_CAN_ENABLE_IRQ;
 		return;
 	}
 
-	/* Send Sync request msg every 2s */
+	/* Send Sync request msg every 2s */ //40s
 	if((p_cm->pdo_sync_timestamp <= timestamp) && (p_cm->pdo_sync_timestamp != 0)){
 		co_send_sync(p_cm);
 		p_cm->pdo_sync_timestamp = timestamp + PDO_READ_BP_DATA_TIME_mS;
@@ -221,10 +224,10 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timesta
 #endif
 
 }
-
-void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
-		uint8_t *rx_buff, const uint32_t timeout) {
 #if 1
+void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
+		uint8_t *rx_buff, const uint32_t timeout)
+{
 	p_cm->pdo_sync_timestamp = 0;
 	p_cm->sdo_server.node_id_processing = node_id;
 	p_cm->sdo_server.timeout = timeout;
@@ -241,8 +244,8 @@ void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t nod
 	p_cm->p_hw->tx_data[3] = (uint8_t) ((p_cm->sdo_server.object_mux & 0x000000ff));
 	can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 	p_cm->sdo_server.state = SDO_ST_SENT;
-#endif
 }
+#endif
 
 void co_sdo_write_object(CAN_master *p_cm, const uint32_t mux,const uint32_t node_id,
 		uint8_t *tx_buff, const uint32_t len, const uint32_t timeout) {

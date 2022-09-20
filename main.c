@@ -19,14 +19,6 @@ static void master_read_serial_number(void);
 //bool sync_was;
 //static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was);
 
-uint8_t serial_number_var[32];
-CO_Sub_Object serial_number_sobj =
-	{
-			.p_data = serial_number_var,	//<< Address variable receiving data
-			.attr	= ODA_SDO_RW,			//<< [skip] set ODA_SDO_RW
-			.len	= 32,					//<< Maximum data size that can be received
-			.p_ext	= NULL					//<< [option], set NULL if not used
-	};
 
 static Cabinet 		bss_cabinets[CABINET_INIT];
 static CO_Slave*	bp_slaves[CABINET_INIT];
@@ -36,6 +28,16 @@ static uint32_t 	sys_tick_ms = APP_STATE_MACHINE_UPDATE_TICK_mS;
 static uint32_t 	com_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
+uint8_t serial_number_var[32];
+CO_Sub_Object serial_number_sobj =
+	{
+			.p_data = serial_number_var,	//<< Address variable receiving data
+			.attr	= ODA_SDO_RW,			//<< [skip] set ODA_SDO_RW
+			.len	= 32,					//<< Maximum data size that can be received
+			.p_ext	= NULL					//<< [option], set NULL if not used
+	};
+
+
 
 void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->bss.cab_num = CABINET_CELL_NUM;
@@ -79,7 +81,8 @@ int main(void) {
 	while (1);
 }
 
-void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
+void HAL_STATE_MACHINE_UPDATE_TICK(void)
+{					//10ms /// 0.2s
 	sys_timestamp += sys_tick_ms;
 
 	switch(selex_bss_app.bss.state){
@@ -105,7 +108,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void) {					//10ms
 void TIM3_IRQHandler(void) { //// 1ms
 	com_timestamp += sys_tick_ms;
 	/*CO_process*/
-//	static bool tpdo_send_req = false;
+	//static bool tpdo_send_req = false;
 	//sync_was = CO_SYNC_process(&CO_DEVICE.sync, 1, 1);
 	//CO_process_tpdo(&CO_DEVICE, 1, tpdo_send_req);
 	/* Process RS485 Protocol */
@@ -142,17 +145,17 @@ static void can_receive_handle(CAN_Hw *p_hw)
 #endif
 	uint32_t cob_id = p_hw->can_rx.StdId;
 
-//	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
-//	{
-//		case CO_CAN_ID_TPDO_1:
-//		case CO_CAN_ID_TPDO_2:
-//		case CO_CAN_ID_TPDO_3:
-//		case CO_CAN_ID_TPDO_4:
-//		selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
-//			break;
-//		default:
-//			break;
-//	}
+	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
+	{
+		case CO_CAN_ID_TPDO_1:
+		case CO_CAN_ID_TPDO_2:
+		case CO_CAN_ID_TPDO_3:
+		case CO_CAN_ID_TPDO_4:
+		selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
+			break;
+		default:
+			break;
+	}
 	CO_can_receive_basic_handle(&CO_DEVICE, cob_id, p_hw->rx_data);
 	/* if assign request message */
 	if (cob_id == selex_bss_app.base.node_id_scan_cobid) // bp send can_id = 0x70
