@@ -27,6 +27,7 @@ void can_master_init(CAN_master *p_cm, CO_Slave **slaves, const uint32_t slave_n
 	p_cm->slave_start_node_id = CABINET_START_NODE_ID;
 	p_cm->slaves = slaves;
 	p_cm->p_hw = p_hw;
+	p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
 	p_cm->sdo_server.state = SDO_ST_IDLE;
 	p_cm->sdo_server.is_new_msg = 0;
 	p_cm->slave_num = slave_num;
@@ -50,7 +51,7 @@ void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
 	if (p_cm->sdo_server.is_new_msg == 1)
 	{
 
-		can_master_process_sdo(p_cm, timestamp);
+		can_master_process_sdo(p_cm, timestamp); // ko can dung vi thu vien moi da ho tro
 		p_cm->sdo_server.is_new_msg = 0;
 		HAL_CAN_ENABLE_IRQ;
 		return;
@@ -204,7 +205,10 @@ void can_set_read_sn_func_pointer(CAN_master* p_cm,void (*read_serial_number_bp)
 //	CAN_master_obj.read_serial_number_bp = read_serial_number_bp;
 	p_cm->read_serial_number_bp = read_serial_number_bp;
 }
-
+void can_set_sdo_write_obj_func_pointer(CAN_master* p_cm,void (*sdo_write_object)(void))
+{
+	p_cm->sdo_write_object = sdo_write_object;
+}
 void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timestamp)
 {
 
@@ -299,7 +303,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 		if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_abort) //fail
 		{
 			p_cm->assign_state = CM_ASSIGN_ST_FAIL;
-			p_cm->CO_base.sdo_client.status == CO_SDO_RT_idle;
+			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
 		}
 		else if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_success)
 		{
@@ -308,7 +312,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 			p_cm->pdo_sync_timestamp = timestamp + 20;
 			reassign_attemp_cnt = 0;
 //			CO_SDO_get_status(&p_c)
-			p_cm->CO_base.sdo_client.status == CO_SDO_RT_idle;
+			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
 		}
 		break;
 	case CM_ASSIGN_ST_DONE:

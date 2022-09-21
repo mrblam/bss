@@ -30,14 +30,14 @@
 #define SW_VERSION			0x00000000	//<< option
 
 /* */
-#define CO_CF_1008_DEVICE_NAME			"SELEX_BSS"
+#define CO_CF_1008_DEVICE_NAME			"SELEX_BSS_MASTER"
 #define CO_CF_1008_DEVICE_NAME_SIZE		(sizeof(CO_CF_1008_DEVICE_NAME))
 
 /* Synchronous schedule */
 #define CO_CF_1006_COMM_CYCLE_PERIOD_MS					(10U)	//<< Set according to synchronous scheduled
 #define CO_CF_1007_SYNC_WINDO_LENGTH_MS					(5U)	//<< Set according to synchronous scheduled
-#define CO_CF_1019_SYNC_CTER_OVER_FLOW_VALUE			(25U)	//<< Set according to synchronous scheduled. Setting range: 1-30000
-#define CO_CF_1030_SYNC_BIT_POS_OVER_FLOW_VALUE			(11U)	//<< Set according to synchronous scheduled. Setting range: 0-31
+#define CO_CF_1019_SYNC_CTER_OVER_FLOW_VALUE			(150U)	//<< Set according to synchronous scheduled. Setting range: 1-30000
+#define CO_CF_1030_SYNC_BIT_POS_OVER_FLOW_VALUE			(1U)	//<< Set according to synchronous scheduled. Setting range: 0-31
 
 #define CO_CF_100500_SYNC_ENABLE						CO_SYNC_VALID		//<< Enable sync mode: Set CO_SYNC_VALID
 																			//   Disable sync mode: set CO_SYNC_NOT_VALID

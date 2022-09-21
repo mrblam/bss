@@ -120,6 +120,8 @@ struct CAN_master_t{
 	void (*reassign_attemp)(CAN_master* p_cm);
 	void (*rpdo_process)(const CAN_master* const p_cm);
 	void 				(*read_serial_number_bp)(void);
+	void 				(*sdo_write_object)(void);
+
 };
 
 extern uint8_t reassign_attemp_cnt;
@@ -137,6 +139,7 @@ void co_sdo_write_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node
 void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint32_t timestamp);
 void can_master_disable_pdo(CAN_master* p_cm);
 void can_set_read_sn_func_pointer(CAN_master* p_cm,void (*read_serial_number_bp)(void));
+void can_set_sdo_write_obj_func_pointer(CAN_master* p_cm,void (*sdo_write_object)(void));
 
 static inline void can_master_slave_select(const CAN_master* p_cm, const uint32_t id){
 	p_cm->slave_select(p_cm,id);

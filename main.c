@@ -15,7 +15,7 @@ RS485_Master rs485m;
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 static void master_read_serial_number(void);
-
+static void master_write_object(void);
 //bool sync_was;
 //static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was);
 
@@ -62,6 +62,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 	can_master_init((CAN_master*) p_ca, bp_slaves, CABINET_CELL_NUM, &can_port);
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
 	can_set_read_sn_func_pointer((CAN_master*) p_ca,master_read_serial_number);
+	can_set_sdo_write_obj_func_pointer((CAN_master*) p_ca,master_write_object);
 	/*CANOpen Init */
 	app_co_init();
 }
@@ -93,7 +94,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 			cab_app_update_io_cab_state(&selex_bss_app);
 		}
 		bss_update_cabinets_state(&selex_bss_app.bss);
-		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp);
+		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
 		CO_process(&CO_DEVICE,10);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 
@@ -205,7 +206,10 @@ static void master_read_serial_number()
 {
 	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
 }
-
+static void master_write_object()
+{
+	CO_SDOclient_start_download(&CO_DEVICE.sdo_client, 5, 0x2003, 0x01, &serial_number_sobj, 2000);
+}
 //static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was)
 //{
 //    for (uint8_t i = 0; i < TPDO_NUMBER; i++)
