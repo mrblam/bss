@@ -152,7 +152,7 @@ static void cabinet_io_scan_timer_init(void){
 
 static void cabinet_io_scan_timer_init_nvic(void){
 	/* TIM3 interrupt Init */
-	HAL_NVIC_SetPriority(TIM3_IRQn, PROCESS_DATA_COM_IRQN_PRIORITY, 0);
+	HAL_NVIC_SetPriority(TIM3_IRQn, TIMER3_PROCESS_DATA_COM_IRQN_PRIORITY, 0);
 	HAL_NVIC_EnableIRQ(TIM3_IRQn);
 }
 

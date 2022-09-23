@@ -44,7 +44,7 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 }
 
 void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
-	if(p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle) return;
+	if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_idle) return;
 
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 0;
 	/*Off BP*/

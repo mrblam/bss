@@ -120,7 +120,7 @@ struct CAN_master_t{
 	void (*reassign_attemp)(CAN_master* p_cm);
 	void (*rpdo_process)(const CAN_master* const p_cm);
 	void 				(*read_serial_number_bp)(void);
-	void 				(*sdo_write_object)(void);
+	bool 				(*sdo_write_object)(void);
 
 };
 

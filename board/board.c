@@ -7,6 +7,7 @@ void board_init(void){
 	max485_hw_init();
 	can_hardware_init();
 	cabinet_hw_init();
+//	timer_hw_init();
 	//adc_hw_init();
 	master_hw_init();
 }

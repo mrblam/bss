@@ -18,6 +18,7 @@ static void iwdg_timer_config(void);
 void core_hw_init(void){
 	system_clock_config();
 	system_tick_config();
+
 #if ENABLE_IWDG_TIMER
 	iwdg_timer_config();
 #endif

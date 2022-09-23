@@ -45,10 +45,10 @@ static void hmi_process_data_timer_init(void){
 
 static void hmi_process_data_timer_nvic(void){
 	/* TIM2 interrupt Init */
-	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(TIM2_IRQn, TIMER2_IRQN_PRIORITY, 0);
 	HAL_NVIC_EnableIRQ(TIM2_IRQn);
 }
-
+#if 1
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle){
 	if(tim_baseHandle->Instance==HMI_TIMER){
 		/* TIM2 clock enable */
@@ -59,4 +59,4 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle){
 		__HAL_RCC_TIM3_CLK_ENABLE();
 	}
 }
-
+#endif

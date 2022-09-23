@@ -9,7 +9,7 @@
 #define BOARD_CORE_HAL_H_
 #include "compiler_optimize.h"
 #include "core_hw.h"
-
+//#include "timer_hw.h"
 #define HAL_SYSTICK_FREQ_Hz                             SYSTICK_FREQ_Hz
 
 void core_hw_init(void) WEAK;

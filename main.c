@@ -15,7 +15,7 @@ RS485_Master rs485m;
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 static void master_read_serial_number(void);
-static void master_write_object(void);
+static bool master_write_object(void);
 //bool sync_was;
 //static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was);
 
@@ -26,6 +26,7 @@ static Charger 		bss_chargers[CHARGER_NUM];
 
 static uint32_t 	sys_tick_ms = APP_STATE_MACHINE_UPDATE_TICK_mS;
 static uint32_t 	com_timestamp = 0;
+uint32_t 	tim2_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
 uint8_t serial_number_var[32];
@@ -36,7 +37,14 @@ CO_Sub_Object serial_number_sobj =
 			.len	= 32,					//<< Maximum data size that can be received
 			.p_ext	= NULL					//<< [option], set NULL if not used
 	};
-
+uint8_t exam_var	= 4;
+CO_Sub_Object exam_tx_obj =
+{
+		.p_data = &exam_var,	//<< Address variable receiving data
+		.attr	= ODA_SDO_RW,	//<< [skip] set ODA_SDO_RW
+		.len	= 1,			//<< data size
+		.p_ext	= NULL		//<< [skip] set NULL
+};
 
 
 void cab_app_init(Cabinet_App *p_ca) {
@@ -81,21 +89,27 @@ int main(void) {
 	}
 	while (1);
 }
-
+/*
+void TIM2_IRQHandler(void)   //1ms
+{
+	sys_timestamp += sys_tick_ms;
+	CO_process(&CO_DEVICE,1);
+}
+*/
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {					//10ms /// 0.2s
 	sys_timestamp += sys_tick_ms;
-
 	switch(selex_bss_app.bss.state){
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
+
 			cab_app_update_connected_cab_state(&selex_bss_app);
-			cab_app_update_io_cab_state(&selex_bss_app);
+			cab_app_update_io_cab_state(&selex_bss_app);///
 		}
+//		CO_process(&CO_DEVICE,10);////muc uu tien cao hon while cua ham sdo download
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
-		CO_process(&CO_DEVICE,10);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 
 		break;
@@ -106,12 +120,12 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 }
 
-void TIM3_IRQHandler(void) { //// 1ms
+void TIM3_IRQHandler(void) { //// 10ms
 	com_timestamp += sys_tick_ms;
+
 	/*CO_process*/
-	//static bool tpdo_send_req = false;
-	//sync_was = CO_SYNC_process(&CO_DEVICE.sync, 1, 1);
-	//CO_process_tpdo(&CO_DEVICE, 1, tpdo_send_req);
+	CO_process(&CO_DEVICE,10);
+
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 
@@ -204,11 +218,28 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 }
 static void master_read_serial_number()
 {
+//	CO_SDO_reset_status(&CO_DEVICE.sdo_client);
 	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
 }
-static void master_write_object()
+static bool master_write_object()
 {
-	CO_SDOclient_start_download(&CO_DEVICE.sdo_client, 5, 0x2003, 0x01, &serial_number_sobj, 2000);
+	CO_SDO* p_sdo = &CO_DEVICE.sdo_client;
+	// Waiting status SDOclient = idle
+	while(CO_SDO_get_status(p_sdo) != CO_SDO_RT_idle);
+
+	// Start command
+	CO_SDOclient_start_download(&CO_DEVICE.sdo_client, 5, 0x2003, 0x01, &exam_tx_obj, 2000);
+
+	// Waiting process is complete
+//	while(CO_SDO_get_status(p_sdo) == CO_SDO_RT_busy);
+	if(CO_SDO_get_status(p_sdo) == CO_SDO_RT_success)
+	{
+		return 1; //success
+	}
+	else
+	{
+		return 0; //fail
+	}
 }
 //static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was)
 //{
