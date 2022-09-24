@@ -131,7 +131,7 @@ static void cabinet_io_scan_timer_init(void){
 	  io_scan_timer.Instance = IO_SCAN_TIMER;
 	  io_scan_timer.Init.Prescaler = 71;
 	  io_scan_timer.Init.CounterMode = TIM_COUNTERMODE_UP;
-	  io_scan_timer.Init.Period = 9999;
+	  io_scan_timer.Init.Period = 999;
 	  io_scan_timer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	  io_scan_timer.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	  if (HAL_TIM_Base_Init(&io_scan_timer) != HAL_OK){

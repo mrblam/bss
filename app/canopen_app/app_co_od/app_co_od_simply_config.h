@@ -50,7 +50,7 @@
 /* Synchronous client SDOs */
 #define CO_CF_103200_SDO_CLI_SYNC_TRANS_TYPE			(0)				//<< Set according to synchronous scheduled
 																		//   Set 0 if you want disable sync mode, switch to always communication mode
-#define CO_CF_103201_SDO_CLI_SYNC_MASK_REGISTER			(0x00000000)	//<< Set according to synchronous scheduled, default: 0x00000000
+#define CO_CF_103201_SDO_CLI_SYNC_MASK_REGISTER			(0x00000003)	//<< Set according to synchronous scheduled, default: 0x00000000
 
 /* Synchronous TPDOs */
 #define CO_CF_180000_TPDO1_ENABLE						CO_PDO_NOT_VALID	//<< Set CO_PDO_VALID if used, otherwise, set CO_PDO_NOT_VALID

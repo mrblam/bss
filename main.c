@@ -37,7 +37,7 @@ CO_Sub_Object serial_number_sobj =
 			.len	= 32,					//<< Maximum data size that can be received
 			.p_ext	= NULL					//<< [option], set NULL if not used
 	};
-uint8_t exam_var	= 4;
+uint8_t exam_var	= 3;        // 3 ok
 CO_Sub_Object exam_tx_obj =
 {
 		.p_data = &exam_var,	//<< Address variable receiving data
@@ -109,7 +109,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		}
 //		CO_process(&CO_DEVICE,10);////muc uu tien cao hon while cua ham sdo download
 		bss_update_cabinets_state(&selex_bss_app.bss);
-		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
+//		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 
 		break;
@@ -120,11 +120,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 }
 
-void TIM3_IRQHandler(void) { //// 10ms
+void TIM3_IRQHandler(void) { //// 1ms
 	com_timestamp += sys_tick_ms;
-
-	/*CO_process*/
-	CO_process(&CO_DEVICE,10);
 
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
@@ -136,6 +133,7 @@ void TIM3_IRQHandler(void) { //// 10ms
 			cab_app_check_buffer(&selex_bss_app);
 		}
 	}
+
 	/* Sync Data to HMI */
 	for(uint8_t i = 0; i < selex_bss_app.hmi_csv.valid_msg_num; i++){
 		if(selex_bss_app.hmi_csv.is_new_msg_to_send[i]){
@@ -143,6 +141,9 @@ void TIM3_IRQHandler(void) { //// 10ms
 			selex_bss_app.hmi_csv.is_new_msg_to_send[i] = 0;
 		}
 	}
+
+	/*CO_process*/
+		CO_process(&CO_DEVICE,10);
 
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
@@ -225,7 +226,7 @@ static bool master_write_object()
 {
 	CO_SDO* p_sdo = &CO_DEVICE.sdo_client;
 	// Waiting status SDOclient = idle
-	while(CO_SDO_get_status(p_sdo) != CO_SDO_RT_idle);
+//	while(CO_SDO_get_status(p_sdo) != CO_SDO_RT_idle);
 
 	// Start command
 	CO_SDOclient_start_download(&CO_DEVICE.sdo_client, 5, 0x2003, 0x01, &exam_tx_obj, 2000);

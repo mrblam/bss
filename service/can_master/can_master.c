@@ -41,6 +41,7 @@ static void co_send_sync(CAN_master *p_cm) {
 }
 
 void can_master_process(CAN_master *p_cm, const uint32_t timestamp) {
+
 	if((p_cm->sdo_server.timeout <= timestamp) && (p_cm->sdo_server.timeout != 0) && (p_cm->sdo_server.state == SDO_ST_SENT))
 	{
 		/*time out*/
