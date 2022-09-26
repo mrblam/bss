@@ -17,7 +17,7 @@ static void cab_app_update_io_cab_state(Cabinet_App*);
 static void master_read_serial_number(void);
 static bool master_write_object(void);
 //bool sync_was;
-//static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was);
+static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was);
 
 
 static Cabinet 		bss_cabinets[CABINET_INIT];
@@ -37,7 +37,7 @@ CO_Sub_Object serial_number_sobj =
 			.len	= 32,					//<< Maximum data size that can be received
 			.p_ext	= NULL					//<< [option], set NULL if not used
 	};
-uint8_t exam_var	= 3;        // 3 ok
+uint8_t exam_var	= 2;        // 3 ok
 CO_Sub_Object exam_tx_obj =
 {
 		.p_data = &exam_var,	//<< Address variable receiving data
@@ -112,6 +112,22 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 //		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 
+			bool sync_was;
+			static bool tpdo_send_req = false;
+
+			sync_was = CO_SYNC_process(&CO_DEVICE.sync, 1, 10);
+			for(int i=0;i<1000;i++);
+//			CO_SDOserver_process(&p_co->sdo_server, time_diff_ms);
+			CO_SDOclient_process(&CO_DEVICE.sdo_client, 10);
+
+//			CO_process_tpdo(&CO_DEVICE, 10, tpdo_send_req);
+//			tpdo_send_req = false;
+//			if(true == sync_was)
+//			{
+//				tpdo_send_req = true;
+//			}
+
+
 		break;
 	case BSS_ST_INIT:
 	case BSS_ST_FAIL:
@@ -143,7 +159,7 @@ void TIM3_IRQHandler(void) { //// 1ms
 	}
 
 	/*CO_process*/
-		CO_process(&CO_DEVICE,10);
+		CO_process(&CO_DEVICE,1);
 
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
@@ -242,10 +258,10 @@ static bool master_write_object()
 		return 0; //fail
 	}
 }
-//static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was)
-//{
-//    for (uint8_t i = 0; i < TPDO_NUMBER; i++)
-//    {
-//        CO_TPDO_process(&p_co->tpdos[i],time_diff_ms, sync_was);
-//    }
-//}
+static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was)
+{
+    for (uint8_t i = 0; i < TPDO_NUMBER; i++)
+    {
+        CO_TPDO_process(&p_co->tpdos[i],time_diff_ms, sync_was);
+    }
+}
