@@ -126,6 +126,10 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 //			{
 //				tpdo_send_req = true;
 //			}
+		if(selex_bss_app.base.assign_state == CM_ASSIGN_ST_AUTHORIZING)
+				{
+					CO_memcpy(bss_cabinets->bp->base.sn, serial_number_var, 32); //success
+				}
 
 
 		break;
@@ -159,7 +163,7 @@ void TIM3_IRQHandler(void) { //// 1ms
 	}
 
 	/*CO_process*/
-		CO_process(&CO_DEVICE,1);
+//		CO_process(&CO_DEVICE,1);
 
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
@@ -235,8 +239,15 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 }
 static void master_read_serial_number()
 {
+//	CO_SDO* p_sdo = &CO_DEVICE.sdo_client;
 //	CO_SDO_reset_status(&CO_DEVICE.sdo_client);
 	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
+//	while(CO_SDO_get_status(p_sdo) == CO_SDO_RT_busy);
+//		if(CO_SDO_get_status(p_sdo) == CO_SDO_RT_success)
+//		{
+//			CO_memcpy(bss_cabinets->bp->base.sn, serial_number_var, 32); //success
+//		}
+
 }
 static bool master_write_object()
 {
