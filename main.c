@@ -27,6 +27,7 @@ static Charger 		bss_chargers[CHARGER_NUM];
 static uint32_t 	sys_tick_ms = APP_STATE_MACHINE_UPDATE_TICK_mS;
 static uint32_t 	com_timestamp = 0;
 uint32_t 	tim2_timestamp = 0;
+static uint32_t 	slave_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
 uint8_t serial_number_var[32];
@@ -111,7 +112,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		bss_update_cabinets_state(&selex_bss_app.bss);
 //		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
-
+#if 1
 			bool sync_was;
 			static bool tpdo_send_req = false;
 
@@ -130,7 +131,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 				{
 					CO_memcpy(bss_cabinets->bp->base.sn, serial_number_var, 32); //success
 				}
-
+#endif
 
 		break;
 	case BSS_ST_INIT:
@@ -141,11 +142,14 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 }
 
 void TIM3_IRQHandler(void) { //// 1ms
-	com_timestamp += sys_tick_ms;
-
-	/* Process RS485 Protocol */
-	rs485_master_update_state(&rs485m, com_timestamp);
-
+//	com_timestamp += sys_tick_ms;
+//	slave_timestamp += sys_tick_ms;
+//	/* Process RS485 Protocol */
+//	if(slave_timestamp < com_timestamp )
+//	{
+//		slave_timestamp = com_timestamp + 1000;
+		rs485_master_update_state(&rs485m, com_timestamp);
+//	}
 	/* Process HMI protocol */
 	if(check_hmi_msg_timestamp == com_timestamp){
 		check_hmi_msg_timestamp = com_timestamp + CHECK_HMI_MSG_TIME_mS;
