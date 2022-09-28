@@ -32,10 +32,12 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 3;
 	/*On BP*/
 #if 1
-	if(p_ca->base.sdo_write_object != NULL)
-	{
-		p_ca->base.sdo_write_object();
-	}
+	p_ca->base.bms_mainswitch_state = BMS_STATE_CHARGING;
+	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, timestamp);
+//	if(p_ca->base.sdo_write_object != NULL)
+//	{
+//		p_ca->base.sdo_write_object();
+//	}
 #else
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
@@ -50,10 +52,12 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 	p_ca->bss.cabs[cab_id].bp->charge_sw_state = 0;
 	/*Off BP*/
 #if 1
-	if(p_ca->base.sdo_write_object != NULL)
-	{
-		p_ca->base.sdo_write_object();
-	}
+	p_ca->base.bms_mainswitch_state = BMS_STATE_DISCHARGING;
+	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, timestamp);
+//	if(p_ca->base.sdo_write_object != NULL)
+//	{
+//		p_ca->base.sdo_write_object();
+//	}
 #else
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,

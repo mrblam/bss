@@ -212,9 +212,6 @@ void can_set_sdo_write_obj_func_pointer(CAN_master* p_cm,void (*sdo_write_object
 }
 void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timestamp)
 {
-
-//	CO_SDOclient_start_upload(p_sdo, server_node_id, index, sub_index, p_rx_obj, allowed_timeout_ms);
-//	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
 #if 0
 	co_sdo_read_object(p_cm,
 			SLAVE_SERIAL_NUMBER_OBJECT_INDEX,
@@ -222,12 +219,40 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timesta
 			p_cm->slaves[cab_id]->sn,
 			timestamp + SDO_READ_SN_TIMEOUT_mS);
 #else
-		if(p_cm->read_serial_number_bp != NULL)
-				{
-					p_cm->read_serial_number_bp();
-				}
+	/*Init SDO data*/
+	p_cm->serial_number_sobj.attr 	= ODA_SDO_RW;		//<< [skip] set ODA_SDO_RW
+	p_cm->serial_number_sobj.p_data = p_cm->slaves[cab_id]->sn;//<< Address variable receiving data
+	p_cm->serial_number_sobj.len 	= 32;				//<< Maximum data size that can be received
+	p_cm->serial_number_sobj.p_ext	= NULL;				//<< [option], set NULL if not used
+	/*Start upload*/
+	CO_SDOclient_start_upload(&p_cm->CO_base.sdo_client,
+								p_cm->slaves[cab_id]->node_id,
+								BMS_INDEX,
+								BMS_SERIAL_NUMBER_OBJECT_SUB_INDEX,
+								&p_cm->serial_number_sobj,
+								SDO_READ_OBJ_TIMEOUT_mS);
+
+//		if(p_cm->read_serial_number_bp != NULL)
+//				{
+//					p_cm->read_serial_number_bp();
+//				}
 #endif
 
+}
+void can_master_write_bms_mainswitch_object(CAN_master* p_cm, uint8_t cab_id, uint32_t timestamp)
+{
+	/*Init SDO data*/
+	p_cm->data_write_bms_od.p_data = &p_cm->bms_mainswitch_state;
+	p_cm->data_write_bms_od.attr   = ODA_SDO_RW;
+	p_cm->data_write_bms_od.len	   = 1;
+	p_cm->data_write_bms_od.p_ext  = NULL;
+	/*Start download*/
+	CO_SDOclient_start_download(&p_cm->CO_base.sdo_client,
+								p_cm->slaves[cab_id]->node_id,
+								BMS_INDEX,
+								BMS_MAINSWITCH_SUB_INDEX,
+								&p_cm->data_write_bms_od,
+								SDO_WRITE_OBJ_TIMEOUT_mS);
 }
 #if 1
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,

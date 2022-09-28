@@ -30,14 +30,7 @@ uint32_t 	tim2_timestamp = 0;
 static uint32_t 	slave_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
-uint8_t serial_number_var[32];
-CO_Sub_Object serial_number_sobj =
-	{
-			.p_data = serial_number_var,	//<< Address variable receiving data
-			.attr	= ODA_SDO_RW,			//<< [skip] set ODA_SDO_RW
-			.len	= 32,					//<< Maximum data size that can be received
-			.p_ext	= NULL					//<< [option], set NULL if not used
-	};
+
 uint8_t exam_var	= 2;        // 3 ok
 CO_Sub_Object exam_tx_obj =
 {
@@ -121,16 +114,13 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 //			CO_SDOserver_process(&p_co->sdo_server, time_diff_ms);
 			CO_SDOclient_process(&CO_DEVICE.sdo_client, 10);
 
-//			CO_process_tpdo(&CO_DEVICE, 10, tpdo_send_req);
-//			tpdo_send_req = false;
-//			if(true == sync_was)
-//			{
-//				tpdo_send_req = true;
-//			}
-		if(selex_bss_app.base.assign_state == CM_ASSIGN_ST_AUTHORIZING)
-				{
-					CO_memcpy(bss_cabinets->bp->base.sn, serial_number_var, 32); //success
-				}
+			CO_process_tpdo(&CO_DEVICE, 10, tpdo_send_req);
+			tpdo_send_req = false;
+			if(true == sync_was)
+			{
+				tpdo_send_req = true;
+			}
+
 #endif
 
 		break;
@@ -142,9 +132,9 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 }
 
 void TIM3_IRQHandler(void) { //// 1ms
-//	com_timestamp += sys_tick_ms;
+	com_timestamp += sys_tick_ms;
 //	slave_timestamp += sys_tick_ms;
-//	/* Process RS485 Protocol */
+	/* Process RS485 Protocol */
 //	if(slave_timestamp < com_timestamp )
 //	{
 //		slave_timestamp = com_timestamp + 1000;
@@ -241,11 +231,11 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 	cab_app_update_charge(p_app, sys_timestamp);
 #endif
 }
-static void master_read_serial_number()
+static void master_read_serial_number() ///not use
 {
 //	CO_SDO* p_sdo = &CO_DEVICE.sdo_client;
 //	CO_SDO_reset_status(&CO_DEVICE.sdo_client);
-	CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
+	//CO_SDOclient_start_upload(&CO_DEVICE.sdo_client, 5, 0x2003, 0x00, &serial_number_sobj, 2000);
 //	while(CO_SDO_get_status(p_sdo) == CO_SDO_RT_busy);
 //		if(CO_SDO_get_status(p_sdo) == CO_SDO_RT_success)
 //		{
