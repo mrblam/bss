@@ -97,7 +97,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
-
 			cab_app_update_connected_cab_state(&selex_bss_app);
 			cab_app_update_io_cab_state(&selex_bss_app);///
 		}

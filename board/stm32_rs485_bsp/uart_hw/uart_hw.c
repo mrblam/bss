@@ -135,8 +135,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle){
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 		/* USART2 setpriority*/
-		HAL_NVIC_SetPriority(USART2_IRQn, UART_RX_DEBUG_IRQN_PRIORITY, 0);
-		HAL_NVIC_EnableIRQ(USART2_IRQn);
+//		HAL_NVIC_SetPriority(USART2_IRQn, UART_RX_DEBUG_IRQN_PRIORITY, 0);
+//		HAL_NVIC_EnableIRQ(USART2_IRQn); /// WARNING: Loss connected
 	}
 }
 
