@@ -138,7 +138,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 }
 
-void TIM3_IRQHandler(void) { //// 1ms
+void TIM3_IRQHandler(void) { //// 10ms
 	com_timestamp += sys_tick_ms;
 //	slave_timestamp += sys_tick_ms;
 	/* Process RS485 Protocol */
