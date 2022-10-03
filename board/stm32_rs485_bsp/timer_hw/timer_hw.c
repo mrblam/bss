@@ -18,15 +18,15 @@ void timer_hw_init(void){
 	HAL_TIM_Base_Start_IT(&hmi_timer);
 }
 
-/* Config IRQ_TIMER2 per 500ms to process HMI messages */
+/* Config IRQ_TIMER2 per 1ms to process HMI messages */
 static void hmi_process_data_timer_init(void){
 	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
 	TIM_MasterConfigTypeDef sMasterConfig = {0};
 
-	hmi_timer.Instance = HMI_TIMER;
-	hmi_timer.Init.Prescaler = 3599;
+	hmi_timer.Instance = TIMER2;
+	hmi_timer.Init.Prescaler = 71;
 	hmi_timer.Init.CounterMode = TIM_COUNTERMODE_UP;
-	hmi_timer.Init.Period = 6999;
+	hmi_timer.Init.Period = 999;
 	hmi_timer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	hmi_timer.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_Base_Init(&hmi_timer) != HAL_OK){
@@ -41,22 +41,23 @@ static void hmi_process_data_timer_init(void){
 	if (HAL_TIMEx_MasterConfigSynchronization(&hmi_timer, &sMasterConfig) != HAL_OK){
 		Error_Handler();
 	}
+	HAL_TIM_Base_Start_IT(&hmi_timer);
 }
 
 static void hmi_process_data_timer_nvic(void){
 	/* TIM2 interrupt Init */
-	HAL_NVIC_SetPriority(TIM2_IRQn, TIMER2_IRQN_PRIORITY, 0);
+	HAL_NVIC_SetPriority(TIM2_IRQn, TIMER2_IRQN_PRIORITY, 1);
 	HAL_NVIC_EnableIRQ(TIM2_IRQn);
 }
 #if 1
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle){
-	if(tim_baseHandle->Instance==HMI_TIMER){
+//	if(tim_baseHandle->Instance==TIMER2){
 		/* TIM2 clock enable */
 		__HAL_RCC_TIM2_CLK_ENABLE();
-	}
-	else if(tim_baseHandle->Instance==IO_SCAN_TIMER){
+//	}
+//	else if(tim_baseHandle->Instance==IO_SCAN_TIMER){
 		/* TIM3 clock enable */
 		__HAL_RCC_TIM3_CLK_ENABLE();
-	}
+//	}
 }
 #endif

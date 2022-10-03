@@ -66,7 +66,8 @@ static void system_clock_config(void){
 }
 
 static void system_tick_config(void){
-	SysTick_Config(SystemCoreClock/SYSTICK_FREQ_Hz);				// 10ms
+	SysTick_Config(SystemCoreClock/SYSTICK_FREQ_Hz);
+//	HAL_NVIC_SetPriority(SysTick_IRQn,4, 0);// 10ms
 }
 
 static void iwdg_timer_config(void){

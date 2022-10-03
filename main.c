@@ -26,7 +26,7 @@ static Charger 		bss_chargers[CHARGER_NUM];
 
 static uint32_t 	sys_tick_ms = APP_STATE_MACHINE_UPDATE_TICK_mS;
 static uint32_t 	com_timestamp = 0;
-uint32_t 	tim2_timestamp = 0;
+static uint32_t 	tim2_timestamp = 0;
 static uint32_t 	slave_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
@@ -83,13 +83,21 @@ int main(void) {
 	}
 	while (1);
 }
-/*
+
 void TIM2_IRQHandler(void)   //1ms
 {
-	sys_timestamp += sys_tick_ms;
+	tim2_timestamp ++;
+#if 0
+	if(tim2_timestamp%2 == 0){
+		BSS_CTRL_LED1_HIGH;
+	}else{
+		BSS_CTRL_LED1_LOW;
+	}
+#endif
 	CO_process(&CO_DEVICE,1);
+	HAL_TIM_IRQHandler(&hmi_timer);
 }
-*/
+
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {					//10ms /// 0.2s
 	sys_timestamp += sys_tick_ms;
@@ -104,21 +112,21 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		bss_update_cabinets_state(&selex_bss_app.bss);
 //		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
-#if 1
+#if 0
 			bool sync_was;
-			static bool tpdo_send_req = false;
-
-			sync_was = CO_SYNC_process(&CO_DEVICE.sync, 1, 10);
-			for(int i=0;i<1000;i++);
+//			static bool tpdo_send_req = false;
+//
+			sync_was = CO_SYNC_process(&CO_DEVICE.sync, 1, 10);///get PDO
+//			for(int i=0;i<1000;i++);
 //			CO_SDOserver_process(&p_co->sdo_server, time_diff_ms);
 			CO_SDOclient_process(&CO_DEVICE.sdo_client, 10);
 
-			CO_process_tpdo(&CO_DEVICE, 10, tpdo_send_req);
-			tpdo_send_req = false;
-			if(true == sync_was)
-			{
-				tpdo_send_req = true;
-			}
+//			CO_process_tpdo(&CO_DEVICE, 10, tpdo_send_req);
+//			tpdo_send_req = false;
+//			if(true == sync_was)
+//			{
+//				tpdo_send_req = true;
+//			}
 
 #endif
 

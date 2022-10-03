@@ -18,6 +18,6 @@ extern TIM_HandleTypeDef hmi_timer;
 
 void timer_hw_init(void);
 
-#define HMI_TIMER		TIM2
+#define TIMER2		TIM2
 
 #endif /* BOARD_STM32_HALLIB_BSP_TIMER_HW_TIMER_HW_H_ */
