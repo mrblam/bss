@@ -199,6 +199,7 @@ void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave, uint32_t timest
 {
 	p_cm->assign_state = CM_ASSIGN_ST_AUTHORIZING;
 	can_master_read_slave_sn(p_cm, slave->node_id - p_cm->slave_start_node_id, timestamp);
+
 }
 void can_set_read_sn_func_pointer(CAN_master* p_cm,void (*read_serial_number_bp)(void))
 {
@@ -231,7 +232,7 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timesta
 								BMS_SERIAL_NUMBER_OBJECT_SUB_INDEX,
 								&p_cm->serial_number_sobj,
 								SDO_READ_OBJ_TIMEOUT_mS);
-
+	p_cm->sdo_server.node_id_processing = p_cm->slaves[cab_id]->node_id; //them 4/10/22
 //		if(p_cm->read_serial_number_bp != NULL)
 //				{
 //					p_cm->read_serial_number_bp();
@@ -253,6 +254,7 @@ void can_master_write_bms_mainswitch_object(CAN_master* p_cm, uint8_t cab_id, ui
 								BMS_MAINSWITCH_SUB_INDEX,
 								&p_cm->data_write_bms_od,
 								SDO_WRITE_OBJ_TIMEOUT_mS);
+	p_cm->sdo_server.node_id_processing = p_cm->slaves[cab_id]->node_id;	//them 4/10/22
 }
 #if 1
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
