@@ -60,6 +60,7 @@ static void CO_TPDO_send(CO_TPDO* p_tpdo)
 		/* Send message */
 		CO_CAN_send(&p_tpdo->base.msg);
 	}
+	p_tpdo->send_request = false;
 }
 
 

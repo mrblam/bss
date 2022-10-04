@@ -106,8 +106,6 @@ void TIM3_IRQHandler(void) { //// 10ms
 			selex_bss_app.hmi_csv.is_new_msg_to_send[i] = 0;
 		}
 	}
-	/*CO_process*/
-//		CO_process(&CO_DEVICE,1);
 
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
