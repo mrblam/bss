@@ -313,9 +313,6 @@ void can_master_update_id_assign_process(CAN_master *p_cm, const uint32_t timest
 	    break;
 	case CM_ASSIGN_ST_START:
 		p_cm->assign_state = CM_ASSIGN_ST_SLAVE_SELECT;
-//		p_cm->p_hw->can_tx.DLC = 0;
-//		p_cm->p_hw->can_tx.StdId = CAN_NODE_ID_ASSIGN_COBID;
-//		can_send(p_cm->p_hw, p_cm->p_hw->tx_data);
 		can_master_slave_select(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 		break;
 	case CM_ASSIGN_ST_SLAVE_SELECT_CONFIRM:

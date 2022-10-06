@@ -10,11 +10,11 @@
 
 #include "bss_data.h"
 
-//static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
-//					= {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
+static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
+					= {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
 
-static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]					//0123
-					= {{0,3}, {1,2,4,5}};
+//static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]					//0123
+//					= {{0,3}, {1,2,4,5}};
 
 
 static void bss_update_io_state(BSS_Data* p_bss);
