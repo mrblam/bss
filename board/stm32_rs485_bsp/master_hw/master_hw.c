@@ -30,8 +30,8 @@ void bss_led_init(void)
 		/* GPIO Ports Clock Enable */
 		__HAL_RCC_GPIOB_CLK_ENABLE();
 		/*Configure GPIO pin Output Level */
-		HAL_GPIO_WritePin(BSS_LED_PORT, BSS_CTRL_LED1 | BSS_CTRL_LED2 , GPIO_PIN_RESET);
-		GPIO_InitStruct.Pin = BSS_CTRL_LED1 | BSS_CTRL_LED2;
+		HAL_GPIO_WritePin(BSS_LED_PORT, BSS_CTRL_LED_RED | BSS_CTRL_LED1 | BSS_CTRL_LED2 , GPIO_PIN_RESET);
+		GPIO_InitStruct.Pin = BSS_CTRL_LED_RED | BSS_CTRL_LED1 | BSS_CTRL_LED2;
 		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

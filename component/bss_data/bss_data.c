@@ -88,6 +88,12 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 	}
 }
 
+void bss_warning(BSS_Data* p_bss)
+{
+//	bss_siren();
+
+}
+
 static void bss_update_io_state(BSS_Data* p_bss){
 
 	for(uint8_t i=0;i<p_bss->cab_num;i++){

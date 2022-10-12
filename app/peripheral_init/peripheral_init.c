@@ -315,6 +315,8 @@ static void led19_update_color(Cabinet_led* p_led);
 
 static void bss_led_set_color_impl(BSS_Led* p_led);
 static void bss_bp_backup_get_voltage_impl(BP_backup* p_bp_backup);
+static void bss_siren_impl(void);
+static void bss_charger_bp_backup_impl(BP_backup* p_bp_backup);
 static void ntc_init(Cabinet_App* p_ca);
 static void ntc_sensor_get_adc_value(NTC* p_ntc);
 
@@ -1946,7 +1948,7 @@ static void bss_led_set_color_impl(BSS_Led* p_led){
 		BSS_DISABLE_LED;
 		break;
 	case LED_RED:
-//		BSS_LED_GREEN_SET_LOW;
+		BSS_CTRL_LED_RED_HIGH;
 //		BSS_LED_BLUE_SET_LOW;
 //		BSS_LED_RED_SET_HIGH;
 		break;
@@ -1984,6 +1986,23 @@ static void bss_led_set_color_impl(BSS_Led* p_led){
 		break;
 	}
 }
+static void bss_siren_impl(void)
+{
+	BSS_CTRL_SPEAKER_HIGH;
+}
+
+static void bss_charger_bp_backup_impl(BP_backup* p_bp_backup)
+{
+	if(p_bp_backup->is_charger)
+	{
+		CHG_ENB_LOW;
+	}
+	else
+	{
+		CHG_ENB_LOW;
+	}
+}
+
 static void bss_bp_backup_get_voltage_impl(BP_backup* p_bp_backup)
 {
 	HAL_ADC_Start(&pin_vol.adc_module);

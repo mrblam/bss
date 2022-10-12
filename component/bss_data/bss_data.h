@@ -35,6 +35,7 @@ typedef struct BP_backup_t BP_backup;
 struct BP_backup_t{
 	ADC_hw* hw;
 	int32_t vol;
+	uint8_t is_charger;
 	void 	(*get_voltage)(BP_backup* p_bp_backup);
 
 };
@@ -75,6 +76,7 @@ void bss_charger_init(BSS_Data* p_bss);
 void bss_update_cabinets_state(BSS_Data* p_bss);
 void bss_set_state(BSS_Data* p_bss, BSS_STATE state);
 void bss_update_charge_state(BSS_Data* p_bss);
+void bss_warning(BSS_Data* p_bss);
 Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){

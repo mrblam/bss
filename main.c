@@ -183,10 +183,7 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 #if ENABLE_CHARGER
 	cab_app_update_charge(p_app, sys_timestamp);
 #endif
+	if(sys_timestamp % 15000 == 0){
 	p_app->bss.bp_backup.get_voltage(&p_app->bss.bp_backup);
-//	HAL_ADC_Start(&pin_vol.adc_module);
-//	p_app->bss.bp_backup.vol = 3.61*VREF*(pin_vol.adc_value - pin_vol.adc_offset)/ADC_RESOLUTION;
-//	HAL_ADC_Stop(&pin_vol.adc_module);
-//	p_app->bss.bp_backup.vol = 3.61*VREF*(pin_vol.adc_value - pin_vol.adc_offset)/ADC_RESOLUTION;
-
+	}
 }
