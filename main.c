@@ -82,6 +82,9 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		break;
 	case BSS_ST_INIT:
+		if(sys_timestamp == 8000){
+		selex_bss_app.bss.state = BSS_ST_ACTIVE;
+		}
 	case BSS_ST_FAIL:
 		break;
 	}
@@ -180,4 +183,10 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 #if ENABLE_CHARGER
 	cab_app_update_charge(p_app, sys_timestamp);
 #endif
+	p_app->bss.bp_backup.get_voltage(&p_app->bss.bp_backup);
+//	HAL_ADC_Start(&pin_vol.adc_module);
+//	p_app->bss.bp_backup.vol = 3.61*VREF*(pin_vol.adc_value - pin_vol.adc_offset)/ADC_RESOLUTION;
+//	HAL_ADC_Stop(&pin_vol.adc_module);
+//	p_app->bss.bp_backup.vol = 3.61*VREF*(pin_vol.adc_value - pin_vol.adc_offset)/ADC_RESOLUTION;
+
 }

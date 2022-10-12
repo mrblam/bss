@@ -314,7 +314,7 @@ static void led18_update_color(Cabinet_led* p_led);
 static void led19_update_color(Cabinet_led* p_led);
 
 static void bss_led_set_color_impl(BSS_Led* p_led);
-
+static void bss_bp_backup_get_voltage_impl(BP_backup* p_bp_backup);
 static void ntc_init(Cabinet_App* p_ca);
 static void ntc_sensor_get_adc_value(NTC* p_ntc);
 
@@ -394,8 +394,9 @@ void peripheral_init(Cabinet_App* p_ca){
 		p_ca->bss.cabs[cab_id].charger.sw_off 				= charger_sw_off_interface[cab_id];
 		p_ca->bss.cabs[cab_id].led.update_color				= led_update_color[cab_id];
 	}
+	adc_hw_init();
 	p_ca->bss.led.set_color = bss_led_set_color_impl;
-
+	p_ca->bss.bp_backup.get_voltage = bss_bp_backup_get_voltage_impl;
 	p_ca->slave_com = &rs485m;
 	rs485_master_init(&rs485m, &cabinet_485_hw);
 	rs485m.p_hw->uart_module = rs485_com.uart_module;
@@ -1982,4 +1983,10 @@ static void bss_led_set_color_impl(BSS_Led* p_led){
 	default:
 		break;
 	}
+}
+static void bss_bp_backup_get_voltage_impl(BP_backup* p_bp_backup)
+{
+	HAL_ADC_Start(&pin_vol.adc_module);
+	p_bp_backup->vol = 3.61*VREF*(pin_vol.adc_value - pin_vol.adc_offset)/ADC_RESOLUTION;
+	HAL_ADC_Stop(&pin_vol.adc_module);
 }

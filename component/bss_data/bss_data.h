@@ -31,6 +31,13 @@ struct BSS_Led_t{
 	void			(*set_color)(BSS_Led* p_led);
 };
 
+typedef struct BP_backup_t BP_backup;
+struct BP_backup_t{
+	ADC_hw* hw;
+	int32_t vol;
+	void 	(*get_voltage)(BP_backup* p_bp_backup);
+
+};
 typedef enum BSS_STATE{
 	BSS_ST_ACTIVE = 0,
 	BSS_ST_MAINTAIN,
@@ -60,6 +67,7 @@ struct BSS_Data_t{
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
 	uint8_t 		is_changed;
 	BSS_Led			led;
+	BP_backup		bp_backup;
 };
 
 void bss_init(BSS_Data* p_bss);

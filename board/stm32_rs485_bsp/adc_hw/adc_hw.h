@@ -15,7 +15,7 @@
 #include "interrupt_hw.h"
 
 #define ADC_PORT		ADC1
-#define ADC_CHANNEL		ADC_CHANNEL_5
+#define ADC_CHANNEL		ADC_CHANNEL_4
 
 typedef struct ADC_hw_t ADC_hw;
 struct ADC_hw_t{
@@ -26,6 +26,7 @@ struct ADC_hw_t{
 };
 
 extern ADC_hw	ntc;
+extern ADC_hw	pin_vol;
 
 void adc_hw_init(void);
 
