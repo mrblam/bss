@@ -61,15 +61,15 @@ int main(void) {
 void TIM2_IRQHandler(void)   //1ms
 {
 	tim2_timestamp ++;
-//	CO_process(&CO_DEVICE,1);
-	CO_SYNC_process(&CO_DEVICE.sync, 1, 1);
+	CO_process(&CO_DEVICE,1);
+//	CO_SYNC_process(&CO_DEVICE.sync, 1, 1);
 	HAL_TIM_IRQHandler(&hmi_timer);
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {					//10ms /// 0.2s
 	sys_timestamp += sys_tick_ms;
-	CO_process(&CO_DEVICE,10);
+//	CO_process(&CO_DEVICE,10);
 	switch(selex_bss_app.bss.state){
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:

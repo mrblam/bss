@@ -24,17 +24,21 @@ void CO_process(CO* p_co, uint16_t time_diff_ms)
 	bool sync_was;
 	static bool tpdo_send_req = false;
 
-	//sync_was = CO_SYNC_process(&p_co->sync, 1, time_diff_ms);
-	for(int i = 0;i<10000;i++);
-	CO_SDOserver_process(&p_co->sdo_server, time_diff_ms);
+	sync_was = CO_SYNC_process(&p_co->sync, 1, time_diff_ms);
 	CO_SDOclient_process(&p_co->sdo_client, time_diff_ms);
-
-	//CO_process_tpdo(p_co, time_diff_ms, tpdo_send_req);
-	tpdo_send_req = false;
-	if(true == sync_was)
-	{
-		tpdo_send_req = true;
-	}
+//	if(false == sync_was)
+//	{
+////		CO_SDOserver_process(&p_co->sdo_server, time_diff_ms);
+////		CO_SDOclient_process(&p_co->sdo_client, time_diff_ms);
+//
+////		CO_process_tpdo(p_co, time_diff_ms, tpdo_send_req);
+////		tpdo_send_req = false;
+//	}
+//
+//	if(true == sync_was)
+//	{
+//		tpdo_send_req = true;
+//	}
 }
 
 static inline void CO_process_tpdo(CO *p_co, uint16_t time_diff_ms, bool sync_was)
