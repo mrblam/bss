@@ -23,7 +23,7 @@ static uint32_t 	com_timestamp = 0;
 static uint32_t 	tim2_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
-
+static uint8_t		node_id_high = 0;
 void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->bss.cab_num = CABINET_CELL_NUM;
 	p_ca->bss.charger_num = CHARGER_NUM;
@@ -61,6 +61,10 @@ int main(void) {
 void TIM2_IRQHandler(void)   //1ms
 {
 	tim2_timestamp ++;
+	if(node_id_high){
+		node_id_high = 0;
+		can_master_slave_deselect(&selex_bss_app.base,selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id);
+	}
 	CO_process(&CO_DEVICE,1);
 //	CO_SYNC_process(&CO_DEVICE.sync, 1, 1);
 	HAL_TIM_IRQHandler(&hmi_timer);
@@ -160,6 +164,7 @@ static void can_receive_handle(CAN_Hw *p_hw)
 			/* slave confirm assign id success*/
 			if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
 			cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp); // den day
+			node_id_high = 1;
 		}
 		return;
 	}

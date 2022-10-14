@@ -129,7 +129,7 @@ static void cabinet_io_scan_timer_init(void){
 	  TIM_MasterConfigTypeDef sMasterConfig = {0};
 
 	  io_scan_timer.Instance = IO_SCAN_TIMER;
-	  io_scan_timer.Init.Prescaler = 71;
+	  io_scan_timer.Init.Prescaler = 35;
 	  io_scan_timer.Init.CounterMode = TIM_COUNTERMODE_UP;
 	  io_scan_timer.Init.Period = 9999;
 	  io_scan_timer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
