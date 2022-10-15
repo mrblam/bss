@@ -86,9 +86,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		break;
 	case BSS_ST_INIT:
-		if(sys_timestamp == 8000){
-		selex_bss_app.bss.state = BSS_ST_ACTIVE;
-		}
 	case BSS_ST_FAIL:
 		break;
 	}
