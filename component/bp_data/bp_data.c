@@ -56,7 +56,7 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){
     else{
         for(uint8_t i = 0; *(p_bp->base.sn + i) != '\0'; i++){
 
-        	*buff++= *(p_bp->base.sn + i) ;
+        	*buff++= *(p_bp->base.sn +12 - i) ;
         }
     }
     *buff++=',';
