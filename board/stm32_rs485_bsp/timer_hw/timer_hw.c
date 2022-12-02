@@ -51,13 +51,7 @@ static void hmi_process_data_timer_nvic(void){
 }
 #if 1
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle){
-//	if(tim_baseHandle->Instance==TIMER2){
-		/* TIM2 clock enable */
 		__HAL_RCC_TIM2_CLK_ENABLE();
-//	}
-//	else if(tim_baseHandle->Instance==IO_SCAN_TIMER){
-		/* TIM3 clock enable */
 		__HAL_RCC_TIM3_CLK_ENABLE();
-//	}
 }
 #endif

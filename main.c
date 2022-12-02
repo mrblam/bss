@@ -66,23 +66,20 @@ void TIM2_IRQHandler(void)   //1ms
 		can_master_slave_deselect(&selex_bss_app.base,selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id);
 	}
 	CO_process(&CO_DEVICE,1);
-//	CO_SYNC_process(&CO_DEVICE.sync, 1, 1);
 	HAL_TIM_IRQHandler(&hmi_timer);
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
-{					//10ms /// 0.2s
+{					//10ms ///
 	sys_timestamp += sys_tick_ms;
-//	CO_process(&CO_DEVICE,10);
 	switch(selex_bss_app.bss.state){
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
 		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
 			cab_app_update_connected_cab_state(&selex_bss_app);
-			cab_app_update_io_cab_state(&selex_bss_app);///
+			cab_app_update_io_cab_state(&selex_bss_app);
 		}
 		bss_update_cabinets_state(&selex_bss_app.bss);
-//		can_master_process((CAN_master*) &selex_bss_app, sys_timestamp); /// se bi thay the boi ham CO_process
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		break;
 	case BSS_ST_INIT:
@@ -96,7 +93,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 
 void TIM3_IRQHandler(void) { //// 10ms
 	com_timestamp += sys_tick_ms;
-//	CO_SYNC_process(&CO_DEVICE.sync, 1, 10);
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 	/* Process HMI protocol */
@@ -165,12 +161,6 @@ static void can_receive_handle(CAN_Hw *p_hw)
 		}
 		return;
 	}
-//	if (cob_id == selex_bss_app.base.sdo_server.rx_address)
-//	{
-//		CO_memcpy(selex_bss_app.base.sdo_server.rx_msg_data, p_hw->rx_data, 8);
-//		selex_bss_app.base.sdo_server.is_new_msg = 1;
-//		HAL_CAN_DISABLE_IRQ;
-//	}
 }
 
 static void cab_app_update_io_cab_state(Cabinet_App* p_app)

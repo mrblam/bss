@@ -11,7 +11,7 @@
 #include "bss_data.h"
 
 static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
-					= {{0,3,4,7,8,11,12,15,16}, {1,2,5,6,9,10,13,14,17,18}};
+					= {{0,1,4,5,8,9,12,13,16}, {2,3,6,7,10,11,14,15,17,18}};
 
 //static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]					//0123
 //					= {{0,3}, {1,2,4,5}};
