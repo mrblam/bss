@@ -33,7 +33,7 @@
 #define BMS_MAINSWITCH_SUB_INDEX						0x01
 #define SLAVE_ID_NUMBER_OBJECT_SUB_INDEX				0x02
 #define BMS_STATE_CHARGING								2
-#define BMS_STATE_DISCHARGING							3
+#define BMS_STATE_DISCHARGING							0
 
 #define SLAVE_RPDO1										0x200
 #define SDO_RX_BUFFER_SIZE                 				(32UL)

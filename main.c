@@ -24,6 +24,12 @@ static uint32_t 	tim2_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
 static uint8_t		node_id_high = 0;
+
+static uint8_t		test_buff[8] = {0};
+static uint8_t 		test_rx_mailbox = 0;
+static uint8_t 		test_tx_mailbox = 0;
+volatile static uint8_t		relay[19];
+
 void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->bss.cab_num = CABINET_CELL_NUM;
 	p_ca->bss.charger_num = CHARGER_NUM;
@@ -56,7 +62,16 @@ int main(void) {
 	for (uint8_t i = 0; i < selex_bss_app.bss.cab_num; i++) {
 		cab_cell_reset_io(&selex_bss_app.bss.cabs[i]);
 	}
-	while (1);
+	while (1)
+	{
+//		can_port.can_tx.StdId = 0x100;
+//		can_port.can_tx.DLC = 8;
+//		can_send(&can_port, test_buff);
+//
+//		//
+//		test_rx_mailbox = HAL_CAN_GetRxFifoFillLevel(&can_port.can_module, CAN_RX_FIFO0);
+//		test_tx_mailbox = HAL_CAN_GetTxMailboxesFreeLevel(&can_port.can_module);
+	}
 }
 void TIM2_IRQHandler(void)   //1ms
 {
@@ -87,6 +102,10 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		break;
 	}
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
+	//test
+	for(uint8_t a = 0;a < 20;a++){
+		relay[a] = bss_cabinets[a].charger.state;
+	}
 }
 
 /* --------------------------------------------------------------------------------------- */

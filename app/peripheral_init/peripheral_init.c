@@ -331,8 +331,8 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
 
 static void can_master_rpdo_process_impl(const CAN_master* const p_cm);
 
-static void cabinet_door_close_event_handle(Cabinet *p_cab);
-static void cabinet_door_open_event_handle(Cabinet *p_cab);
+//static void cabinet_door_close_event_handle(Cabinet *p_cab);
+//static void cabinet_door_open_event_handle(Cabinet *p_cab);
 static void can_master_slave_select_impl(const CAN_master *p_cm, const uint32_t id);
 static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_t id);
 static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id);
@@ -572,9 +572,17 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 
 	switch(cob_id){
 	case BP_VOL_CUR_TPDO_COBID:
-		selex_bss_app.bss.cabs[bp_id].bp->vol		= 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data);
-		selex_bss_app.bss.cabs[bp_id].bp->cur 		= 10*((int16_t)CO_getUint16(p_cm->p_hw->rx_data + 2));
+//		selex_bss_app.bss.cabs[bp_id].bp->vol		= 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data);
+		if(10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) < 70000 && 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) > 40000){
+			selex_bss_app.bss.cabs[bp_id].bp->vol = 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data);
+		}
+		if(10*((int16_t)CO_getUint16(p_cm->p_hw->rx_data + 2)) > -20000
+				&& 10*((int16_t)CO_getUint16(p_cm->p_hw->rx_data + 2)) < 20000 ){
+			selex_bss_app.bss.cabs[bp_id].bp->cur 		= 10*((int16_t)CO_getUint16(p_cm->p_hw->rx_data + 2));
+		}
+		if(1){
 		selex_bss_app.bss.cabs[bp_id].bp->soc 		= p_cm->p_hw->rx_data[4];
+		}
 		selex_bss_app.bss.cabs[bp_id].bp->state 	= p_cm->p_hw->rx_data[5];
 		selex_bss_app.bss.cabs[bp_id].bp->status	= CO_getUint16(p_cm->p_hw->rx_data + 6);
 		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
