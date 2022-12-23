@@ -536,6 +536,7 @@ void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
 			if(p_app->bss.cabs[id].bp->base.inactive_time_ms <= BP_INACTIVE_TIMEOUT_mS) continue;
 			cab_cell_reset(&p_app->bss.cabs[id]);
+//			p_app->bss.cabs[id].op_state = CAB_CELL_ST_FAIL;
 			for(uint8_t i = 0; i < p_app->bss.charger_num; i++){
 				if(p_app->bss.ac_chargers[i].charging_cabin != &p_app->bss.cabs[id]) continue;
 				sw_off(&p_app->bss.ac_chargers[i].charging_cabin->charger);

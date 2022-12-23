@@ -62,16 +62,7 @@ int main(void) {
 	for (uint8_t i = 0; i < selex_bss_app.bss.cab_num; i++) {
 		cab_cell_reset_io(&selex_bss_app.bss.cabs[i]);
 	}
-	while (1)
-	{
-//		can_port.can_tx.StdId = 0x100;
-//		can_port.can_tx.DLC = 8;
-//		can_send(&can_port, test_buff);
-//
-//		//
-//		test_rx_mailbox = HAL_CAN_GetRxFifoFillLevel(&can_port.can_module, CAN_RX_FIFO0);
-//		test_tx_mailbox = HAL_CAN_GetTxMailboxesFreeLevel(&can_port.can_module);
-	}
+	while (1);
 }
 void TIM2_IRQHandler(void)   //1ms
 {

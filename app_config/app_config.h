@@ -10,7 +10,7 @@
 #include "core_hal.h"
 
 #define APP_STATE_MACHINE_UPDATE_TICK_mS 		(1000/HAL_SYSTICK_FREQ_Hz)
-#define BP_INACTIVE_TIMEOUT_mS           		2000
+#define BP_INACTIVE_TIMEOUT_mS           		5000
 #define CHECK_HMI_MSG_TIME_mS					200
 #define SDO_SET_BMS_MAIN_SW_TIMEOUT_mS			1000
 #define PDO_READ_BP_DATA_TIME_mS				2000
