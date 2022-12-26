@@ -284,6 +284,10 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_INIT;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
+		else if(state == CAB_CELL_ST_FAIL){
+			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_FAIL;
+			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+		}
 		break;
 
 /* Use for test Slave LED */

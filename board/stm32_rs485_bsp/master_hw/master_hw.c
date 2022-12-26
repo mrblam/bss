@@ -30,8 +30,8 @@ void bss_led_init(void)
 		/* GPIO Ports Clock Enable */
 		__HAL_RCC_GPIOB_CLK_ENABLE();
 		/*Configure GPIO pin Output Level */
-		HAL_GPIO_WritePin(BSS_LED_PORT, BSS_CTRL_LED_RED | BSS_CTRL_LED1 | BSS_CTRL_LED2 , GPIO_PIN_RESET);
-		GPIO_InitStruct.Pin = BSS_CTRL_LED_RED | BSS_CTRL_LED1 | BSS_CTRL_LED2;
+		HAL_GPIO_WritePin(BSS_LED_PORT, BSS_CTRL_LED_RED | BSS_CTRL_LED_GREEN | BSS_CTRL_LED_BLUE , GPIO_PIN_RESET);
+		GPIO_InitStruct.Pin = BSS_CTRL_LED_RED | BSS_CTRL_LED_GREEN | BSS_CTRL_LED_BLUE;
 		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -49,8 +49,7 @@ void bss_led_init(void)
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 		HAL_GPIO_Init(BSS_LED_PORT, &GPIO_InitStruct);
 		/**/
-		BSS_CTRL_LED1_HIGH;
-		BSS_CTRL_LED2_HIGH;
+
 }
 void bss_fan_init(void)
 {
@@ -58,13 +57,15 @@ void bss_fan_init(void)
 		/* GPIO Ports Clock Enable */
 		__HAL_RCC_GPIOB_CLK_ENABLE();
 		/*Configure GPIO pin Output Level */
-		HAL_GPIO_WritePin(BSS_FAN_PORT, BSS_CTRL_FAN1|BSS_CTRL_FAN2, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(BSS_FAN1_PORT, BSS_CTRL_FAN1, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(BSS_FAN2_PORT, BSS_CTRL_FAN2, GPIO_PIN_RESET);
 		/*Configure GPIO pins : PB4 PB5 */
 		GPIO_InitStruct.Pin = BSS_CTRL_FAN1|BSS_CTRL_FAN2;
 		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-		HAL_GPIO_Init(BSS_FAN_PORT, &GPIO_InitStruct);
+		HAL_GPIO_Init(BSS_FAN1_PORT, &GPIO_InitStruct);
+		HAL_GPIO_Init(BSS_FAN2_PORT, &GPIO_InitStruct);
 }
 void bss_speaker_init(void)
 {
