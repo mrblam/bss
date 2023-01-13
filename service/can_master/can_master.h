@@ -62,6 +62,12 @@ typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 //			.p_ext	= NULL					//<< [option], set NULL if not used
 //	};
 
+typedef enum BMS_OBJ{
+	BMS_MAINSWITCH	= 0,
+	BMS_MATTING		= 1,
+	BMS_MATED_DEV	= 2
+}BMS_OBJ;
+
 typedef enum SDO_STATE_t{
 	SDO_ST_IDLE 	= 0,
 	SDO_ST_SENT		= 1,
@@ -144,7 +150,7 @@ void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_start_assign_next_slave(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id, uint32_t timestamp);
-void can_master_write_bms_mainswitch_object(CAN_master* p_cm, uint8_t slave_id, uint32_t timestamp);
+void can_master_write_bms_mainswitch_object(CAN_master* p_cm, uint8_t slave_id, BMS_OBJ bms_obj, uint32_t timestamp);
 void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave, uint32_t timestamp);
 void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp);
 void co_sdo_read_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,uint8_t* rx_buff,const uint32_t timeout);

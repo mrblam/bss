@@ -36,7 +36,7 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 	/*On BP*/
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_CHARGING;
-	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, timestamp);
+	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
 //	if(p_ca->base.sdo_write_object != NULL)
 //	{
 //		p_ca->base.sdo_write_object();
@@ -55,7 +55,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 	/*Off BP*/
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_DISCHARGING;
-	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, timestamp);
+	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
 //	if(p_ca->base.sdo_write_object != NULL)
 //	{
 //		p_ca->base.sdo_write_object();
@@ -283,10 +283,6 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 		}
 		else if(state == CAB_CELL_ST_INIT){
 			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_INIT;
-			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		}
-		else if(state == CAB_CELL_ST_FAIL){
-			p_ca->bss.cabs[id].op_state = CAB_CELL_ST_FAIL;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		break;

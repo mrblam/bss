@@ -240,21 +240,57 @@ void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id, uint32_t timesta
 #endif
 
 }
-void can_master_write_bms_mainswitch_object(CAN_master* p_cm, uint8_t cab_id, uint32_t timestamp)
+void can_master_write_bms_mainswitch_object(CAN_master* p_cm, uint8_t cab_id, BMS_OBJ bms_obj, uint32_t timestamp)
 {
-	/*Init SDO data*/
-	p_cm->data_write_bms_od.p_data = &p_cm->bms_mainswitch_state;
-	p_cm->data_write_bms_od.attr   = ODA_SDO_RW;
-	p_cm->data_write_bms_od.len	   = 1;
-	p_cm->data_write_bms_od.p_ext  = NULL;
-	/*Start download*/
-	CO_SDOclient_start_download(&p_cm->CO_base.sdo_client,
-								p_cm->slaves[cab_id]->node_id,
-								BMS_INDEX,
-								BMS_MAINSWITCH_SUB_INDEX,
-								&p_cm->data_write_bms_od,
-								SDO_WRITE_OBJ_TIMEOUT_mS);
-	p_cm->sdo_server.node_id_processing = p_cm->slaves[cab_id]->node_id;	//them 4/10/22
+	switch(bms_obj){
+	case BMS_MAINSWITCH:
+		/*Init SDO data*/
+		p_cm->data_write_bms_od.p_data = &p_cm->bms_mainswitch_state;
+		p_cm->data_write_bms_od.attr   = ODA_SDO_RW;
+		p_cm->data_write_bms_od.len	   = 1;
+		p_cm->data_write_bms_od.p_ext  = NULL;
+		/*Start download*/
+		CO_SDOclient_start_download(&p_cm->CO_base.sdo_client,
+									p_cm->slaves[cab_id]->node_id,
+									BMS_INDEX,
+									BMS_MAINSWITCH_SUB_INDEX,
+									&p_cm->data_write_bms_od,
+									SDO_WRITE_OBJ_TIMEOUT_mS);
+		p_cm->sdo_server.node_id_processing = p_cm->slaves[cab_id]->node_id;	//them 4/10/22
+
+		break;
+	case BMS_MATTING:
+		/*Init SDO data*/
+		p_cm->data_write_bms_od.p_data = &p_cm->bms_mainswitch_state;
+		p_cm->data_write_bms_od.attr   = ODA_SDO_RW;
+		p_cm->data_write_bms_od.len	   = 1;
+		p_cm->data_write_bms_od.p_ext  = NULL;
+		/*Start download*/
+		CO_SDOclient_start_download(&p_cm->CO_base.sdo_client,
+									p_cm->slaves[cab_id]->node_id,
+									0x2004,
+									BMS_MAINSWITCH_SUB_INDEX,
+									&p_cm->data_write_bms_od,
+									SDO_WRITE_OBJ_TIMEOUT_mS);
+
+		break;
+	case BMS_MATED_DEV:
+		/*Init SDO data*/
+		p_cm->data_write_bms_od.p_data = &p_cm->bms_mainswitch_state;
+		p_cm->data_write_bms_od.attr   = ODA_SDO_RW;
+		p_cm->data_write_bms_od.len	   = 1;
+		p_cm->data_write_bms_od.p_ext  = NULL;
+		/*Start download*/
+		CO_SDOclient_start_download(&p_cm->CO_base.sdo_client,
+									p_cm->slaves[cab_id]->node_id,
+									0x2004,
+									0x2001,
+									&p_cm->data_write_bms_od,
+									SDO_WRITE_OBJ_TIMEOUT_mS);
+		break;
+	default :
+		break;
+	}
 }
 #if 1
 void co_sdo_read_object(CAN_master *p_cm, const uint32_t mux, const uint32_t node_id,
