@@ -28,6 +28,7 @@ static void cab_app_process_hmi_write_command(Cabinet_App* p_ca, const uint8_t m
 static void cab_app_process_hmi_read_command(Cabinet_App* p_ca, const uint8_t msg_id);
 static void cab_app_confirm_hmi_cmd(Cabinet_App* p_ca, const uint8_t msg_id, char* buff);
 static uint8_t cab_app_get_obj_state(Cabinet_App* p_ca, const uint8_t msg_id);
+static void cab_app_write_bss_sn(Cabinet* p_ca);
 
 void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
 	if(p_ca->base.CO_base.sdo_client.status != CO_SDO_RT_idle) return;
@@ -501,17 +502,14 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 					continue;
 				}
 				cab_app_active_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
-				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.node_id !=
-						p_ca->base.sdo_server.node_id_processing) continue;
-				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success)
-				{
+				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success || p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort){
 					p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 				}
+				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.node_id !=
+						p_ca->base.sdo_server.node_id_processing) continue;
 				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_CHARGING){
 					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_CHARGING;
 				}
-				else if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort)
-					p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 			}
 		}
 		else
@@ -548,4 +546,8 @@ void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 			}
 		}
 	}
+}
+
+static void cab_app_write_bss_sn(Cabinet* p_ca){
+
 }

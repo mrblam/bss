@@ -36,7 +36,7 @@
 #define ADC_RESOLUTION							4095
 
 #define ENABLE_CELL_FAN							0
-#define ENABLE_IWDG_TIMER						0
+#define ENABLE_IWDG_TIMER						1
 #define ENABLE_CHARGER							1
 
 #define CABINET_START_NODE_ID					5

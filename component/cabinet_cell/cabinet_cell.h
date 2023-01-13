@@ -16,6 +16,7 @@
 #include "switch.h"
 #include "ntc.h"
 #include "string_util.h"
+#include "string.h"
 
 typedef struct Cabinet_t Cabinet;
 

@@ -56,7 +56,7 @@ static void can_hardware_init_module(void) {
 	can_port.can_module.Init.SyncJumpWidth = CAN_SJW_1TQ;
 	can_port.can_module.Init.TimeSeg1 = CAN_BS1_15TQ;
 	can_port.can_module.Init.TimeSeg2 = CAN_BS2_8TQ;
-	can_port.can_module.Init.AutoBusOff = DISABLE;
+	can_port.can_module.Init.AutoBusOff = ENABLE;
 	can_port.can_module.Init.AutoRetransmission = DISABLE;
 	can_port.can_module.Init.AutoWakeUp = DISABLE;
 	can_port.can_module.Init.ReceiveFifoLocked = DISABLE;

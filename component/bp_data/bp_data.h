@@ -12,6 +12,7 @@
 #include "stdlib.h"
 #include "string_util.h"
 #include "CO.h"
+#include "string.h"
 
 typedef struct BP_t BP;
 
