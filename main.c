@@ -87,6 +87,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		}
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+		can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
 		break;
 	case BSS_ST_INIT:
 	case BSS_ST_FAIL:

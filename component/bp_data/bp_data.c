@@ -40,7 +40,7 @@ void bp_reset_data(BP* p_bp){
 	p_bp->vol = 0;
 }
 
-static void bp_data_serialize_impl(BP* p_bp, char* buff){
+static void bp_data_serialize_impl(BP* p_bp, char* buff){  /// add bss_sn,camel_sn
 	*buff++=':';
 	*buff++='R';
     *buff++=',';

@@ -114,6 +114,14 @@ typedef enum CM_ASSIGN_STATE{
 	CM_ASSIGN_ST_FAIL
 } CM_ASSIGN_STATE;
 
+typedef enum SN_ASSIGN_STATE{
+	BMS_MATED_DEV_START_WRITE_SN,
+	BMS_MATED_DEV_CHECK_WRITE_SN_STATE,
+	BMS_MATED_DEV_WRITE_BSS_SN,
+	BMS_MATED_DEV_WRITE_DONE
+} SN_ASSIGN_STATE;
+
+
 struct CAN_master_t{
 	CO 							CO_base; // new
 	uint8_t 					is_active;
@@ -121,6 +129,7 @@ struct CAN_master_t{
 	uint32_t 					slave_start_node_id;
 	uint32_t 					node_id_scan_cobid;
 	CM_ASSIGN_STATE				assign_state;
+	SN_ASSIGN_STATE				sn_assign_state;
 	uint32_t 					assign_timeout;
 	CO_Slave**					slaves;
 	CO_Slave* 					assigning_slave;
@@ -134,6 +143,9 @@ struct CAN_master_t{
 	CO_Sub_Object 				serial_number_sobj;
 	CO_Sub_Object				data_write_bms_od;
 	uint8_t						bms_mainswitch_state;
+	uint8_t						bms_matting_state;
+	uint8_t						bss_sn[32];
+	uint8_t						camel_sn[32];
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
 	void (*on_slave_assign_fail)(CAN_master* p_cm,uint32_t slave_id);
 	void (*reassign_attemp)(CAN_master* p_cm);
@@ -149,8 +161,9 @@ void can_master_init(CAN_master* p_cm,CO_Slave** slaves, const uint32_t slave_nu
 void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_start_assign_next_slave(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp);
+void can_master_update_sn_assign_process(CAN_master* p_cm);
 void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id, uint32_t timestamp);
-void can_master_write_bms_mainswitch_object(CAN_master* p_cm, uint8_t slave_id, BMS_OBJ bms_obj, uint32_t timestamp);
+void can_master_write_bms_object(CAN_master* p_cm, uint8_t slave_id, BMS_OBJ bms_obj, uint32_t timestamp);
 void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave, uint32_t timestamp);
 void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp);
 void co_sdo_read_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,uint8_t* rx_buff,const uint32_t timeout);

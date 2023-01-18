@@ -28,7 +28,7 @@ static void cab_app_process_hmi_write_command(Cabinet_App* p_ca, const uint8_t m
 static void cab_app_process_hmi_read_command(Cabinet_App* p_ca, const uint8_t msg_id);
 static void cab_app_confirm_hmi_cmd(Cabinet_App* p_ca, const uint8_t msg_id, char* buff);
 static uint8_t cab_app_get_obj_state(Cabinet_App* p_ca, const uint8_t msg_id);
-static void cab_app_write_bss_sn(Cabinet* p_ca);
+static void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
 
 void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
 	if(p_ca->base.CO_base.sdo_client.status != CO_SDO_RT_idle) return;
@@ -36,7 +36,7 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 	/*On BP*/
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_CHARGING;
-	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
+	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
 //	if(p_ca->base.sdo_write_object != NULL)
 //	{
 //		p_ca->base.sdo_write_object();
@@ -55,7 +55,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 	/*Off BP*/
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_DISCHARGING;
-	can_master_write_bms_mainswitch_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
+	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
 //	if(p_ca->base.sdo_write_object != NULL)
 //	{
 //		p_ca->base.sdo_write_object();
@@ -76,12 +76,12 @@ void cab_app_delivery_bp(Cabinet_App* p_ca, CABIN_ID cab_id){
 	p_ca->bss.cabs[cab_id].op_state = CAB_CELL_ST_EMPTY;
 }
 
-void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){
+void cab_app_sync_bss_data_hmi(Cabinet_App* p_ca){   //not use
 	bss_data_serialize(&p_ca->bss, tx_buff);
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
 }
 
-void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){
+void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){    // not use
 	if((p_ca->bss.cabs[cab_id].bp->base.con_state!=CO_SLAVE_CON_ST_CONNECTED) ||
 			(p_ca->bss.cabs[cab_id].bp->vol == 0)) return;
 
@@ -89,7 +89,7 @@ void cab_app_sync_bp_data_hmi(Cabinet_App* p_ca,uint8_t cab_id){
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
 }
 
-void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){
+void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){ ///not use
 	cab_cell_data_serialize(&p_ca->bss.cabs[cab_id], tx_buff);
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
 }
@@ -279,6 +279,7 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 		}
 		else if(state == CAB_CELL_ST_EMPTY){
 			cab_cell_set_op_state(&p_ca->bss.cabs[id], CAB_CELL_ST_EMPTY);
+			co_slave_set_con_state(&p_ca->bss.cabs[id].bp->base, CO_SLAVE_CON_ST_DISCONNECT);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
 		else if(state == CAB_CELL_ST_INIT){
@@ -544,6 +545,16 @@ void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 	}
 }
 
-static void cab_app_write_bss_sn(Cabinet* p_ca){
-
+static void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp){
+//	if(p_ca->base.CO_base.sdo_client.status != CO_SDO_RT_idle) return;
+	/*Off BP*/
+	p_ca->base.bss_sn[0] = 'b';
+	p_ca->base.bss_sn[1] = 's';
+	p_ca->base.bss_sn[2] = 's';
+	p_ca->base.bss_sn[3] = '_';
+	p_ca->base.bss_sn[4] = 'v';
+	p_ca->base.bss_sn[5] = '1';
+	p_ca->base.bss_sn[6] = '.';
+	p_ca->base.bss_sn[7] = '0';
+	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MATED_DEV, timestamp);
 }

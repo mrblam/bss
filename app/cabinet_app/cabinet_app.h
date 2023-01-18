@@ -51,7 +51,9 @@ typedef enum SUB_OBJS{
 	OP_STATE 		= 'O',
 	SYNC_DATA		= 'Y',
 	CAB_NUM			= 'N',
-	TEMP			= 'T'
+	TEMP			= 'T',
+	S2_CAMEL_SN		= 'M',
+	BSS_SN			= 'B'
 } SUB_OBJS;
 
 #define STATE_OK		'O'
