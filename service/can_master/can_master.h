@@ -145,6 +145,7 @@ struct CAN_master_t{
 	uint8_t						bms_mainswitch_state;
 	uint8_t						bms_matting_state;
 	uint8_t						bss_sn[32];
+	uint8_t						slave_id;
 	uint8_t						camel_sn[32];
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
 	void (*on_slave_assign_fail)(CAN_master* p_cm,uint32_t slave_id);

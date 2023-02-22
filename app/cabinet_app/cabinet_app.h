@@ -53,7 +53,8 @@ typedef enum SUB_OBJS{
 	CAB_NUM			= 'N',
 	TEMP			= 'T',
 	S2_CAMEL_SN		= 'M',
-	BSS_SN			= 'B'
+	BSS_SN			= 'B',
+	WRITE_SN		= 'V'
 } SUB_OBJS;
 
 #define STATE_OK		'O'
@@ -66,6 +67,7 @@ struct CSV_t{
 	MAIN_OBJS		main_obj[AVAILABLE_HMI_MSG_NUM];
 	SUB_OBJS		sub_obj[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			obj_state[AVAILABLE_HMI_MSG_NUM];
+	uint8_t			data[32];
 	uint8_t			is_new_data;
 	uint8_t			is_new_msg_to_send[AVAILABLE_HMI_MSG_NUM];
 	uint8_t 		valid_msg_num;
@@ -98,6 +100,7 @@ void cab_app_check_buffer(Cabinet_App* p_ca);
 void cab_app_send_msg_to_hmi(Cabinet_App* p_ca);
 void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp);
 void cab_app_update_connected_cab_state(Cabinet_App* p_app);
+void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
 
 static inline CABINET_APP_STATE cab_app_get_state(Cabinet_App* p_ca){
 	return p_ca->state;

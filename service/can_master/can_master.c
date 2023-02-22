@@ -8,7 +8,7 @@
 #include "can_master.h"
 
 uint8_t reassign_attemp_cnt = 0;
-
+static int delay = 0;
 CAN_master CAN_master_obj;
 
 static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_cm);
@@ -276,6 +276,7 @@ void can_master_write_bms_object(CAN_master* p_cm, uint8_t cab_id, BMS_OBJ bms_o
 		break;
 	case BMS_MATED_DEV:
 		p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_BSS_SN;
+		p_cm->slave_id = cab_id;
 		break;
 	default :
 		break;
@@ -383,12 +384,12 @@ static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_c
 }
 
 void can_master_update_sn_assign_process(CAN_master* p_cm){
-	uint8_t cab_id ;
 	switch(p_cm->sn_assign_state){
 	case BMS_MATED_DEV_WRITE_BSS_SN:
 		if(p_cm->CO_base.sdo_client.status == CO_SDO_RT_abort || p_cm->CO_base.sdo_client.status == CO_SDO_RT_success){
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
-			cab_id = p_cm->assigning_slave->node_id - p_cm->slave_start_node_id;
+		}
+		if(p_cm->CO_base.sdo_client.status == CO_SDO_RT_idle){
 			/*Init SDO data*/
 			p_cm->data_write_bms_od.p_data = &p_cm->bss_sn[0];
 			p_cm->data_write_bms_od.attr   = ODA_SDO_RW;
@@ -396,7 +397,7 @@ void can_master_update_sn_assign_process(CAN_master* p_cm){
 			p_cm->data_write_bms_od.p_ext  = NULL;
 			/*Start download*/
 			CO_SDOclient_start_download(&p_cm->CO_base.sdo_client,
-										p_cm->slaves[cab_id]->node_id,
+										p_cm->slaves[p_cm->slave_id]->node_id,
 										0x2004,
 										0x01,
 										&p_cm->data_write_bms_od,
@@ -406,29 +407,32 @@ void can_master_update_sn_assign_process(CAN_master* p_cm){
 		break;
 	case BMS_MATED_DEV_CHECK_WRITE_SN_STATE:
 		if(p_cm->CO_base.sdo_client.status == CO_SDO_RT_abort){
-
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
 		}
 		if(p_cm->CO_base.sdo_client.status == CO_SDO_RT_success){
-			uint8_t cab_id = p_cm->assigning_slave->node_id - p_cm->slave_start_node_id;
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
+			delay++;
 			/*Init SDO data*/
-			if(p_cm->bss_sn[0] == '\0'){
+			if(delay > 100){
+				delay = 0;
 				p_cm->serial_number_sobj.attr 	= ODA_SDO_RW;		//<< [skip] set ODA_SDO_RW
-				p_cm->serial_number_sobj.p_data = p_cm->bss_sn;		//<< Address variable receiving data
+				p_cm->serial_number_sobj.p_data = p_cm->slaves[p_cm->slave_id]->xe_sn;		//<< Address variable receiving data
 				p_cm->serial_number_sobj.len 	= 32;				//<< Maximum data size that can be received
 				p_cm->serial_number_sobj.p_ext	= NULL;				//<< [option], set NULL if not used
 				/*Start upload*/
 				CO_SDOclient_start_upload(&p_cm->CO_base.sdo_client,
-											p_cm->slaves[cab_id]->node_id,
-											BMS_INDEX,
-											BMS_SERIAL_NUMBER_OBJECT_SUB_INDEX,
+											p_cm->slaves[p_cm->slave_id]->node_id,
+											0x2004,
+											0x01,
 											&p_cm->serial_number_sobj,
 											SDO_READ_OBJ_TIMEOUT_mS);
-			}else{
-				p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_DONE;
 			}
 		}
+//		if(p_cm->slaves[p_cm->slave_id]->xe_sn[0] != '\0'){
+//		p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_BSS_SN; //hmi
+		p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_DONE; //master
+//		}
+
 		break;
 	case BMS_MATED_DEV_WRITE_DONE:
 		break;

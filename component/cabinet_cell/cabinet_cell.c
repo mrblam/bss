@@ -111,6 +111,14 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cab->cell_fan.state,buff);
     *buff++=',';
+//	buff+=long_to_string(p_cab->charger.state,buff);
+//  *buff++=',';
+//    if(p_cab->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED){
+//        for(uint8_t i = 0; *(p_cab->bp->camel_sn + i) != '\0'; i++){
+//        	*buff++= *(p_cab->bp->camel_sn + strlen((const char*)p_cab->bp->camel_sn) - 1 - i);
+//        }
+//    }
+//	*buff++=',';
 	buff+=long_to_string(p_cab->temp,buff);
     *buff++=',';
 //|| p_cab->bp->base.con_state == CO_SLAVE_CON_ST_AUTHORIZING

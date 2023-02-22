@@ -28,7 +28,7 @@ static void cab_app_process_hmi_write_command(Cabinet_App* p_ca, const uint8_t m
 static void cab_app_process_hmi_read_command(Cabinet_App* p_ca, const uint8_t msg_id);
 static void cab_app_confirm_hmi_cmd(Cabinet_App* p_ca, const uint8_t msg_id, char* buff);
 static uint8_t cab_app_get_obj_state(Cabinet_App* p_ca, const uint8_t msg_id);
-static void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
+void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
 
 void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
 	if(p_ca->base.CO_base.sdo_client.status != CO_SDO_RT_idle) return;
@@ -37,10 +37,10 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_CHARGING;
 	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
-//	if(p_ca->base.sdo_write_object != NULL)
-//	{
-//		p_ca->base.sdo_write_object();
-//	}
+	//	if(p_ca->base.sdo_write_object != NULL)
+	//	{
+	//		p_ca->base.sdo_write_object();
+	//	}
 #else
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
@@ -56,10 +56,10 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_DISCHARGING;
 	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
-//	if(p_ca->base.sdo_write_object != NULL)
-//	{
-//		p_ca->base.sdo_write_object();
-//	}
+	//	if(p_ca->base.sdo_write_object != NULL)
+	//	{
+	//		p_ca->base.sdo_write_object();
+	//	}
 #else
 	co_sdo_write_object(&p_ca->base, BMS_MAINSWITCH_INDEX,
 			p_ca->bss.cabs[cab_id].bp->base.node_id,
@@ -96,8 +96,9 @@ void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){ ///not use
 
 void cab_app_send_msg_to_hmi(Cabinet_App* p_ca){
 	(void)p_ca;
+	//	sprintf((char*)p_ca->bss.cabs->bp->camel_sn,(char*)p_ca->base.camel_sn);
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
-//	uart_sends(&debug_com, (uint8_t*)tx_buff);
+	//	uart_sends(&debug_com, (uint8_t*)tx_buff);
 }
 
 void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp){
@@ -143,31 +144,31 @@ static void cab_app_process_hmi_write_command(Cabinet_App* p_ca, const uint8_t m
 }
 
 static void cab_app_process_hmi_read_command(Cabinet_App* p_ca, const uint8_t msg_id){
-		switch(p_ca->hmi_csv.main_obj[msg_id]){
-		case BSS_STATION:
-			if(p_ca->hmi_csv.sub_obj[msg_id] == ALL){
-				bss_data_serialize(&p_ca->bss, tx_buff);
-			}
-			else {
-				p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
-				cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
-			}
-			break;
-		case BSS_CABINET:
-			if(p_ca->hmi_csv.sub_obj[msg_id] == ALL){
-				cab_cell_data_serialize(&p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]], tx_buff);
-			}
-			else{
-				p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
-				cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
-			}
-			break;
-		case BSS_BP:
-			bp_data_serialize(p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]].bp, tx_buff);
-			break;
-		default:
-			break;
+	switch(p_ca->hmi_csv.main_obj[msg_id]){
+	case BSS_STATION:
+		if(p_ca->hmi_csv.sub_obj[msg_id] == ALL){
+			bss_data_serialize(&p_ca->bss, tx_buff);
 		}
+		else {
+			p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
+			cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
+		}
+		break;
+	case BSS_CABINET:
+		if(p_ca->hmi_csv.sub_obj[msg_id] == ALL){
+			cab_cell_data_serialize(&p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]], tx_buff);
+		}
+		else{
+			p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
+			cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
+		}
+		break;
+	case BSS_BP:
+		bp_data_serialize(p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]].bp, tx_buff);
+		break;
+	default:
+		break;
+	}
 }
 
 static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t msg_id, const uint32_t timestamp){
@@ -178,12 +179,12 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 	switch(sub_obj){
 	case BSS_ID_ASSIGN:
 		//if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
-//			can_master_disable_pdo((CAN_master*)p_ca);
-			can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[state], timestamp);
-			reassign_attemp_cnt = 0;
-			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-//		}
-//		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+		//			can_master_disable_pdo((CAN_master*)p_ca);
+		can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[state], timestamp);
+		reassign_attemp_cnt = 0;
+		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+		//		}
+		//		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 
 		break;
 	case BSS_AUTHORIZE:
@@ -273,7 +274,7 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 
 	case OP_STATE:
 		if(state == CAB_CELL_ST_INACTIVE){
-//			cab_cell_set_op_state(&p_ca->bss.cabs[id], CAB_CELL_ST_INACTIVE);
+			//			cab_cell_set_op_state(&p_ca->bss.cabs[id], CAB_CELL_ST_INACTIVE);
 			cab_cell_reset(&p_ca->bss.cabs[id]);
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		}
@@ -288,11 +289,15 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 		}
 		break;
 
-/* Use for test Slave LED */
+		/* Use for test Slave LED */
 	case LAMP:
 		rs485_master_process_switch_command(p_ca->slave_com, 0, SLAVE_LED, state);
 		break;
-
+	case WRITE_SN:
+		memcpy(p_ca->base.bss_sn,p_ca->hmi_csv.data,sizeof(p_ca->hmi_csv.data));
+		cab_app_write_bss_sn(p_ca,id,2000);
+		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+		break;
 	default:
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 		break;
@@ -407,10 +412,17 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 		p_ca->hmi_csv.sub_obj[p_ca->hmi_csv.valid_msg_num] = *token;
 		token += 3;
 		if((*token != '*') ){
-			*(token+1) = '\0';
-			token -= 1;
-			p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token);
-			token += 3;
+			if(*(token+9) != '*'){
+				token -=1;
+				for(uint8_t i = 0; i<8;i++){
+					p_ca->hmi_csv.data[i] = *(token+i);
+				}
+			}else{
+				*(token+1) = '\0';
+				token -= 1;
+				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token);
+				token += 3;
+			}
 		}
 		else {
 			*token = '\0';
@@ -438,20 +450,20 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 					|| (charge_no_cur_timestamp[id] >= 10000) )
 			{
 				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_OVER_CHARGE_THRESHOLD)
+					//						&& p_ca->bss.ac_chargers[id].charging_cabin->bp->cur < CUR_STOP_CHARGER_THRESHOLD)
 				{
-//					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);		// why sw_off before cab_deactive_charger
+					//					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);		// why sw_off before cab_deactive_charger
 					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
-
 					if((p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success)){
 						p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 					}
 					if(p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_STANDBY)
-//							|| (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort)) /// luu y sua lai bang cach goi ham de thay doi gia tri bien
+						//							|| (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort)) /// luu y sua lai bang cach goi ham de thay doi gia tri bien
 					{
 						{
 							sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
-//							p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
-//							p_ca->base.sdo_server.state = SDO_ST_IDLE;
+							//							p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
+							//							p_ca->base.sdo_server.state = SDO_ST_IDLE;
 							p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
 							p_ca->bss.ac_chargers[id].charging_cabin = NULL;
 							charge_no_cur_timestamp[id] = 0;
@@ -468,8 +480,6 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 					{
 						{
 							sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
-//							p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
-//							p_ca->base.sdo_server.state = SDO_ST_IDLE;
 							p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
 							p_ca->bss.ac_chargers[id].charging_cabin = NULL;
 							charge_no_cur_timestamp[id] = 0;
@@ -493,7 +503,7 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 				if(cab_cell_get_op_state(p_ca->bss.ac_chargers[id].charging_cabin) == CAB_CELL_ST_CHARGING){
 					if(p_ca->bss.ac_chargers[id].charging_cabin->bp->cur < 100) charge_no_cur_timestamp[id] += 10;
 					else{
-//						swicth_time_charger +=10;
+						//						swicth_time_charger +=10;
 						charge_no_cur_timestamp[id] = 0;
 					}
 					continue;
@@ -511,7 +521,7 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 		}
 		else
 		{
-	 		Cabinet* cab = bss_get_cab_need_charge(&p_ca->bss, id);
+			Cabinet* cab = bss_get_cab_need_charge(&p_ca->bss, id);
 			if(cab != NULL){
 				delay_time_10ms ++;
 				if(delay_time_10ms > 500){					// delay 5s
@@ -519,11 +529,7 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 					p_ca->bss.ac_chargers[id].charging_cabin = cab;
 					sw_on(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 				}
-//				if(p_ca->bss.ac_chargers[id].charging_cabin->charger.state == SW_ST_ON){
-//					p_ca->bss.ac_chargers[id].charging_cabin = cab;
-//				}
 			}
-
 		}
 	}
 }
@@ -535,7 +541,7 @@ void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
 			if(p_app->bss.cabs[id].bp->base.inactive_time_ms <= BP_INACTIVE_TIMEOUT_mS) continue;
 			cab_cell_reset(&p_app->bss.cabs[id]);
-//			p_app->bss.cabs[id].op_state = CAB_CELL_ST_FAIL;
+			//			p_app->bss.cabs[id].op_state = CAB_CELL_ST_FAIL;
 			for(uint8_t i = 0; i < p_app->bss.charger_num; i++){
 				if(p_app->bss.ac_chargers[i].charging_cabin != &p_app->bss.cabs[id]) continue;
 				sw_off(&p_app->bss.ac_chargers[i].charging_cabin->charger);
@@ -545,16 +551,11 @@ void cab_app_update_connected_cab_state(Cabinet_App* p_app){
 	}
 }
 
-static void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp){
-//	if(p_ca->base.CO_base.sdo_client.status != CO_SDO_RT_idle) return;
-	/*Off BP*/
-	p_ca->base.bss_sn[0] = 'b';
-	p_ca->base.bss_sn[1] = 's';
-	p_ca->base.bss_sn[2] = 's';
-	p_ca->base.bss_sn[3] = '_';
-	p_ca->base.bss_sn[4] = 'v';
-	p_ca->base.bss_sn[5] = '1';
-	p_ca->base.bss_sn[6] = '.';
-	p_ca->base.bss_sn[7] = '0';
-	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MATED_DEV, timestamp);
+void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp){
+	//	if(p_ca->base.CO_base.sdo_client.status != CO_SDO_RT_idle) return;
+	//if(p_ca->base.sn_assign_state == BMS_MATED_DEV_WRITE_DONE ||
+	//		p_ca->base.sn_assign_state == BMS_MATED_DEV_START_WRITE_SN){
+	//	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MATED_DEV, timestamp);
+	//}
+	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MATED_DEV, timestamp);//hmi
 }

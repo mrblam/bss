@@ -25,6 +25,7 @@ struct CO_Slave_t{
 	uint32_t node_id;
 	uint32_t sdo_server_address;
 	uint8_t  sn[32];
+	uint8_t  xe_sn[32];
 	CO_SLAVE_NET_STATE con_state;
 	bool     is_reconnect;
 	void     (*disconnect_handle)(CO_Slave*);

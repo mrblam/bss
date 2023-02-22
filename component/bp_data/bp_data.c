@@ -27,7 +27,7 @@ BP* bp_construct(uint8_t id){
 	for(uint8_t i = 0; i < 16; i++) p_bp->cell_vol[i] = 0;
 	for(uint8_t i = 0; i < 8; i++) p_bp->temp[i] = 0;
 	for(uint8_t i = 0; i < 32; i++) p_bp->base.sn[i] = 0;
-
+	for(uint8_t i = 0; i < 32; i++) p_bp->base.xe_sn[i] = 0;
 	p_bp->data_serialize = bp_data_serialize_impl;
 	return p_bp;
 }
@@ -76,7 +76,17 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){  /// add bss_sn,camel_
     *buff++=',';
 	buff+=long_to_string(p_bp->soc,buff);
     *buff++=',';
-	buff+=long_to_string(p_bp->soh,buff);
+	buff+=long_to_string(p_bp->soh,buff);//ma xe
+    *buff++=',';
+    if(p_bp->base.xe_sn[0] == '\0'){
+    	*buff++='0';
+    }
+    else{
+        for(uint8_t i = 0; *(p_bp->base.xe_sn + i) != '\0'; i++){
+
+        	*buff++= *(p_bp->base.xe_sn + i) ;
+        }
+    }
     *buff++=',';
     *buff++='[';
     for(uint8_t i = 0; i < 16; i++){

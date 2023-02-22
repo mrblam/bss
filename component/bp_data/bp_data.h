@@ -55,6 +55,7 @@ struct BP_t{
 	uint32_t 	vol;
 	int32_t 	cur;
 	uint32_t 	cycle;
+	uint8_t		camel_sn[32];
 	uint8_t		bss[32];
 	uint8_t 	cell_vol[16];
 	uint8_t 	temp[8];
