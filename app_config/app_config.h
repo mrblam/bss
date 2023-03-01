@@ -10,7 +10,7 @@
 #include "core_hal.h"
 
 #define APP_STATE_MACHINE_UPDATE_TICK_mS 		(1000/HAL_SYSTICK_FREQ_Hz)
-#define BP_INACTIVE_TIMEOUT_mS           		1500
+#define BP_INACTIVE_TIMEOUT_mS           		5000
 #define CHECK_HMI_MSG_TIME_mS					200
 #define SDO_SET_BMS_MAIN_SW_TIMEOUT_mS			1000
 #define PDO_READ_BP_DATA_TIME_mS				2000
@@ -38,7 +38,7 @@
 
 #define ENABLE_CELL_FAN							0
 #define ENABLE_IWDG_TIMER						1
-#define ENABLE_CHARGER							0
+#define ENABLE_CHARGER							1
 
 #define CABINET_START_NODE_ID					5
 
