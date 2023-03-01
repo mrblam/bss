@@ -38,7 +38,7 @@
 
 #define ENABLE_CELL_FAN							0
 #define ENABLE_IWDG_TIMER						1
-#define ENABLE_CHARGER							1
+#define ENABLE_CHARGER							0
 
 #define CABINET_START_NODE_ID					5
 

@@ -392,8 +392,35 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 		stop = cab_app_search_char((char*)buff, stop + 2, p_ca->rx_index, '*');
 		if(stop <= start) break;
 		/* Parse data */
+		// W,S,0,I,0*
+		// W,S,0,V,NADE0999*
+		// W,S,0,D,1*
+		// R,C,0,A*
+		// R,B,
 		uint8_t* token = &buff[start + 1];
+#if 1
+		token = (uint8_t*)strtok((char*)token, ",");
 		p_ca->hmi_csv.cmd_code[p_ca->hmi_csv.valid_msg_num] = *token;
+		token = (uint8_t*)strtok(NULL, ",");
+		p_ca->hmi_csv.main_obj[p_ca->hmi_csv.valid_msg_num] = *token;
+		token = (uint8_t*)strtok(NULL, ",");
+		p_ca->hmi_csv.id[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token);
+		token = (uint8_t*)strtok(NULL, ",");
+		p_ca->hmi_csv.sub_obj[p_ca->hmi_csv.valid_msg_num] = *token;
+		if(*token != 'V'){
+			token = (uint8_t*)strtok(NULL, "*");
+			if((*token != STATE_OK) && (*token != STATE_FAIL)){
+				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token);
+			}
+			else{
+				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = *token;
+			}
+		}else{
+			token = (uint8_t*)strtok(NULL, "*");
+			 memcpy(p_ca->hmi_csv.data,token, strlen((const char *)token));
+		}
+
+#else
 		token += 2;
 		p_ca->hmi_csv.main_obj[p_ca->hmi_csv.valid_msg_num] = *token;
 		token += 3;
@@ -418,9 +445,10 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 					p_ca->hmi_csv.data[i] = *(token+i);
 				}
 			}else{
+				token
 				*(token+1) = '\0';
 				token -= 1;
-				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token);
+				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*)token); //token = id
 				token += 3;
 			}
 		}
@@ -433,6 +461,7 @@ void cab_app_check_buffer(Cabinet_App* p_ca){
 			else p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = *token;
 			token += 2;
 		}
+#endif
 		p_ca->hmi_csv.valid_msg_num++;
 	} while((start >= 0) && (stop > start));
 	p_ca->is_new_msg = 0;

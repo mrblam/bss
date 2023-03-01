@@ -59,8 +59,6 @@ int main(void) {
 		cab_cell_reset_io(&selex_bss_app.bss.cabs[i]);
 	}
 	while (1){
-		selex_bss_app.base.bss_sn[0]++;
-		cab_app_write_bss_sn(&selex_bss_app,1,2000);
 	}
 }
 void TIM2_IRQHandler(void)   //1ms
