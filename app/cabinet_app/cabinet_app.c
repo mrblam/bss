@@ -37,6 +37,7 @@ void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t tim
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_CHARGING;
 	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
+	p_ca->base.sdo_service = SDO_SERVICE_ACTIVE_CHARGER;
 	//	if(p_ca->base.sdo_write_object != NULL)
 	//	{
 	//		p_ca->base.sdo_write_object();
@@ -56,6 +57,7 @@ void cab_app_deactive_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t t
 #if 1
 	p_ca->base.bms_mainswitch_state = BMS_STATE_DISCHARGING;
 	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MAINSWITCH, timestamp);
+	p_ca->base.sdo_service = SDO_SERVICE_DEACTIVE_CHARGER;
 	//	if(p_ca->base.sdo_write_object != NULL)
 	//	{
 	//		p_ca->base.sdo_write_object();
@@ -294,7 +296,7 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App* p_ca, const uint8_t m
 		rs485_master_process_switch_command(p_ca->slave_com, 0, SLAVE_LED, state);
 		break;
 	case WRITE_SN:
-		memcpy(p_ca->base.bss_sn,p_ca->hmi_csv.data,sizeof(p_ca->hmi_csv.data));
+		memcpy(p_ca->base.hmi_xe_sn,p_ca->hmi_csv.data,sizeof(p_ca->hmi_csv.data));
 		cab_app_write_bss_sn(p_ca,id,2000);
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 		break;
@@ -483,9 +485,12 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 				{
 					//					sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);		// why sw_off before cab_deactive_charger
 					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
-					if((p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success)){
+					if((p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success) && (p_ca->base.sdo_service == SDO_SERVICE_DEACTIVE_CHARGER)){
+						p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
+					}else if((p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort) && (p_ca->base.sdo_service == SDO_SERVICE_DEACTIVE_CHARGER)){
 						p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 					}
+
 					if(p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_STANDBY)
 						//							|| (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort)) /// luu y sua lai bang cach goi ham de thay doi gia tri bien
 					{
@@ -502,7 +507,10 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 				else //// charge_no_cur_timestamp[id] >= 10000
 				{
 					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
-					if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success){
+					if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success && p_ca->base.sdo_service == SDO_SERVICE_DEACTIVE_CHARGER){
+						p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
+					}
+					else if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort && p_ca->base.sdo_service == SDO_SERVICE_DEACTIVE_CHARGER){
 						p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 					}
 					if(p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_STANDBY)
@@ -515,8 +523,6 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 							swicth_time_charger = 0;
 						}
 					}
-					else if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort)
-						p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 				}
 			}
 			/* Process BP Disconnected */
@@ -538,7 +544,10 @@ void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp)
 					continue;
 				}
 				cab_app_active_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
-				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success || p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort){
+				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success && p_ca->base.sdo_service == SDO_SERVICE_ACTIVE_CHARGER){
+					p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
+				}
+				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort && p_ca->base.sdo_service == SDO_SERVICE_ACTIVE_CHARGER){
 					p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 				}
 				if(p_ca->bss.ac_chargers[id].charging_cabin->bp->base.node_id !=
