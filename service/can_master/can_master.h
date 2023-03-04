@@ -123,12 +123,13 @@ typedef enum SN_ASSIGN_STATE{
 } SN_ASSIGN_STATE;
 
 typedef enum SDO_SERVICE{
+	SDO_SERVICE_IDLE,
 	SDO_SERVICE_ACTIVE_CHARGER,
 	SDO_SERVICE_DEACTIVE_CHARGER,
 	SDO_SERVICE_READ_SN_BP,
 	SDO_SERVICE_WRITE_SN_XE,
-	SDO_SERVICE_READ_SN_XE,
-	SDO_SERVICE_IDLE
+	SDO_SERVICE_READ_SN_XE
+
 }SDO_SERVICE;
 
 struct CAN_master_t{
@@ -157,6 +158,14 @@ struct CAN_master_t{
 	uint8_t						slave_id;
 	uint8_t						camel_sn[32];
 	SDO_SERVICE					sdo_service;
+	int							write;
+	int							write_success;
+	int							write_abort;
+	int							read;
+	int							read_success;
+	int							read_abort_sdo_success;
+	int							read_abort;
+	bool						sdo_service_xe_sn_done;
 	void (*on_slave_assign_success)(const CAN_master* const p_cm,uint32_t slave_id);
 	void (*on_slave_assign_fail)(CAN_master* p_cm,uint32_t slave_id);
 	void (*reassign_attemp)(CAN_master* p_cm);

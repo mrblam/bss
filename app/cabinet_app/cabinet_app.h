@@ -101,7 +101,8 @@ void cab_app_send_msg_to_hmi(Cabinet_App* p_ca);
 void cab_app_update_charge(Cabinet_App* p_ca, const uint32_t timestamp);
 void cab_app_update_connected_cab_state(Cabinet_App* p_app);
 void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
-
+void cab_app_send_data_log(Cabinet_App* p_ca);
+void cabinet_app_data_log_serialize(Cabinet_App* p_ca,char* buff);
 static inline CABINET_APP_STATE cab_app_get_state(Cabinet_App* p_ca){
 	return p_ca->state;
 }

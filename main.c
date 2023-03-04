@@ -63,6 +63,7 @@ int main(void) {
 }
 void TIM2_IRQHandler(void)   //1ms
 {
+
 	tim2_timestamp ++;
 	if(node_id_high){
 		node_id_high = 0;
@@ -70,11 +71,13 @@ void TIM2_IRQHandler(void)   //1ms
 	}
 	CO_process(&CO_DEVICE,1);
 	HAL_TIM_IRQHandler(&hmi_timer);
+
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {					//10ms ///
 	sys_timestamp += sys_tick_ms;
+	BSS_CTRL_SPEAKER_HIGH;
 	switch(selex_bss_app.bss.state){
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
@@ -91,6 +94,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		break;
 	}
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
+	BSS_CTRL_SPEAKER_LOW;
 }
 
 /* --------------------------------------------------------------------------------------- */
@@ -117,7 +121,10 @@ void TIM3_IRQHandler(void) { //// 10ms
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
 #endif
-
+	if(selex_bss_app.base.sdo_service_xe_sn_done){
+		selex_bss_app.base.sdo_service_xe_sn_done = false;
+		cab_app_send_data_log(&selex_bss_app);
+	}
 	HAL_TIM_IRQHandler(&io_scan_timer);
 }
 

@@ -431,15 +431,18 @@ void can_master_update_sn_assign_process(CAN_master *p_cm) {
 					p_cm->slaves[p_cm->slave_id]->node_id, 0x2004, 0x01,
 					&p_cm->data_write_bms_od,
 					SDO_WRITE_OBJ_TIMEOUT_mS);
-			write++;
+			p_cm->write++;
 			p_cm->sdo_service = SDO_SERVICE_WRITE_SN_XE;
 			p_cm->sn_assign_state = BMS_MATED_DEV_CHECK_WRITE_SN_STATE;
 		}
 		break;
 	case BMS_MATED_DEV_CHECK_WRITE_SN_STATE:
-		if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_abort) {
+		if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_abort
+				&& p_cm->sdo_service == SDO_SERVICE_WRITE_SN_XE) {
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
-			write_abort++;
+			p_cm->write_abort++;
+			p_cm->sdo_service = SDO_SERVICE_IDLE;
+			p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_BSS_SN;
 		}
 		if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_success
 				&& p_cm->sdo_service == SDO_SERVICE_WRITE_SN_XE) {
@@ -447,7 +450,7 @@ void can_master_update_sn_assign_process(CAN_master *p_cm) {
 			/*Init SDO data*/
 			if (delay_ms > 30) {
 				delay_ms = 0;
-				write_success++;
+				p_cm->write_success++;
 				p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
 				p_cm->serial_number_sobj.attr = ODA_SDO_RW;	//<< [skip] set ODA_SDO_RW
 				p_cm->serial_number_sobj.p_data =
@@ -459,34 +462,40 @@ void can_master_update_sn_assign_process(CAN_master *p_cm) {
 						p_cm->slaves[p_cm->slave_id]->node_id, 0x2004, 0x01,
 						&p_cm->serial_number_sobj,
 						SDO_READ_OBJ_TIMEOUT_mS);
-				read++;
+				p_cm->read++;
 				p_cm->sdo_service = SDO_SERVICE_READ_SN_XE;
 				p_cm->sn_assign_state = BMS_MATED_DEV_CHECK_READ_BSS_SN;
 			}
 		}
-		//		if(p_cm->slaves[p_cm->slave_id]->xe_sn[0] != '\0'){
-		//		p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_BSS_SN; //hmi
-		//master
-		//		}
-
 		break;
 	case BMS_MATED_DEV_CHECK_READ_BSS_SN:
 		if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_success
 				&& p_cm->sdo_service == SDO_SERVICE_READ_SN_XE) {
-			p_cm->sdo_service == SDO_SERVICE_IDLE;
+			p_cm->sdo_service = SDO_SERVICE_IDLE;
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
-			read_success++;
+			p_cm->read_success++;
 			p_cm->sn_assign_state = BMS_MATED_DEV_DONE;
 		}
 		if (p_cm->CO_base.sdo_client.status == CO_SDO_RT_abort
 				&& p_cm->sdo_service == SDO_SERVICE_READ_SN_XE) {
-			p_cm->sdo_service == SDO_SERVICE_IDLE;
+			p_cm->sdo_service = SDO_SERVICE_IDLE;
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
-			read_abort++;
+			p_cm->read_abort++;
+			p_cm->serial_number_sobj.attr = ODA_SDO_RW;	//<< [skip] set ODA_SDO_RW
+			p_cm->serial_number_sobj.p_data = p_cm->slaves[p_cm->slave_id]->xe_sn;//<< Address variable receiving data
+			p_cm->serial_number_sobj.len = 32;//<< Maximum data size that can be received
+			p_cm->serial_number_sobj.p_ext = NULL;//<< [option], set NULL if not used
+			/*Start upload*/
+			CO_SDOclient_start_upload(&p_cm->CO_base.sdo_client,
+					p_cm->slaves[p_cm->slave_id]->node_id, 0x2004, 0x01,
+					&p_cm->serial_number_sobj,
+					SDO_READ_OBJ_TIMEOUT_mS);
+
 			p_cm->sn_assign_state = BMS_MATED_DEV_DONE;
 		}
 		break;
 	case BMS_MATED_DEV_DONE:
+		p_cm->sdo_service_xe_sn_done = true;
 //		p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_BSS_SN;
 		break;
 	default:

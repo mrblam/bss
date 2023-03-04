@@ -58,9 +58,8 @@ void bss_fan_init(void)
 		__HAL_RCC_GPIOB_CLK_ENABLE();
 		/*Configure GPIO pin Output Level */
 		HAL_GPIO_WritePin(BSS_FAN1_PORT, BSS_CTRL_FAN1, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(BSS_FAN2_PORT, BSS_CTRL_FAN2, GPIO_PIN_RESET);
 		/*Configure GPIO pins : PB4 PB5 */
-		GPIO_InitStruct.Pin = BSS_CTRL_FAN1|BSS_CTRL_FAN2;
+		GPIO_InitStruct.Pin = BSS_CTRL_FAN1;
 		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

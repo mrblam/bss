@@ -13,6 +13,7 @@ Cabinet_App selex_bss_app;
 
 
 static char tx_buff[200];
+static char data_log[200];
 static uint32_t charge_no_cur_timestamp[2] = {0, 0};
 static uint32_t swicth_time_charger = 0;
 uint32_t 	sys_timestamp = 0;
@@ -29,6 +30,8 @@ static void cab_app_process_hmi_read_command(Cabinet_App* p_ca, const uint8_t ms
 static void cab_app_confirm_hmi_cmd(Cabinet_App* p_ca, const uint8_t msg_id, char* buff);
 static uint8_t cab_app_get_obj_state(Cabinet_App* p_ca, const uint8_t msg_id);
 void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
+
+
 
 void cab_app_active_charge(Cabinet_App* p_ca, uint8_t cab_id, const uint32_t timestamp){
 	if(p_ca->base.CO_base.sdo_client.status != CO_SDO_RT_idle) return;
@@ -98,9 +101,7 @@ void cab_app_sync_cab_data_hmi(Cabinet_App* p_ca, uint8_t cab_id){ ///not use
 
 void cab_app_send_msg_to_hmi(Cabinet_App* p_ca){
 	(void)p_ca;
-	//	sprintf((char*)p_ca->bss.cabs->bp->camel_sn,(char*)p_ca->base.camel_sn);
 	uart_sends(&hmi_com, (uint8_t*)tx_buff);
-	//	uart_sends(&debug_com, (uint8_t*)tx_buff);
 }
 
 void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp){
@@ -180,14 +181,9 @@ static void	cab_app_process_hmi_write_bss_cmd(Cabinet_App* p_ca, const uint8_t m
 
 	switch(sub_obj){
 	case BSS_ID_ASSIGN:
-		//if(p_ca->base.assign_state == CM_ASSIGN_ST_DONE){
-		//			can_master_disable_pdo((CAN_master*)p_ca);
 		can_master_start_assign_slave((CAN_master*)p_ca, p_ca->base.slaves[state], timestamp);
 		reassign_attemp_cnt = 0;
 		p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-		//		}
-		//		else p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
-
 		break;
 	case BSS_AUTHORIZE:
 		if(p_ca->base.assign_state == CM_ASSIGN_ST_AUTHORIZING){
@@ -361,6 +357,16 @@ static void cab_app_confirm_hmi_cmd(Cabinet_App* p_ca, const uint8_t msg_id, cha
 	*buff++= ',';
 	if(p_ca->hmi_csv.cmd_code[msg_id] == HMI_WRITE){
 		*buff++=p_ca->hmi_csv.obj_state[msg_id];
+		*buff ++= ',';
+	    if(p_ca->hmi_csv.data[0] == '\0'){
+	    	*buff++='0';
+	    }
+	    else{
+	        for(uint8_t i = 0; *(p_ca->hmi_csv.data + i) != '\0'; i++){
+
+	        	*buff++= *(p_ca->hmi_csv.data + i);
+	        }
+	    }
 	}
 	else buff+=long_to_string(p_ca->hmi_csv.obj_state[msg_id], buff);
 	*buff++= '*';
@@ -596,4 +602,57 @@ void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t times
 	//	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MATED_DEV, timestamp);
 	//}
 	can_master_write_bms_object(&p_ca->base, cab_id, BMS_MATED_DEV, timestamp);//hmi
+}
+
+void cabinet_app_data_log_serialize(Cabinet_App* p_ca, char* buff){
+	*buff++= ':';
+    if(p_ca->hmi_csv.data[0] == '\0'){
+    	*buff++='0';
+    }
+    else{
+        for(uint8_t i = 0; *(p_ca->hmi_csv.data + i) != '\0'; i++){
+
+        	*buff++= *(p_ca->hmi_csv.data + i);
+        }
+    }
+	*buff++= ',';
+    if(p_ca->base.hmi_xe_sn[0] == '\0'){
+    	*buff++='0';
+    }
+    else{
+        for(uint8_t i = 0; *(p_ca->base.hmi_xe_sn + i) != '\0'; i++){
+
+        	*buff++= *(p_ca->base.hmi_xe_sn + i);
+        }
+    }
+	*buff++= ',';
+    if(p_ca->base.assigning_slave->xe_sn[0] == '\0'){
+    	*buff++='0';
+    }
+    else{
+        for(uint8_t i = 0; *(p_ca->base.assigning_slave->xe_sn + i) != '\0'; i++){
+
+        	*buff++= *(p_ca->base.assigning_slave->xe_sn + i);
+        }
+    }
+    *buff ++= ',';
+    buff += long_to_string(p_ca->base.write,buff);
+    *buff ++= ',';
+    buff += long_to_string(p_ca->base.write_success,buff);
+    *buff ++= ',';
+    buff += long_to_string(p_ca->base.write_abort,buff);
+    *buff ++= ',';
+    buff += long_to_string(p_ca->base.read,buff);
+    *buff ++= ',';
+    buff += long_to_string(p_ca->base.read_success,buff);
+    *buff ++= ',';
+    buff += long_to_string(p_ca->base.read_abort,buff);
+	*buff++= '*';
+	*buff++= '\n';
+	*buff++= '\0';
+}
+void cab_app_send_data_log(Cabinet_App* p_ca){
+	(void)p_ca;
+	cabinet_app_data_log_serialize(p_ca, data_log);
+	uart_sends(&debug_com, (uint8_t*)data_log);
 }
