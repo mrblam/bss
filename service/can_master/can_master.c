@@ -448,7 +448,7 @@ void can_master_update_sn_assign_process(CAN_master *p_cm) {
 				&& p_cm->sdo_service == SDO_SERVICE_WRITE_SN_XE) {
 			delay_ms++;
 			/*Init SDO data*/
-			if (delay_ms > 30) {
+			if (delay_ms > 1500) {
 				delay_ms = 0;
 				p_cm->write_success++;
 				p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
