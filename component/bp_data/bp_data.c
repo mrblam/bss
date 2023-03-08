@@ -8,11 +8,9 @@
 #include "bp_data.h"
 
 static void bp_data_serialize_impl(BP* p_bp, char* buff);
-
+static BP bp_arr[20] ;
 BP* bp_construct(uint8_t id){
-	BP* p_bp = (BP*)malloc(sizeof(BP));
-	while(p_bp == NULL);
-
+	BP* p_bp = &bp_arr[id];
 	p_bp->state = BP_ST_IDLE;
 	p_bp->charge_sw_state = 0;
 	p_bp->vol = 0;
