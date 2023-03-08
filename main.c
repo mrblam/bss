@@ -70,6 +70,7 @@ void TIM2_IRQHandler(void)   //1ms
 		can_master_slave_deselect(&selex_bss_app.base,selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id);
 	}
 	CO_process(&CO_DEVICE,1);
+	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
 	HAL_TIM_IRQHandler(&hmi_timer);
 
 }
@@ -87,7 +88,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		}
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
-		can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
 		break;
 	case BSS_ST_INIT:
 	case BSS_ST_FAIL:
@@ -99,8 +99,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 
 /* --------------------------------------------------------------------------------------- */
 
-void TIM3_IRQHandler(void) { //// 10ms
-	com_timestamp += sys_tick_ms;
+void TIM3_IRQHandler(void) { //// 5ms
+	com_timestamp += 5;
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 	/* Process HMI protocol */
