@@ -587,12 +587,20 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 		selex_bss_app.bss.cabs[bp_id].bp->status	= CO_getUint16(p_cm->p_hw->rx_data + 6);
 		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
-	case BP_LOW_CELLS_VOL_TPDO_COBID:
-		CO_memcpy(selex_bss_app.bss.cabs[bp_id].bp->cell_vol, p_cm->p_hw->rx_data, 8);
+	case BP_CELLS_VOL_1_TO_4:
+		CO_memcpy((uint8_t*)(selex_bss_app.bss.cabs[bp_id].bp->cell_vol), p_cm->p_hw->rx_data, 8);
 		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
-	case BP_HIGH_CELLS_VOL_TPDO_COBID:
-		CO_memcpy(selex_bss_app.bss.cabs[bp_id].bp->cell_vol + 8, p_cm->p_hw->rx_data, 8);
+	case BP_CELLS_VOL_5_TO_8:
+		CO_memcpy((uint8_t*)(selex_bss_app.bss.cabs[bp_id].bp->cell_vol + 4), p_cm->p_hw->rx_data, 8);
+		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
+		break;
+	case BP_CELLS_VOL_9_TO_12:
+		CO_memcpy((uint8_t*)(selex_bss_app.bss.cabs[bp_id].bp->cell_vol + 8), p_cm->p_hw->rx_data, 8);
+		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
+		break;
+	case BP_CELLS_VOL_13_TO_16:
+		CO_memcpy((uint8_t*)(selex_bss_app.bss.cabs[bp_id].bp->cell_vol + 12), p_cm->p_hw->rx_data, 8);
 		selex_bss_app.bss.cabs[bp_id].bp->is_data_available++;
 		break;
 	case BP_TEMP_TPDO_COBID:

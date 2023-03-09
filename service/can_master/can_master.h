@@ -49,8 +49,10 @@ typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 #define SDO_CS_ABORT                    7
 
 #define BP_VOL_CUR_TPDO_COBID                           CO_CAN_ID_TPDO_1
-#define BP_LOW_CELLS_VOL_TPDO_COBID                     CO_CAN_ID_TPDO_2
-#define BP_HIGH_CELLS_VOL_TPDO_COBID                    CO_CAN_ID_TPDO_3
+#define BP_CELLS_VOL_1_TO_4         		            CO_CAN_ID_TPDO_2
+#define BP_CELLS_VOL_5_TO_8			                    CO_CAN_ID_TPDO_3
+#define BP_CELLS_VOL_9_TO_12							CO_CAN_ID_RPDO_1
+#define BP_CELLS_VOL_13_TO_16							CO_CAN_ID_RPDO_2
 #define BP_TEMP_TPDO_COBID                              CO_CAN_ID_TPDO_4
 //
 //uint8_t serial_number_var[10];

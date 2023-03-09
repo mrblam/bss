@@ -57,7 +57,7 @@ struct BP_t{
 	uint32_t 	cycle;
 	uint8_t		camel_sn[32];
 	uint8_t		bss[32];
-	uint8_t 	cell_vol[16];
+	uint16_t 	cell_vol[16];
 	uint8_t 	temp[8];
 	BP_STATUS 	status;
 	uint8_t 	is_changed;
