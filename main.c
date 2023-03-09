@@ -143,6 +143,8 @@ static void can_receive_handle(CAN_Hw *p_hw)
 		case CO_CAN_ID_TPDO_2:
 		case CO_CAN_ID_TPDO_3:
 		case CO_CAN_ID_TPDO_4:
+		case CO_CAN_ID_RPDO_1:
+		case CO_CAN_ID_RPDO_2:
 		selex_bss_app.base.rpdo_process((CAN_master*)&selex_bss_app);
 			break;
 		default:
@@ -176,12 +178,14 @@ static void can_receive_handle(CAN_Hw *p_hw)
 
 static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 {
-	if(cab_id == p_app->bss.cab_num)
-	{
-		cab_id = 0;
+	if(p_app->slave_com->state == RS485_MASTER_ST_IDLE){
+		if(cab_id == p_app->bss.cab_num){
+				cab_id = 0;
+		}
+		cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);
+		cab_id++;
 	}
-	cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);
-	cab_id++;
+
 
 #if ENABLE_CHARGER
 	cab_app_update_charge(p_app, sys_timestamp);
