@@ -78,7 +78,7 @@ void TIM2_IRQHandler(void)   //1ms
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {					//10ms ///
 	sys_timestamp += sys_tick_ms;
-	BSS_CTRL_SPEAKER_HIGH;
+
 	switch(selex_bss_app.bss.state){
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
@@ -94,13 +94,14 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		break;
 	}
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
-	BSS_CTRL_SPEAKER_LOW;
+
 }
 
 /* --------------------------------------------------------------------------------------- */
 
 void TIM3_IRQHandler(void) { //// 5ms
 	com_timestamp += 5;
+
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 	/* Process HMI protocol */
@@ -109,7 +110,7 @@ void TIM3_IRQHandler(void) { //// 5ms
 		if(selex_bss_app.is_new_msg){
 			cab_app_check_buffer(&selex_bss_app);
 		}
-	}
+	} /// 0,5ms
 	/* Sync Data to HMI */
 	for(uint8_t i = 0; i < selex_bss_app.hmi_csv.valid_msg_num; i++){
 		if(selex_bss_app.hmi_csv.is_new_msg_to_send[i]){
