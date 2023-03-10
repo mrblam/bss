@@ -146,9 +146,10 @@ static uint8_t rs485_master_check_valid_msg(RS485_Master* p_485m){
 
 void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE_OBJECTS obj, SLAVE_OBJECT_STATE state){
 	rs485_master_set_csv_data(p_485m, id, obj, state);
-//	if(p_485m->state == RS485_MASTER_ST_IDLE){
+	while((p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
+			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM)){
 		p_485m->state = RS485_MASTER_ST_SEND_CMD;
-//	}
+	}
 //	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
 //			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
 //			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
