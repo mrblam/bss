@@ -125,6 +125,9 @@ void cab_app_process_hmi_command(Cabinet_App* p_ca, const uint32_t timestamp){
 		}
 		p_ca->hmi_csv.is_new_msg_to_send[i] = 1;
 		p_ca->hmi_csv.cmd_code[i] = p_ca->hmi_csv.id[i] = p_ca->hmi_csv.main_obj[i] = p_ca->hmi_csv.obj_state[i] = p_ca->hmi_csv.sub_obj[i] = 0;
+		for(uint8_t i = 0;i<32;i++){
+			p_ca->hmi_csv.data[i] = '\0';
+		}
 		while(p_ca->hmi_csv.is_new_msg_to_send[i] != 0);
 	}
 	p_ca->hmi_csv.valid_msg_num = 0;
