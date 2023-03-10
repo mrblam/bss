@@ -3,7 +3,7 @@
 UART_hw hmi_com;
 UART_hw rs485_com;
 UART_hw debug_com;
-
+DMA_HandleTypeDef hdma_usart3_tx;
 static void uart_hmi_hw_init(void);
 static void uart_rs485_hw_init(void);
 static void uart_debug_hw_init(void);
@@ -12,6 +12,7 @@ void uart_hw_init(void){
 	uart_hmi_hw_init();
 	uart_rs485_hw_init();
 	uart_debug_hw_init();
+	UART_DMA_Init();
 }
 
 static void uart_hmi_hw_init(void){
@@ -113,6 +114,21 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle){
 		/* USART3 interrupt Init */
 		HAL_NVIC_SetPriority(USART3_IRQn, UART_RX_HMI_IRQN_PRIORITY, 0);
 		HAL_NVIC_EnableIRQ(USART3_IRQn);
+#if USE_DMA_UART_TRANSMIT
+		hdma_usart3_tx.Instance = DMA1_Channel2;
+		hdma_usart3_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+		hdma_usart3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+		hdma_usart3_tx.Init.MemInc = DMA_MINC_ENABLE;
+		hdma_usart3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+		hdma_usart3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+		hdma_usart3_tx.Init.Mode = DMA_NORMAL;
+		hdma_usart3_tx.Init.Priority = DMA_PRIORITY_LOW;
+		if (HAL_DMA_Init(&hdma_usart3_tx) != HAL_OK) {
+			Error_Handler();
+		}
+
+		__HAL_LINKDMA(uartHandle, hdmatx, hdma_usart3_tx);
+#endif
 	}
 	else if(uartHandle->Instance == DEBUG_PORT_COM)
 	{
@@ -141,10 +157,27 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle){
 }
 
 void uart_sends(UART_hw* p_hw, uint8_t* s){
-	while(*s){
-		HAL_UART_Transmit(&p_hw->uart_module, s, 1, 500);
-		s++;
+#if USE_DMA_UART_TRANSMIT
+	int size_s = 0;
+	for (uint8_t i = 0; i < 200; i++) {
+		if(s[i] == '\0'){
+			size_s = i;
+			break;
+		}
 	}
+	HAL_UART_Transmit_DMA(&p_hw->uart_module, s, size_s);
+//		if(HAL_OK != HAL_UART_Transmit_DMA(&p_hw->uart_module, s, sizeof(s)))
+//		{
+//			this->send_state = MCU_UART__SEND_STATE__IDLE;
+//		}
+//		__HAL_DMA_DISABLE_IT(&p_hw->uart_module, DMA_IT_HT);
+#else
+	while(*s){
+			HAL_UART_Transmit(&p_hw->uart_module, s, 1, 500);
+			s++;
+		}
+
+#endif
 }
 
 char uart_receives(UART_hw* p_hw, char* s){
@@ -177,4 +210,16 @@ void USART2_IRQHandler(void){
 	{
 		debug_com.receive_handle(&debug_com);
 	}
+}
+void UART_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+
 }

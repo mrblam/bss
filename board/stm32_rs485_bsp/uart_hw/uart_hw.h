@@ -11,6 +11,7 @@ typedef struct UART_hw_t UART_hw;
 struct UART_hw_t{
 	UART_HandleTypeDef 	uart_module;
 	uint8_t				rx_data;
+
 	void				(*receive_handle)(UART_hw* p_hw);
 	void				(*uart_send)(UART_hw* p_hw);
 };
@@ -31,5 +32,5 @@ extern UART_hw rs485_com;
 void uart_hw_init(void);
 void uart_sends(UART_hw* p_hw, uint8_t* s);
 char uart_receives(UART_hw* p_hw, char* s);
-
+void UART_DMA_Init(void);
 #endif
