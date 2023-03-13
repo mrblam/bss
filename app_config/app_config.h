@@ -9,6 +9,7 @@
 #define APP_CONFIG_APP_CONFIG_H_
 #include "core_hal.h"
 
+/*timeout*/
 #define APP_STATE_MACHINE_UPDATE_TICK_mS 		(1000/HAL_SYSTICK_FREQ_Hz)
 #define BP_INACTIVE_TIMEOUT_mS           		5000
 #define CHECK_HMI_MSG_TIME_mS					200
@@ -16,16 +17,17 @@
 #define PDO_READ_BP_DATA_TIME_mS				2000
 #define WAIT_BP_ASSIGN_REQ_TIMEOUT_mS			500
 #define SLAVE_SELECT_CONFIRM_TIMEOUT_mS			200
-
+#define CHARGER_NO_CURRENT_TIMEOUT				20000
+#define WAIT_BP_WRITE_DATA_TO_FLASH				1500
+/*number*/
 #define MAX_CABINET_AVAILABLE					19
 #define MAX_ASSIGNED_CABINET					((MAX_CABINET_AVAILABLE + 1)/2)
 #define CABINET_CELL_NUM						MAX_CABINET_AVAILABLE
 #define CABINET_INIT							(CABINET_CELL_NUM + 1)
-
 #define CHARGER_NUM								2
 #define MAX_ASSIGNED_CAB_NUM					(CABINET_INIT/2)
 
-
+/*threshold*/
 #define BP_START_CHARGE_THRESHOLD				65500
 #define BP_STOP_CHARGER_THRESHOLD				67200
 #define BP_OVER_CHARGE_THRESHOLD				67200
@@ -44,6 +46,7 @@
 
 #define USE_DMA_UART_TRANSMIT					0
 #define NEW_CANOPEN_LIB							1			// 1 : use new canopen_lib
+
 typedef enum CABIN_ID{
 	CAB1 = 0,
 	CAB2 = 1,

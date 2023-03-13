@@ -58,6 +58,7 @@ struct Cabinet_t{
 	uint8_t 			is_changed;
 	void (*data_serialize)(Cabinet* p_cab, char* buff);
 	CABINET_OP_STATE 	fail_state;
+	uint8_t				on_bp_counter[2];
 };
 
 void cab_cell_init(Cabinet* , uint8_t);
