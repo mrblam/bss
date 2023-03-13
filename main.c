@@ -63,7 +63,6 @@ int main(void) {
 }
 void TIM2_IRQHandler(void)   //1ms
 {
-
 	tim2_timestamp ++;
 	if(node_id_high){
 		node_id_high = 0;
@@ -72,13 +71,11 @@ void TIM2_IRQHandler(void)   //1ms
 	CO_process(&CO_DEVICE,1);
 	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
 	HAL_TIM_IRQHandler(&hmi_timer);
-
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {					//10ms ///
 	sys_timestamp += sys_tick_ms;
-
 	switch(selex_bss_app.bss.state){
 	case BSS_ST_MAINTAIN:
 	case BSS_ST_ACTIVE:
@@ -179,19 +176,16 @@ static void can_receive_handle(CAN_Hw *p_hw)
 
 static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 {
-	if(p_app->slave_com->state == RS485_MASTER_ST_IDLE){
-		if(cab_id == p_app->bss.cab_num){
-				cab_id = 0;
-		}
-		cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);
-		cab_id++;
+	if (cab_id == p_app->bss.cab_num) {
+		cab_id = 0;
 	}
-
+	cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);
+	cab_id++;
 
 #if ENABLE_CHARGER
 	cab_app_update_charge(p_app, sys_timestamp);
 #endif
-	if(sys_timestamp % 15000 == 0){
-	p_app->bss.bp_backup.get_voltage(&p_app->bss.bp_backup);
-	}
+//	if(sys_timestamp % 15000 == 0){
+//	p_app->bss.bp_backup.get_voltage(&p_app->bss.bp_backup);
+//	}
 }

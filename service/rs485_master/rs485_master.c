@@ -80,13 +80,7 @@ void rs485_master_update_state(RS485_Master* p_485m, const uint32_t timestamp){
 		p_485m->state = RS485_MASTER_ST_WAIT_CONFIRM;
 		break;
 	case RS485_MASTER_ST_SUCCESS:
-			rs485_master_reset_buffer(p_485m);
-			p_485m->state = RS485_MASTER_ST_IDLE;
-		break;
 	case RS485_MASTER_ST_FAIL:
-			rs485_master_reset_buffer(p_485m);
-			p_485m->state = RS485_MASTER_ST_IDLE;
-		break;
 	default:
 		break;
 	}
@@ -146,15 +140,14 @@ static uint8_t rs485_master_check_valid_msg(RS485_Master* p_485m){
 
 void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE_OBJECTS obj, SLAVE_OBJECT_STATE state){
 	rs485_master_set_csv_data(p_485m, id, obj, state);
-	while((p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
-			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM)){
+	if(p_485m->state == RS485_MASTER_ST_IDLE){
 		p_485m->state = RS485_MASTER_ST_SEND_CMD;
 	}
-//	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
-//			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
-//			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
-//	rs485_master_reset_buffer(p_485m);
-//	p_485m->state = RS485_MASTER_ST_IDLE;
+	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
+			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
+			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(p_485m);
+	p_485m->state = RS485_MASTER_ST_IDLE;
 }
 
 void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
@@ -162,10 +155,10 @@ void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
 	if(p_485m->state == RS485_MASTER_ST_IDLE){
 		p_485m->state = RS485_MASTER_ST_SEND_SYNC;
 	}
-//	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
-//			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
-//			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
-//	rs485_master_reset_buffer(p_485m);
-//	p_485m->state = RS485_MASTER_ST_IDLE;
+	while((p_485m->state == RS485_MASTER_ST_SEND_CMD) ||
+			(p_485m->state == RS485_MASTER_ST_SEND_SYNC) ||
+			(p_485m->state == RS485_MASTER_ST_WAIT_CONFIRM));
+	rs485_master_reset_buffer(p_485m);
+	p_485m->state = RS485_MASTER_ST_IDLE;
 }
 

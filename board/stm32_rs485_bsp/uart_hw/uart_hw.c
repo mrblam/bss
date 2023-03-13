@@ -12,7 +12,9 @@ void uart_hw_init(void){
 	uart_hmi_hw_init();
 	uart_rs485_hw_init();
 	uart_debug_hw_init();
+#if USE_DMA_UART_TRANSMIT
 	UART_DMA_Init();
+#endif
 }
 
 static void uart_hmi_hw_init(void){
