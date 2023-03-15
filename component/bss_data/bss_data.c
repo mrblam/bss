@@ -19,10 +19,11 @@ static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
 
 static void bss_update_io_state(BSS_Data* p_bss);
 static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff);
-
+static void all_data_cabinet_serialize_impl(BSS_Data* p_bss,char* buff);
 void bss_init(BSS_Data* p_bss){
 	p_bss->state = BSS_ST_INIT;
 	p_bss->data_serialize = bss_data_serialize_impl;
+	p_bss->all_data_cabinet_serialize = all_data_cabinet_serialize_impl;
 	p_bss->bss_temps[0] = p_bss->bss_temps[1] = 30;
 
 	p_bss->ac_chargers[1].assigned_cab_num = MAX_ASSIGNED_CAB_NUM;
@@ -177,5 +178,7 @@ static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
     *buff++='\0';
     *buff++='\n';
 }
+static void all_data_cabinet_serialize_impl(BSS_Data* p_bss,char* buff){
 
+}
 #endif /* COMPONENT_BSS_DATA_BSS_DATA_C_ */

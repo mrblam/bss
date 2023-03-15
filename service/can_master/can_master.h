@@ -32,6 +32,11 @@
 #define BMS_SERIAL_NUMBER_OBJECT_SUB_INDEX				0x00
 #define BMS_MAINSWITCH_SUB_INDEX						0x01
 #define SLAVE_ID_NUMBER_OBJECT_SUB_INDEX				0x02
+#define BMS_VERSION_INDEX								0x100A
+#define BMS_VERSION_SUBINDEX							0x00
+#define BMS_VEHICLE_SN_INDEX							0x2004
+#define BMS_MATTED_DEV_SUBINDEX							0x01
+
 #define BMS_STATE_CHARGING								2
 #define BMS_STATE_DISCHARGING							0
 
@@ -117,7 +122,7 @@ typedef enum CM_ASSIGN_STATE{
 } CM_ASSIGN_STATE;
 
 typedef enum SN_ASSIGN_STATE{
-	BMS_MATED_DEV_START_WRITE_SN,
+	BMS_MATED_DEV_IDLE,
 	BMS_MATED_DEV_CHECK_WRITE_SN_STATE,
 	BMS_MATED_DEV_WRITE_BSS_SN,
 	BMS_MATED_DEV_CHECK_READ_BSS_SN,
@@ -130,7 +135,8 @@ typedef enum SDO_SERVICE{
 	SDO_SERVICE_DEACTIVE_CHARGER,
 	SDO_SERVICE_READ_SN_BP,
 	SDO_SERVICE_WRITE_SN_XE,
-	SDO_SERVICE_READ_SN_XE
+	SDO_SERVICE_READ_SN_XE,
+	SDO_SERVICE_READ_BP_SW_VERSION
 
 }SDO_SERVICE;
 
@@ -184,8 +190,8 @@ void can_master_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_start_assign_next_slave(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_id_assign_process(CAN_master* p_cm,const uint32_t timestamp);
 void can_master_update_sn_assign_process(CAN_master* p_cm);
-void can_master_read_slave_sn(CAN_master* p_cm, uint8_t slave_id, uint32_t timestamp);
-void can_master_write_bms_object(CAN_master* p_cm, uint8_t slave_id, BMS_OBJ bms_obj, uint32_t timestamp);
+void can_master_read_slave_sn(CAN_master* p_cm, uint8_t cab_id, uint32_t timestamp);
+void can_master_write_bms_object(CAN_master* p_cm, uint8_t cab_id, BMS_OBJ bms_obj, uint32_t timestamp);
 void cm_start_authorize_slave(CAN_master* p_cm,CO_Slave* slave, uint32_t timestamp);
 void can_master_send_sync_request(CAN_master* p_cm,const uint32_t timestamp);
 void co_sdo_read_object(CAN_master* p_cm,const uint32_t mux,const uint32_t node_id,uint8_t* rx_buff,const uint32_t timeout);
@@ -195,7 +201,7 @@ void can_master_start_assign_slave(CAN_master* p_cm, CO_Slave *slave, const uint
 void can_master_disable_pdo(CAN_master* p_cm);
 void can_set_read_sn_func_pointer(CAN_master* p_cm,void (*read_serial_number_bp)(void));
 void can_set_sdo_write_obj_func_pointer(CAN_master* p_cm,void (*sdo_write_object)(void));
-
+void can_master_read_bp_version_software(CAN_master* p_cm, uint8_t cab_id);
 static inline void can_master_slave_select(const CAN_master* p_cm, const uint32_t id){
 	p_cm->slave_select(p_cm,id);
 }

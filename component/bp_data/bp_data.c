@@ -26,6 +26,7 @@ BP* bp_construct(uint8_t id){
 	for(uint8_t i = 0; i < 8; i++) p_bp->temp[i] = 0;
 	for(uint8_t i = 0; i < 32; i++) p_bp->base.sn[i] = 0;
 	for(uint8_t i = 0; i < 32; i++) p_bp->base.xe_sn[i] = 0;
+	for(uint8_t i = 0; i < 32; i++) p_bp->base.bp_software_version[i] = 0;
 	p_bp->data_serialize = bp_data_serialize_impl;
 	return p_bp;
 }
@@ -39,69 +40,76 @@ void bp_reset_data(BP* p_bp){
 }
 
 static void bp_data_serialize_impl(BP* p_bp, char* buff){  /// add bss_sn,camel_sn
-	*buff++=':';
-	*buff++='R';
-    *buff++=',';
-	*buff++='B';
-    *buff++=',';
-    buff+=long_to_string(p_bp->pos, buff);
-    *buff++=',';
-    *buff++='A';
-    *buff++=',';
-    if(p_bp->base.sn[0] == '\0'){
-    	*buff++='0';
-    }
-    else{
-        for(uint8_t i = 0; *(p_bp->base.sn + i) != '\0'; i++){
+	*buff++ = ':';
+	*buff++ = 'R';
+	*buff++ = ',';
+	*buff++ = 'B';
+	*buff++ = ',';
+	buff += long_to_string(p_bp->pos, buff);
+	*buff++ = ',';
+	*buff++ = 'A';
+	*buff++ = ',';
+	if (p_bp->base.sn[0] == '\0') {
+		*buff++ = '0';
+	} else {
+		for (uint8_t i = 0; *(p_bp->base.sn + i) != '\0'; i++) {
 
-        	*buff++= *(p_bp->base.sn + strlen((const char*)p_bp->base.sn) - 1 - i) ;
-        }
-    }
-    *buff++=',';
-	buff+=long_to_string(p_bp->state,buff);
-    *buff++=',';
-	buff+=long_to_string(p_bp->status,buff);
-    *buff++=',';
-	buff+=long_to_string(p_bp->vol,buff);
-    *buff++=',';
-    if(p_bp->cur < 0){
-    	*buff++='-';
-    	buff+=long_to_string((-1)*p_bp->cur,buff);
-    }
-    else buff+=long_to_string(p_bp->cur,buff);
-    *buff++=',';
-	buff+=long_to_string(p_bp->cycle,buff);
-    *buff++=',';
-	buff+=long_to_string(p_bp->soc,buff);
-    *buff++=',';
-	buff+=long_to_string(p_bp->soh,buff);//ma xe
-    *buff++=',';
-    if(p_bp->base.xe_sn[0] == '\0'){
-    	*buff++='0';
-    }
-    else{
-        for(uint8_t i = 0; *(p_bp->base.xe_sn + i) != '\0'; i++){
+			*buff++ = *(p_bp->base.sn + strlen((const char*) p_bp->base.sn) - 1 - i);
+		}
+	}
+	*buff++ = ',';
+	buff += long_to_string(p_bp->state, buff);
+	*buff++ = ',';
+	buff += long_to_string(p_bp->status, buff);
+	*buff++ = ',';
+	buff += long_to_string(p_bp->vol, buff);
+	*buff++ = ',';
+	if (p_bp->cur < 0) {
+		*buff++ = '-';
+		buff += long_to_string((-1) * p_bp->cur, buff);
+	} else
+		buff += long_to_string(p_bp->cur, buff);
+	*buff++ = ',';
+	buff += long_to_string(p_bp->cycle, buff);
+	*buff++ = ',';
+	buff += long_to_string(p_bp->soc, buff);
+	*buff++ = ',';
+	buff += long_to_string(p_bp->soh, buff);  //ma xe
+	*buff++ = ',';
+	if (p_bp->base.xe_sn[0] == '\0') {
+		*buff++ = '0';
+	} else {
+		for (uint8_t i = 0; *(p_bp->base.xe_sn + i) != '\0'; i++) {
 
-        	*buff++= *(p_bp->base.xe_sn + i) ;
-        }
-    }
-    *buff++=',';
-    *buff++='[';
-    for(uint8_t i = 0; i < 16; i++){
-    	buff+=long_to_string(p_bp->cell_vol[i], buff);
-    	*buff++=',';
-    }
-    *--buff=']';
-    buff++;
-    *buff++=',';
-    *buff++='[';
-    for(uint8_t i = 0; i < 8; i++){
-    	buff+=long_to_string(p_bp->temp[i], buff);
-    	*buff++=',';
-    }
-    *--buff=']';
-    buff++;
-    *buff++='*';
-    *buff++='\n';
-    *buff++='\0';
+			*buff++ = *(p_bp->base.xe_sn + i);
+		}
+	}
+	*buff++ = ',';
+	if (p_bp->base.bp_software_version[0] == '\0') {
+		*buff++ = '0';
+	} else {
+		for (uint8_t i = 0; *(p_bp->base.bp_software_version + i) != '\0'; i++) {
+
+			*buff++ = *(p_bp->base.bp_software_version + i);
+		}
+	}
+	*buff++ = ',';
+	*buff++ = '[';
+	for (uint8_t i = 0; i < 16; i++) {
+		buff += long_to_string(p_bp->cell_vol[i], buff);
+		*buff++ = ',';
+	}
+	*--buff = ']';
+	buff++;
+	*buff++ = ',';
+	*buff++ = '[';
+	for (uint8_t i = 0; i < 8; i++) {
+		buff += long_to_string(p_bp->temp[i], buff);
+		*buff++ = ',';
+	}
+	*--buff = ']';
+	buff++;
+	*buff++ = '*';
+	*buff++ = '\n';
+	*buff++ = '\0';
 }

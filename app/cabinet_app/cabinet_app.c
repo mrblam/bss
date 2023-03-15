@@ -134,6 +134,9 @@ static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t ms
 				p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
 				cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
 			}
+			if(p_ca->hmi_csv.id[msg_id] == 'A'){
+				bss_all_cabinet_data_serialize(&p_ca->bss, tx_buff);
+			}
 			break;
 		case BSS_BP:
 			bp_data_serialize(p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]].bp, tx_buff);
@@ -379,7 +382,12 @@ void cab_app_check_buffer(Cabinet_App *p_ca) {
 		token = (uint8_t*) strtok(NULL, ",");
 		p_ca->hmi_csv.main_obj[p_ca->hmi_csv.valid_msg_num] = *token;
 		token = (uint8_t*) strtok(NULL, ",");
-		p_ca->hmi_csv.id[p_ca->hmi_csv.valid_msg_num] = atoi((char*) token);
+		if(*token != 'A'){
+			p_ca->hmi_csv.id[p_ca->hmi_csv.valid_msg_num] = atoi((char*) token);
+		}else{
+			p_ca->hmi_csv.id[p_ca->hmi_csv.valid_msg_num] = *token;
+		}
+
 		token = (uint8_t*) strtok(NULL, ",");
 		p_ca->hmi_csv.sub_obj[p_ca->hmi_csv.valid_msg_num] = *token;
 		if (*token != 'V') {

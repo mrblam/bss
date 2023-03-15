@@ -66,6 +66,7 @@ struct BSS_Data_t{
 	uint8_t 		bss_temps[2];
 	Cabinet*        cabs;
 	void			(*data_serialize)(BSS_Data* p_bss_data, char* buff);
+	void			(*all_data_cabinet_serialize)(BSS_Data* p_bss_data, char* buff);
 	uint8_t 		is_changed;
 	BSS_Led			led;
 	BP_backup		bp_backup;
@@ -87,5 +88,7 @@ static inline void bss_set_led_color(BSS_Data* p_bss, BSS_LED_COLOR color){
 	p_bss->led.color = color;
 	p_bss->led.set_color(&p_bss->led);
 }
-
+static inline void bss_all_cabinet_data_serialize(BSS_Data* p_bss_data, char* buff){
+	p_bss_data->all_data_cabinet_serialize(p_bss_data, buff);
+}
 #endif /* COMPONENT_BSS_DATA_BSS_DATA_H_ */
