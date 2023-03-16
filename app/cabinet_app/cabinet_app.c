@@ -74,7 +74,7 @@ void cab_app_sync_cab_data_hmi(Cabinet_App *p_ca, uint8_t cab_id) { ///not use
 }
 void cab_app_send_msg_to_hmi(Cabinet_App *p_ca) {
 	(void) p_ca;
-	uart_sends(&hmi_com, (uint8_t*) tx_buff);
+	uart_sends(&debug_com, (uint8_t*) tx_buff);
 }
 void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
 	for (uint8_t i = 0; i < p_ca->hmi_csv.valid_msg_num; i++) {
@@ -128,14 +128,15 @@ static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t ms
 			}
 			break;
 		case BSS_CABINET:
-			if (p_ca->hmi_csv.sub_obj[msg_id] == ALL) {
-				cab_cell_data_serialize(&p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]], tx_buff);
-			} else {
-				p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
-				cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
-			}
 			if(p_ca->hmi_csv.id[msg_id] == 'A'){
-				bss_all_cabinet_data_serialize(&p_ca->bss, tx_buff);
+					bss_all_cabinet_data_serialize(&p_ca->bss, tx_buff);
+			}else{
+				if (p_ca->hmi_csv.sub_obj[msg_id] == ALL) {
+					cab_cell_data_serialize(&p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]], tx_buff);
+				} else {
+					p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
+					cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
+				}
 			}
 			break;
 		case BSS_BP:

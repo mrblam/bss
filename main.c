@@ -128,11 +128,10 @@ void TIM3_IRQHandler(void) { //// 5ms
 
 /* ------------------------------------------------------------------------------ */
 
-static void can_receive_handle(CAN_Hw *p_hw)
-{
+static void can_receive_handle(CAN_Hw *p_hw){
 #if 0
 	app_co_can_receive_handle(p_can_hw->RxHeader.Identifier, p_can_hw->rx_msg_data);
-#endif
+#else
 	uint32_t cob_id = p_hw->can_rx.StdId;
 
 	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
@@ -172,6 +171,7 @@ static void can_receive_handle(CAN_Hw *p_hw)
 		}
 		return;
 	}
+#endif
 }
 
 static void cab_app_update_io_cab_state(Cabinet_App* p_app)
