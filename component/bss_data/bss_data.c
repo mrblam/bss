@@ -195,6 +195,7 @@ static void all_data_cabinet_serialize_impl(BSS_Data* p_bss,char* buff){
 	buff += long_to_string(p_bss->cabs[0].cell_fan.state, buff);
 	*buff++ = ',';
 	buff += long_to_string(p_bss->cabs[0].temp, buff);
+
 	*buff++ = ',';
 	*buff++ = 'R';
 	*buff++ = ',';
@@ -211,6 +212,7 @@ static void all_data_cabinet_serialize_impl(BSS_Data* p_bss,char* buff){
 	buff += long_to_string(p_bss->cabs[1].cell_fan.state, buff);
 	*buff++ = ',';
 	buff += long_to_string(p_bss->cabs[1].temp, buff);
+
 	*buff++ = ',';
 	*buff++ = 'R';
 	*buff++ = ',';
@@ -224,9 +226,27 @@ static void all_data_cabinet_serialize_impl(BSS_Data* p_bss,char* buff){
 	*buff++ = ',';
 	buff += long_to_string(p_bss->cabs[2].door.state, buff);
 	*buff++ = ',';
+	buff += long_to_string(p_bss->cabs[2].cell_fan.state, buff);
+	*buff++ = ',';
+	buff += long_to_string(p_bss->cabs[2].temp, buff);
+
+	*buff++ = ',';
+	*buff++ = 'R';
+	*buff++ = ',';
+	*buff++ = 'C';
+	*buff++ = ',';
+	buff += long_to_string(p_bss->cabs[3].cab_id, buff);
+	*buff++ = ',';
+	*buff++ = 'A';
+	*buff++ = ',';
+	buff += long_to_string(p_bss->cabs[3].op_state, buff);
+	*buff++ = ',';
+	buff += long_to_string(p_bss->cabs[3].door.state, buff);
+	*buff++ = ',';
 	buff += long_to_string(p_bss->cabs[3].cell_fan.state, buff);
 	*buff++ = ',';
 	buff += long_to_string(p_bss->cabs[3].temp, buff);
+
 	*buff++ = ',';
 	*buff++ = 'R';
 	*buff++ = ',';
