@@ -116,21 +116,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle){
 		/* USART3 interrupt Init */
 		HAL_NVIC_SetPriority(USART3_IRQn, UART_RX_HMI_IRQN_PRIORITY, 0);
 		HAL_NVIC_EnableIRQ(USART3_IRQn);
-#if USE_DMA_UART_TRANSMIT
-		hdma_usart3_tx.Instance = DMA1_Channel2;
-		hdma_usart3_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-		hdma_usart3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-		hdma_usart3_tx.Init.MemInc = DMA_MINC_ENABLE;
-		hdma_usart3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-		hdma_usart3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-		hdma_usart3_tx.Init.Mode = DMA_NORMAL;
-		hdma_usart3_tx.Init.Priority = DMA_PRIORITY_LOW;
-		if (HAL_DMA_Init(&hdma_usart3_tx) != HAL_OK) {
-			Error_Handler();
-		}
 
-		__HAL_LINKDMA(uartHandle, hdmatx, hdma_usart3_tx);
-#endif
 	}
 	else if(uartHandle->Instance == DEBUG_PORT_COM)
 	{
@@ -151,10 +137,25 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle){
 		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#if USE_DMA_UART_TRANSMIT
+		hdma_usart3_tx.Instance = DMA1_Channel7;
+		hdma_usart3_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+		hdma_usart3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+		hdma_usart3_tx.Init.MemInc = DMA_MINC_ENABLE;
+		hdma_usart3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+		hdma_usart3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+		hdma_usart3_tx.Init.Mode = DMA_NORMAL;
+		hdma_usart3_tx.Init.Priority = DMA_PRIORITY_LOW;
+		if (HAL_DMA_Init(&hdma_usart3_tx) != HAL_OK) {
+			Error_Handler();
+		}
 
+		__HAL_LINKDMA(uartHandle, hdmatx, hdma_usart3_tx);
+#endif
 		/* USART2 setpriority*/
 		HAL_NVIC_SetPriority(USART2_IRQn, UART_RX_DEBUG_IRQN_PRIORITY, 0);
 		HAL_NVIC_EnableIRQ(USART2_IRQn); /// WARNING: Loss connected
+
 	}
 }
 
@@ -220,8 +221,8 @@ void UART_DMA_Init(void)
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
-  /* DMA1_Channel2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+  /* DMA1_Channel7_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
 
 }

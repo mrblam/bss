@@ -11,7 +11,7 @@
 
 //Cabinet_App selex_bss_app;
 RS485_Master rs485m;
-
+char _s[100] = "hoqqqanpx";
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 
@@ -98,7 +98,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 
 void TIM3_IRQHandler(void) { //// 5ms
 	com_timestamp += 5;
-
+//	HAL_UART_Transmit_DMA(&debug_com.uart_module,(uint8_t *) _s, 100);
+	HAL_UART_Transmit(&debug_com.uart_module, (uint8_t*)_s, 9, 500);
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 	/* Process HMI protocol */

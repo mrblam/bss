@@ -188,7 +188,7 @@ void PendSV_Handler(void)
 /**
   * @brief This function handles DMA1 channel2 global interrupt.
   */
-void DMA1_Channel2_IRQHandler(void)
+void DMA1_Channel7_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel2_IRQn 0 */
 
