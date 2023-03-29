@@ -97,6 +97,9 @@ void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
 		for (uint8_t i = 0; i < 32; i++) {
 			p_ca->hmi_csv.data[i] = '\0';
 		}
+//		for (uint16_t i = 0; i < 1024; i++){
+//			p_ca->hmi_csv.firmware[i] = '\0';
+//		}
 		while (p_ca->hmi_csv.is_new_msg_to_send[i] != 0);
 	}
 	p_ca->hmi_csv.valid_msg_num = 0;
@@ -350,8 +353,8 @@ static void cab_app_reset_buffer(Cabinet_App *p_ca) {
 	p_ca->is_new_msg = 0;
 }
 
-static int8_t cab_app_search_char(char *buff, uint8_t start, uint8_t stop, char find_char) {
-	for (uint8_t i = start; i < stop; i++) {
+static int16_t cab_app_search_char(char *buff, uint16_t start, uint16_t stop, char find_char) {
+	for (uint16_t i = start; i < stop; i++) {
 		if (buff[i] == find_char)
 			return i;
 	}
@@ -360,8 +363,8 @@ static int8_t cab_app_search_char(char *buff, uint8_t start, uint8_t stop, char 
 
 void cab_app_check_buffer(Cabinet_App *p_ca) {
 	uint8_t *buff = (uint8_t*) p_ca->rx_data;
-	int8_t start = -1;
-	int8_t stop = -1;
+	int16_t start = -1;
+	int16_t stop = -1;
 	do {
 		/* Check valid msg */
 		start = cab_app_search_char((char*) buff, stop + 1, p_ca->rx_index, ':');
@@ -376,6 +379,7 @@ void cab_app_check_buffer(Cabinet_App *p_ca) {
 		// W,S,0,D,1*
 		// R,C,0,A*
 		// R,B,
+		// W,C,id,B,data1kb
 		uint8_t *token = &buff[start + 1];
 #if 1
 		token = (uint8_t*) strtok((char*) token, ",");
@@ -392,11 +396,16 @@ void cab_app_check_buffer(Cabinet_App *p_ca) {
 		token = (uint8_t*) strtok(NULL, ",");
 		p_ca->hmi_csv.sub_obj[p_ca->hmi_csv.valid_msg_num] = *token;
 		if (*token != 'V') {
-			token = (uint8_t*) strtok(NULL, "*");
-			if ((*token != STATE_OK) && (*token != STATE_FAIL)) {
-				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*) token);
+			if(*token != 'B'){
+				token = (uint8_t*) strtok(NULL, "*");
+				if ((*token != STATE_OK) && (*token != STATE_FAIL)) {
+					p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = atoi((char*) token);
+				} else {
+					p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = *token;
+				}
 			} else {
-				p_ca->hmi_csv.obj_state[p_ca->hmi_csv.valid_msg_num] = *token;
+				token = (uint8_t*) strtok(NULL, "*");
+				memcpy(p_ca->hmi_csv.firmware, token, strlen((const char*) token));
 			}
 		} else {
 			token = (uint8_t*) strtok(NULL, "*");
@@ -582,12 +591,20 @@ void cabinet_app_data_log_serialize(Cabinet_App *p_ca, char *buff) {
 		}
 	}
 	*buff++ = ',';
-	if (p_ca->base.assigning_slave->xe_sn[0] == '\0') {
+//	if (p_ca->base.assigning_slave->xe_sn[0] == '\0') {
+//		*buff++ = '0';
+//	} else {
+//		for (uint8_t i = 0; *(p_ca->base.assigning_slave->xe_sn + i) != '\0'; i++) {
+//
+//			*buff++ = *(p_ca->base.assigning_slave->xe_sn + i);
+//		}
+//	}
+//	*buff++ = ',';
+	if(p_ca->hmi_csv.firmware[0] == '\0'){
 		*buff++ = '0';
-	} else {
-		for (uint8_t i = 0; *(p_ca->base.assigning_slave->xe_sn + i) != '\0'; i++) {
-
-			*buff++ = *(p_ca->base.assigning_slave->xe_sn + i);
+	}else{
+		for (uint16_t i = 0; *(p_ca->hmi_csv.firmware + i) != '\0'; i++){
+			*buff++ = *(p_ca->hmi_csv.firmware + i);
 		}
 	}
 	*buff++ = ',';
@@ -616,4 +633,7 @@ static void delay_time_ms(int time_ms){
 	for(i = 0;i<time_ms;i++){
 		for(j = 0; j < 40;j++);
 	}
+}
+void cab_app_process_firmware_segment(Cabinet_App* p_ca,char* buff){
+
 }

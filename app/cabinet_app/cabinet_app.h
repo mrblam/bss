@@ -68,6 +68,7 @@ struct CSV_t{
 	SUB_OBJS		sub_obj[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			obj_state[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			data[32];
+	uint8_t			firmware[1024];
 	uint8_t			is_new_data;
 	uint8_t			is_new_msg_to_send[AVAILABLE_HMI_MSG_NUM];
 	uint8_t 		valid_msg_num;
@@ -79,8 +80,8 @@ struct Cabinet_App_t{
 	CSV					hmi_csv;
 	RS485_Master*		slave_com;
 	BSS_Data			bss;
-	uint8_t				rx_data[32];
-	uint8_t				rx_index;
+	uint8_t				rx_data[1100];
+	uint16_t				rx_index;
 	uint8_t				is_new_msg;
 	uint8_t*			start_msg_index;
 	uint8_t 			is_hmi_req_sync;
@@ -103,6 +104,7 @@ void cab_app_update_connected_cab_state(Cabinet_App* p_app);
 void cab_app_write_bss_sn(Cabinet_App* p_ca,uint8_t cab_id, const uint32_t timestamp);
 void cab_app_send_data_log(Cabinet_App* p_ca);
 void cabinet_app_data_log_serialize(Cabinet_App* p_ca,char* buff);
+void cab_app_process_firmware_segment(Cabinet_App* p_ca,char* buff);
 static inline CABINET_APP_STATE cab_app_get_state(Cabinet_App* p_ca){
 	return p_ca->state;
 }

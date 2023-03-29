@@ -23,7 +23,8 @@ SRCS+=component/adc_sensor/adc_sensor.c \
 SRCS+=service/can_master/can_master.c \
 	service/rs485_master/rs485_master.c
 	
-SRCS+=util/string/string_util.c
+SRCS+=util/string/string_util.c \
+	util/crc/crc.c
 	
 BSP_SRCS:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_SRCS))
 BSP_INCLUDES:=$(addprefix board/$(BOARD_TYPE)/,$(BSP_INCLUDES))
@@ -42,7 +43,8 @@ INCLUDES+=component/adc_sensor \
 INCLUDES+=service/can_master \
 	service/rs485_master
 	
-INCLUDES+= util/string
+INCLUDES+= util/string \
+	util/crc
 
 USER_LIB_INCLUDES=$(PROJ_ROOT)/libs/selex-libc/canopen
 USER_LIBS=CANopen

@@ -520,7 +520,7 @@ static void debug_receive_handle_impl(UART_hw* p_hw){
 	if(p_hw->rx_data == '*'){
 		selex_bss_app.is_new_msg = 1;
 	}
-	if(selex_bss_app.rx_index == 32){
+	if(selex_bss_app.rx_index == 1100){
 		selex_bss_app.rx_index = 0;
 		return;
 	}

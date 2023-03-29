@@ -44,7 +44,7 @@
 
 #define CABINET_START_NODE_ID					5
 
-#define USE_DMA_UART_TRANSMIT					1
+#define USE_DMA_UART_TRANSMIT					0
 #define NEW_CANOPEN_LIB							1			// 1 : use new canopen_lib
 
 typedef enum CABIN_ID{

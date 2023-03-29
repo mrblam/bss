@@ -11,7 +11,6 @@
 
 //Cabinet_App selex_bss_app;
 RS485_Master rs485m;
-char _s[100] = "hoqqqanpx";
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 
@@ -78,11 +77,12 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	sys_timestamp += sys_tick_ms;
 	switch(selex_bss_app.bss.state){
 	case BSS_ST_MAINTAIN:
+		bss_update_cabinets_state(&selex_bss_app.bss);
+		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+		break;
 	case BSS_ST_ACTIVE:
-		if(selex_bss_app.bss.state == BSS_ST_ACTIVE){
-			cab_app_update_connected_cab_state(&selex_bss_app);
-			cab_app_update_io_cab_state(&selex_bss_app);
-		}
+		cab_app_update_connected_cab_state(&selex_bss_app);
+		cab_app_update_io_cab_state(&selex_bss_app);
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 		break;
@@ -98,8 +98,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 
 void TIM3_IRQHandler(void) { //// 5ms
 	com_timestamp += 5;
-//	HAL_UART_Transmit_DMA(&debug_com.uart_module,(uint8_t *) _s, 100);
-	HAL_UART_Transmit(&debug_com.uart_module, (uint8_t*)_s, 9, 500);
+
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 	/* Process HMI protocol */
@@ -112,7 +111,7 @@ void TIM3_IRQHandler(void) { //// 5ms
 	/* Sync Data to HMI */
 	for(uint8_t i = 0; i < selex_bss_app.hmi_csv.valid_msg_num; i++){
 		if(selex_bss_app.hmi_csv.is_new_msg_to_send[i]){
-			cab_app_send_msg_to_hmi(&selex_bss_app);
+			cab_app_send_data_log(&selex_bss_app);
 			selex_bss_app.hmi_csv.is_new_msg_to_send[i] = 0;
 		}
 	}
