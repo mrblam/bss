@@ -168,6 +168,7 @@ void uart_sends(UART_hw* p_hw, uint8_t* s){
 			break;
 		}
 	}
+//	HAL_UART_Transmit(&p_hw->uart_module, s, 1, 500);
 	HAL_UART_Transmit_DMA(&p_hw->uart_module, s, size_s);
 //		if(HAL_OK != HAL_UART_Transmit_DMA(&p_hw->uart_module, s, sizeof(s)))
 //		{

@@ -81,7 +81,7 @@ struct Cabinet_App_t{
 	RS485_Master*		slave_com;
 	BSS_Data			bss;
 	uint8_t				rx_data[1100];
-	uint16_t				rx_index;
+	uint16_t			rx_index;
 	uint8_t				is_new_msg;
 	uint8_t*			start_msg_index;
 	uint8_t 			is_hmi_req_sync;

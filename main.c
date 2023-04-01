@@ -8,9 +8,11 @@
 #include "board.h"
 #include "peripheral_init.h"
 #include "app_co_init.h"
+#include "bootloader_app.h"
 
 //Cabinet_App selex_bss_app;
 RS485_Master rs485m;
+char s[100] = "hoanpx";
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 
@@ -85,13 +87,15 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		cab_app_update_io_cab_state(&selex_bss_app);
 		bss_update_cabinets_state(&selex_bss_app.bss);
 		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+//		get_seg_fw(&segment_test,&selex_bss_app);
 		break;
 	case BSS_ST_INIT:
 	case BSS_ST_FAIL:
 		break;
 	}
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
-
+//	HAL_UART_Transmit(&debug_com.uart_module, s, 6, 500);
+//	HAL_UART_Transmit_DMA(&debug_com.uart_module, (uint8_t*)s, 6);
 }
 
 /* --------------------------------------------------------------------------------------- */

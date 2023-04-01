@@ -405,6 +405,7 @@ void cab_app_check_buffer(Cabinet_App *p_ca) {
 				}
 			} else {
 				token = (uint8_t*) strtok(NULL, "*");
+				memset(p_ca->hmi_csv.firmware, 0, sizeof(p_ca->hmi_csv.firmware));
 				memcpy(p_ca->hmi_csv.firmware, token, strlen((const char*) token));
 			}
 		} else {
