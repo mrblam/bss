@@ -28,7 +28,8 @@ SRCS+=component/adc_sensor/adc_sensor.c \
 	component/ntc/ntc.c \
 	component/switch/switch.c 
 SRCS+=service/can_master/can_master.c \
-	service/rs485_master/rs485_master.c
+	service/rs485_master/rs485_master.c \
+	service/host_master/host_master.c
 	
 SRCS+=util/string/string_util.c \
 	util/crc/crc.c
@@ -54,7 +55,8 @@ INCLUDES+=component/adc_sensor \
 	component/ntc \
 	component/switch
 INCLUDES+=service/can_master \
-	service/rs485_master
+	service/rs485_master \
+	service/host_master
 	
 INCLUDES+= util/string \
 	util/crc

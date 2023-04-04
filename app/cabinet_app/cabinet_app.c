@@ -74,7 +74,7 @@ void cab_app_sync_cab_data_hmi(Cabinet_App *p_ca, uint8_t cab_id) { ///not use
 }
 void cab_app_send_msg_to_hmi(Cabinet_App *p_ca) {
 	(void) p_ca;
-	uart_sends(&debug_com, (uint8_t*) tx_buff);
+	uart_sends(&hmi_com, (uint8_t*) tx_buff);
 }
 void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
 	for (uint8_t i = 0; i < p_ca->hmi_csv.valid_msg_num; i++) {
