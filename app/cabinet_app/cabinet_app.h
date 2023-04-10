@@ -55,7 +55,8 @@ typedef enum SUB_OBJS{
 	S2_CAMEL_SN		= 'M',
 	BSS_SN			= 'B',
 	WRITE_SN		= 'V',
-	REBOOT_BP		= 'R'
+	REBOOT_BP		= 'R',
+	REBOOT_SUCCESS	= 'K'
 } SUB_OBJS;
 
 #define STATE_OK		'O'

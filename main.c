@@ -37,8 +37,8 @@ int32_t my_callback(int32_t _cmd, const uint8_t* _data, int32_t _len, void* _arg
 	can_port.can_tx.StdId = ((uint16_t)_data[0] << 8) | (uint16_t)_data[1];
 	can_port.can_tx.DLC = _len - 2;
 	can_send(&can_port, (uint8_t*)(_data + 2));
-	rs485_master_log(&rs485m,counter_callback,counter_can);
-	rs485_send_log(&rs485m);
+//	rs485_master_log(&rs485m,counter_callback,counter_can);
+//	rs485_send_log(&rs485m);
 	return _len;
 }
 int32_t my_send_interface(const uint8_t* _data, int32_t _len){
@@ -89,14 +89,14 @@ int main(void) {
 void TIM2_IRQHandler(void)   //1ms
 {
 	tim2_timestamp ++;
-//	if(node_id_high){
-//		node_id_high = 0;
-//		can_master_slave_deselect(&selex_bss_app.base,selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id);
-//	}
-//	if(selex_bss_app.base.sdo_service != SDO_SERVICE_BOOT_BMS){
-//		CO_process(&CO_DEVICE,1);
-//	}
-//	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
+	if(node_id_high){
+		node_id_high = 0;
+		can_master_slave_deselect(&selex_bss_app.base,selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id);
+	}
+	if(selex_bss_app.base.sdo_service != SDO_SERVICE_BOOT_BMS){
+		CO_process(&CO_DEVICE,1);
+	}
+	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
 	HAL_TIM_IRQHandler(&hmi_timer);
 }
 
@@ -110,7 +110,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 			break;
 		case BSS_ST_ACTIVE:
 			cab_app_update_connected_cab_state(&selex_bss_app);
-//			cab_app_update_io_cab_state(&selex_bss_app);
+			cab_app_update_io_cab_state(&selex_bss_app);
 			bss_update_cabinets_state(&selex_bss_app.bss);
 			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 			break;
@@ -123,7 +123,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	}
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 	sm_host_process(host_master);
-
 //	HAL_UART_Transmit(&debug_com.uart_module, s, 6, 500);
 //	sm_host_send_response(host_master, 0x10, 0x00, "abc", 3);
 }
@@ -178,12 +177,12 @@ static void can_receive_handle(CAN_Hw *p_hw){
 		array[len++] =  p_hw->rx_data[i];
 	}
 //	if(frame_id )
-	counter_can ++;
-	rs485_master_log(&rs485m,counter_callback,counter_can);
-	rs485_send_log(&rs485m);
+//	counter_can ++;
+//	rs485_master_log(&rs485m,counter_callback,counter_can);
+//	rs485_send_log(&rs485m);
 	sm_host_send_response(host_master, 0x10, 0x00, array , len);
 //	if(selex_bss_app.bss.state == BSS_ST_UPGRADE_FW_BP).
-	return;
+//	return;
 
 	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
 	{
