@@ -88,10 +88,11 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){  /// add bss_sn,camel_
 	if (p_bp->base.bp_software_version[0] == '\0') {
 		*buff++ = '0';
 	} else {
-		for (uint8_t i = 0; *(p_bp->base.bp_software_version + i) != '\0'; i++) {
-
-			*buff++ = *(p_bp->base.bp_software_version + i);
-		}
+		buff += long_to_string(p_bp->base.bp_software_version[2],buff);
+		*buff++ = '.';
+		buff += long_to_string(p_bp->base.bp_software_version[1],buff);
+		*buff++ = '.';
+		buff += long_to_string(p_bp->base.bp_software_version[0],buff);
 	}
 	*buff++ = ',';
 	*buff++ = '[';

@@ -77,6 +77,8 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 		break;
 	case BSS_ST_FAIL:
 		break;
+	case BSS_ST_UPGRADE_FW_BP:
+		break;
 	default:
 		break;
 	}

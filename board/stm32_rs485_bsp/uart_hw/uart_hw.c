@@ -1,9 +1,10 @@
 #include "uart_hw.h"
-
+#include "host_master.h"
 UART_hw hmi_com;
 UART_hw rs485_com;
 UART_hw debug_com;
 DMA_HandleTypeDef hdma_usart3_tx;
+extern sm_host_t* host_master;
 static void uart_hmi_hw_init(void);
 static void uart_rs485_hw_init(void);
 static void uart_debug_hw_init(void);
@@ -201,18 +202,23 @@ void USART1_IRQHandler(void){
 void USART3_IRQHandler(void){
 	HAL_UART_IRQHandler(&hmi_com.uart_module);
 	uart_receives(&hmi_com, (char*)&hmi_com.rx_data);
+	sm_host_asyn_feed((uint8_t*)&debug_com.rx_data, 1, host_master);
 	if(hmi_com.receive_handle != NULL)
 	{
 		hmi_com.receive_handle(&hmi_com);
 	}
 }
 
+
+
+
 void USART2_IRQHandler(void){
 	HAL_UART_IRQHandler(&debug_com.uart_module);
 	uart_receives(&debug_com, (char*)&debug_com.rx_data);
+	sm_host_asyn_feed((char*)&debug_com.rx_data, 1, host_master);
 	if(debug_com.receive_handle != NULL)
 	{
-		debug_com.receive_handle(&debug_com);
+//		debug_com.receive_handle(&debug_com);
 	}
 }
 void UART_DMA_Init(void)

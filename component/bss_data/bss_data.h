@@ -43,7 +43,8 @@ typedef enum BSS_STATE{
 	BSS_ST_ACTIVE = 0,
 	BSS_ST_MAINTAIN,
 	BSS_ST_FAIL,
-	BSS_ST_INIT
+	BSS_ST_INIT,
+	BSS_ST_UPGRADE_FW_BP
 } BSS_STATE;
 
 typedef struct Charger_t Charger;

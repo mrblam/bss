@@ -143,7 +143,7 @@ int32_t sm_host_send_cmd(sm_host_t* _host, int32_t _cmd, const uint8_t* _data, i
     }
 
     crc = CRC_CalculateCRC16(packet, len);
-    packet[len++] = (crc >> 16) & 0xFF;
+    packet[len++] = (crc >> 8) & 0xFF;
     packet[len++] = (crc & 0xFF);
 
     packet[len++] = SM_PROTO_STOP_BYTE;
@@ -155,10 +155,10 @@ int32_t sm_host_send_cmd(sm_host_t* _host, int32_t _cmd, const uint8_t* _data, i
     return len;
 }
 
-int32_t sm_host_send_response(sm_host_t* _host, int32_t _cmd, int32_t _ret, const uint8_t* _data, int32_t _len){
-    uint8_t packet[SM_HOST_MAX_BUFFER];
+int32_t sm_host_send_response(sm_host_t *_host, int32_t _cmd, int32_t _ret, const uint8_t *_data, int32_t _len) {
+	uint8_t packet[SM_HOST_MAX_BUFFER];
     int32_t len = 0;
-    int32_t data_len = _len+1+2; // 1-cmd, 2-crc
+    int32_t data_len = _len+1+2+1+1; // 1-cmd, 2-crc, 1-addr, 1-rets
     int32_t index = 0;
     uint16_t crc;
 
@@ -168,6 +168,7 @@ int32_t sm_host_send_response(sm_host_t* _host, int32_t _cmd, int32_t _ret, cons
     packet[len++] = SM_PROTO_START_BYTE;
     packet[len++] = (data_len >> 8) & 0xFF;
     packet[len++] = (data_len & 0xff);
+    packet[len++] = _host->m_addr;
     packet[len++] = _cmd;
     packet[len++] = _ret;
 
@@ -176,7 +177,7 @@ int32_t sm_host_send_response(sm_host_t* _host, int32_t _cmd, int32_t _ret, cons
     }
 
     crc = CRC_CalculateCRC16(packet, len);
-    packet[len++] = (crc >> 16) & 0xFF;
+    packet[len++] = (crc >> 8) & 0xFF;
     packet[len++] = (crc & 0xFF);
 
     packet[len++] = SM_PROTO_STOP_BYTE;
@@ -192,17 +193,17 @@ void sm_host_process(sm_host_t* _host){
     sm_host_t* host = _host;
     int32_t ret = -1;
     int32_t cmd = 0;
-    if (host->m_buffer_index != host->m_process_index){
+    while (host->m_buffer_index != host->m_process_index){
         host->m_packet[host->m_packet_index] = host->m_buffer[host->m_process_index];
 
-        if(host->m_packet[host->m_packet_index] == SM_PROTO_STOP_BYTE &&
+        if(host->m_packet[host->m_packet_index] == SM_PROTO_STOP_BYTE  &&
                 host->m_packet_index == (WORD(host->m_packet[SM_PROTO_LENGTH_HIGH_INDEX], host->m_packet[SM_PROTO_LENGTH_LOW_INDEX]) + 3)){
 
             if(host->m_packet[SM_PROTO_DEVICE_ADDR_INDEX] != host->m_addr){
                 return;
             }
-
-            if(!CRC_CalculateCRC16(&host->m_packet[SM_PROTO_LENGTH_HIGH_INDEX], host->m_packet_index - 1)){
+            uint16_t crc = CRC_CalculateCRC16(&host->m_packet[SM_PROTO_START_BYTE_INDEX], host->m_packet_index);
+            if(!crc){
                 if(host->m_cmd_callback){
                     cmd = host->m_packet[SM_PROTO_CMD_INDEX];
                     ret = host->m_cmd_callback(cmd,
@@ -216,13 +217,11 @@ void sm_host_process(sm_host_t* _host){
             }
             host->m_packet_index = 0;
 
-//            sm_host_send_response(host, cmd, ret, host->m_packet, len);
-
         }else if((host->m_packet[host->m_packet_index] == SM_PROTO_START_BYTE && host->m_packet_index == SM_PROTO_START_BYTE_INDEX) ||
                  (host->m_packet_index > 0)){
 
             host->m_packet_index++;
-            if(host->m_packet_index >= SM_HOST_MAX_BUFFER){
+            if(host->m_packet_index >= 20){
                 host->m_packet_index = 0;
             }
         }

@@ -72,7 +72,8 @@ typedef struct CO_SDO_SERVER_t CO_SDO_SERVER;
 typedef enum BMS_OBJ{
 	BMS_MAINSWITCH	= 0,
 	BMS_MATTING		= 1,
-	BMS_MATED_DEV	= 2
+	BMS_MATED_DEV	= 2,
+	BMS_NEW_FW_REQ	= 3
 }BMS_OBJ;
 
 typedef enum SDO_STATE_t{
@@ -136,7 +137,8 @@ typedef enum SDO_SERVICE{
 	SDO_SERVICE_READ_SN_BP,
 	SDO_SERVICE_WRITE_SN_XE,
 	SDO_SERVICE_READ_SN_XE,
-	SDO_SERVICE_READ_BP_SW_VERSION
+	SDO_SERVICE_READ_BP_SW_VERSION,
+	SDO_SERVICE_BOOT_BMS
 
 }SDO_SERVICE;
 
@@ -162,6 +164,7 @@ struct CAN_master_t{
 	CO_Sub_Object				data_write_bms_od;
 	uint8_t						bms_mainswitch_state;
 	uint8_t						bms_matting_state;
+	uint8_t						bms_new_fw_req;
 	uint8_t						hmi_xe_sn[32];
 	uint8_t						slave_id;
 	uint8_t						camel_sn[32];

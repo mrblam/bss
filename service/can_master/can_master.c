@@ -16,8 +16,7 @@ int write_abort;
 int read;
 int read_success;
 int read_abort;
-static CO_Slave* can_master_get_assign_request_slave(
-		const CAN_master *const p_cm);
+static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_cm);
 static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp);
 static void delay_time_ms(int time_ms);
 #if 0
@@ -181,7 +180,6 @@ static void can_master_process_sdo(CAN_master *p_cm, const uint32_t timestamp) {
 		break;
 	}
 }
-
 #if 1
 void can_master_start_assign_next_slave(CAN_master *p_cm,
 		const uint32_t timestamp) // not use
@@ -196,8 +194,7 @@ void can_master_start_assign_next_slave(CAN_master *p_cm,
 	}
 	p_cm->assign_timeout = timestamp + WAIT_BP_ASSIGN_REQ_TIMEOUT_mS;
 	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
-	can_master_slave_deselect(p_cm,
-			p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
+	can_master_slave_deselect(p_cm,p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 }
 #endif
 
@@ -206,58 +203,45 @@ void can_master_start_assign_slave(CAN_master *p_cm, CO_Slave *slave,
 	co_slave_set_con_state(slave, CO_SLAVE_CON_ST_ASSIGNING);
 	//    p_cm->pdo_sync_timestamp = 0;
 	p_cm->assigning_slave = slave;
-	can_master_slave_select(p_cm,
-			p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
+	can_master_slave_select(p_cm,p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 	for (uint8_t i = 0; i < 32; i++) {
 		p_cm->assigning_slave->sn[i] = 0;
 	}
 	p_cm->assign_timeout = timestamp + WAIT_BP_ASSIGN_REQ_TIMEOUT_mS;
 	p_cm->assign_state = CM_ASSIGN_ST_WAIT_REQUEST;
-	can_master_slave_deselect(p_cm,
-			p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
+	can_master_slave_deselect(p_cm,p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 }
 
 void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave, uint32_t timestamp) {
 	p_cm->assign_state = CM_ASSIGN_ST_AUTHORIZING;
 	can_master_read_slave_sn(p_cm, slave->node_id - p_cm->slave_start_node_id, timestamp);
 }
-void can_set_read_sn_func_pointer(CAN_master *p_cm,
-		void (*read_serial_number_bp)(void)) {
+void can_set_read_sn_func_pointer(CAN_master *p_cm,void (*read_serial_number_bp)(void)) {
 	//	(void)p_cm;
-	//	CAN_master_obj.read_serial_number_bp = read_serial_number_bp;
 	p_cm->read_serial_number_bp = read_serial_number_bp;
 }
 void can_set_sdo_write_obj_func_pointer(CAN_master *p_cm,
 		void (*sdo_write_object)(void)) {
 	p_cm->sdo_write_object = sdo_write_object;
 }
-void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id,
-		uint32_t timestamp) {
-#if 0
-	co_sdo_read_object(p_cm,
-			SLAVE_SERIAL_NUMBER_OBJECT_INDEX,
-			p_cm->slaves[cab_id]->node_id,
-			p_cm->slaves[cab_id]->sn,
-			timestamp + SDO_READ_SN_TIMEOUT_mS);
-#else
+void can_master_read_slave_sn(CAN_master *p_cm, uint8_t cab_id,uint32_t timestamp) {
 	/*Init SDO data*/
-	p_cm->serial_number_sobj.attr = ODA_SDO_RW;		//<< [skip] set ODA_SDO_RW
-	p_cm->serial_number_sobj.p_data = p_cm->slaves[cab_id]->sn;	//<< Address variable receiving data
-	p_cm->serial_number_sobj.len = 32;//<< Maximum data size that can be received
-	p_cm->serial_number_sobj.p_ext = NULL;	//<< [option], set NULL if not used
+	p_cm->serial_number_sobj.attr = ODA_SDO_RW;
+	p_cm->serial_number_sobj.p_data = p_cm->slaves[cab_id]->sn;
+	p_cm->serial_number_sobj.len = 32;
+	p_cm->serial_number_sobj.p_ext = NULL;
 	/*Start upload*/
 	CO_SDOclient_start_upload(&p_cm->CO_base.sdo_client,
-			p_cm->slaves[cab_id]->node_id,
-			BMS_INDEX,
-			BMS_SERIAL_NUMBER_OBJECT_SUB_INDEX, &p_cm->serial_number_sobj,
-			SDO_READ_OBJ_TIMEOUT_mS);
+								p_cm->slaves[cab_id]->node_id,
+								BMS_INDEX,
+								BMS_SERIAL_NUMBER_OBJECT_SUB_INDEX,
+								&p_cm->serial_number_sobj,
+								SDO_READ_OBJ_TIMEOUT_mS);
 	p_cm->sdo_server.node_id_processing = p_cm->slaves[cab_id]->node_id; //them 4/10/22
 	//		if(p_cm->read_serial_number_bp != NULL)
 	//				{
 	//					p_cm->read_serial_number_bp();
 	//				}
-#endif
-
 }
 void can_master_write_bms_object(CAN_master *p_cm, uint8_t cab_id,
 		BMS_OBJ bms_obj, uint32_t timestamp) {
@@ -293,6 +277,20 @@ void can_master_write_bms_object(CAN_master *p_cm, uint8_t cab_id,
 	case BMS_MATED_DEV:
 		p_cm->sn_assign_state = BMS_MATED_DEV_WRITE_BSS_SN;
 		p_cm->slave_id = cab_id;
+		break;
+	case BMS_NEW_FW_REQ:
+		p_cm->data_write_bms_od.p_data = &p_cm->bms_new_fw_req;
+		p_cm->data_write_bms_od.attr = ODA_SDO_RW;
+		p_cm->data_write_bms_od.len = 1;
+		p_cm->data_write_bms_od.p_ext = NULL;
+			/*Start download*/
+		CO_SDOclient_start_download(&p_cm->CO_base.sdo_client,
+									p_cm->slaves[cab_id]->node_id,
+									0x2001,
+									0x07,
+									&p_cm->data_write_bms_od,
+									SDO_WRITE_OBJ_TIMEOUT_mS);
+
 		break;
 	default:
 		break;
@@ -404,8 +402,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,
 	}
 }
 
-static CO_Slave* can_master_get_assign_request_slave(
-		const CAN_master *const p_cm) {
+static CO_Slave* can_master_get_assign_request_slave(const CAN_master *const p_cm) {
 	for (uint32_t i = 0; i < p_cm->slave_num; i++) {
 		if (p_cm->slaves[i]->con_state == CO_SLAVE_CON_ST_ASSIGNING) {
 			return p_cm->slaves[i];
@@ -510,11 +507,11 @@ void can_master_read_bp_version_software(CAN_master* p_cm, uint8_t cab_id){
 	p_cm->serial_number_sobj.p_ext = NULL;						//<< [option], set NULL if not used
 	/*Start upload*/
 	CO_SDOclient_start_upload(&p_cm->CO_base.sdo_client,
-							   p_cm->slaves[cab_id]->node_id,
-							   BMS_VERSION_INDEX,
-							   BMS_VERSION_SUBINDEX,
-							   &p_cm->serial_number_sobj,
-							   SDO_READ_OBJ_TIMEOUT_mS);
+								p_cm->slaves[cab_id]->node_id,
+								BMS_VERSION_INDEX,
+								BMS_VERSION_SUBINDEX,
+								&p_cm->serial_number_sobj,
+								SDO_READ_OBJ_TIMEOUT_mS);
 	p_cm->sdo_service = SDO_SERVICE_READ_BP_SW_VERSION;
 }
 static void delay_time_ms(int time_ms){

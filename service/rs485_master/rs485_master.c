@@ -162,3 +162,17 @@ void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id){
 	p_485m->state = RS485_MASTER_ST_IDLE;
 }
 
+void rs485_master_log(RS485_Master* p_485m,int callback,int can){
+	char* buff = (char*)p_485m->tx_data;
+	*buff++=':';
+	buff+=long_to_string(callback, buff);
+	*buff++=',';
+	buff+=long_to_string(can, buff);
+	*buff++='*';
+	*buff++='\0';
+}
+void rs485_send_log(RS485_Master* p_485m){
+	p_485m->set_transmit_mode(p_485m);
+	p_485m->p_hw->sends(p_485m->p_hw, (char*)p_485m->tx_data);
+	p_485m->set_receive_mode(p_485m);
+}
