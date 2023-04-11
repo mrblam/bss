@@ -202,7 +202,7 @@ void USART1_IRQHandler(void){
 void USART3_IRQHandler(void){
 	HAL_UART_IRQHandler(&hmi_com.uart_module);
 	uart_receives(&hmi_com, (char*)&hmi_com.rx_data);
-	sm_host_asyn_feed((uint8_t*)&debug_com.rx_data, 1, host_master);
+	sm_host_asyn_feed((char*)&hmi_com.rx_data, 1, host_master);
 	if(hmi_com.receive_handle != NULL)
 	{
 		hmi_com.receive_handle(&hmi_com);
@@ -215,10 +215,10 @@ void USART3_IRQHandler(void){
 void USART2_IRQHandler(void){
 	HAL_UART_IRQHandler(&debug_com.uart_module);
 	uart_receives(&debug_com, (char*)&debug_com.rx_data);
-	sm_host_asyn_feed((uint8_t*)&debug_com.rx_data, 1, host_master);
+	sm_host_asyn_feed((char*)&debug_com.rx_data, 1, host_master);
 	if(debug_com.receive_handle != NULL)
 	{
-		debug_com.receive_handle(&debug_com);
+//		debug_com.receive_handle(&debug_com);
 	}
 }
 void UART_DMA_Init(void)

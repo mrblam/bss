@@ -42,7 +42,7 @@ int32_t my_callback(int32_t _cmd, const uint8_t* _data, int32_t _len, void* _arg
 	return _len;
 }
 int32_t my_send_interface(const uint8_t* _data, int32_t _len){
-	HAL_UART_Transmit(&debug_com.uart_module, (uint8_t*)_data, _len, 500);
+	HAL_UART_Transmit(&hmi_com.uart_module, (uint8_t*)_data, _len, 500);
 	return _len;
 }
 sm_host_t* host_master;
@@ -122,7 +122,7 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 			break;
 	}
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
-	sm_host_process(host_master);
+//	sm_host_process(host_master);
 //	HAL_UART_Transmit(&debug_com.uart_module, s, 6, 500);
 //	sm_host_send_response(host_master, 0x10, 0x00, "abc", 3);
 }
@@ -166,7 +166,8 @@ static void can_receive_handle(CAN_Hw *p_hw){
 	app_co_can_receive_handle(p_can_hw->RxHeader.Identifier, p_can_hw->rx_msg_data);
 #else
 	uint32_t cob_id = p_hw->can_rx.StdId;
-
+if(selex_bss_app.is_main_hmi_shutdown == true){
+//	selex_bss_app.is_main_hmi_shutdown = false;
 	uint8_t array[32];
 	uint8_t len = 0;
 //	array[len++] = frame_id;
@@ -181,6 +182,7 @@ static void can_receive_handle(CAN_Hw *p_hw){
 //	rs485_master_log(&rs485m,counter_callback,counter_can);
 //	rs485_send_log(&rs485m);
 	sm_host_send_response(host_master, 0x10, 0x00, array , len);
+}
 //	if(selex_bss_app.bss.state == BSS_ST_UPGRADE_FW_BP).
 //	return;
 
