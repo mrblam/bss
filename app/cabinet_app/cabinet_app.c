@@ -560,7 +560,7 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 			Cabinet *cab = bss_get_cab_need_charge(&p_ca->bss, id);
 			if (cab != NULL) {
 				delay_time_10ms++;
-				if (delay_time_10ms > 500) {					// delay 5s
+				if (delay_time_10ms > 100) {					// delay 5s
 					delay_time_10ms = 0;
 					p_ca->bss.ac_chargers[id].charging_cabin = cab;
 					sw_on(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
@@ -571,7 +571,7 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 }
 void cab_app_update_connected_cab_state(Cabinet_App *p_app) {
 	for (uint8_t id = 0; id < p_app->bss.cab_num; id++) {
-		if ((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED) && (p_app->base.pdo_sync_timestamp)) {
+		if ((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)) {
 			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
 			if (p_app->bss.cabs[id].bp->base.inactive_time_ms <= BP_INACTIVE_TIMEOUT_mS)
 				continue;

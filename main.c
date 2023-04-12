@@ -42,6 +42,7 @@ int32_t my_callback(int32_t _cmd, const uint8_t* _data, int32_t _len, void* _arg
 	return _len;
 }
 int32_t my_send_interface(const uint8_t* _data, int32_t _len){
+	HAL_UART_Transmit(&debug_com.uart_module, (uint8_t*)_data, _len, 500);
 	HAL_UART_Transmit(&hmi_com.uart_module, (uint8_t*)_data, _len, 500);
 	return _len;
 }
@@ -131,7 +132,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 
 void TIM3_IRQHandler(void) { //// 5ms
 	com_timestamp += 5;
-
 	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
 	/* Process HMI protocol */
@@ -235,7 +235,7 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 	cab_id++;
 
 #if ENABLE_CHARGER
-	cab_app_update_charge(p_app, sys_timestamp);
+	cab_app_update_charge(p_app, com_timestamp);
 #endif
 //	if(sys_timestamp % 15000 == 0){
 //	p_app->bss.bp_backup.get_voltage(&p_app->bss.bp_backup);
