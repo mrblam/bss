@@ -75,7 +75,7 @@ void cab_app_sync_cab_data_hmi(Cabinet_App *p_ca, uint8_t cab_id) { ///not use
 void cab_app_send_msg_to_hmi(Cabinet_App *p_ca) {
 	(void) p_ca;
 	uart_sends(&hmi_com, (uint8_t*) tx_buff);
-	uart_sends(&debug_com, (uint8_t*) tx_buff);
+//	uart_sends(&debug_com, (uint8_t*) tx_buff);
 
 }
 void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
@@ -309,15 +309,20 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t m
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 			break;
 		case REBOOT_BP:
-//			if(p_ca->bss.cabs[id].op_state == CAB_CELL_ST_STANDBY){
+			if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_idle){
 				cab_app_request_upgrade_fw_bp(p_ca, id, 2000);
 				delay_time_ms(10000);//10ms
-				p_ca->base.sdo_service = SDO_SERVICE_BOOT_BMS;
-				p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-				p_ca->is_main_hmi_shutdown = true;
-//			}else{
-//				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
-//			}
+				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success){
+					p_ca->base.sdo_service = SDO_SERVICE_BOOT_BMS;
+					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+					p_ca->is_main_hmi_shutdown = true;
+				}else{
+					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+				}
+
+			}else{
+				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+			}
 			break;
 		case REBOOT_SUCCESS:
 			p_ca->base.sdo_service = SDO_SERVICE_IDLE;
@@ -572,7 +577,7 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 void cab_app_update_connected_cab_state(Cabinet_App *p_app) {
 	for (uint8_t id = 0; id < p_app->bss.cab_num; id++) {
 		if ((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)) {
-			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
+			p_app->bss.cabs[id].bp->base.inactive_time_ms ++;
 			if (p_app->bss.cabs[id].bp->base.inactive_time_ms <= BP_INACTIVE_TIMEOUT_mS)
 				continue;
 			cab_cell_reset(&p_app->bss.cabs[id]);

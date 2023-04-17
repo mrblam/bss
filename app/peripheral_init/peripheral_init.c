@@ -560,12 +560,12 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 		}
 	}
 }
-
+static uint8_t bpid;
 static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 	uint32_t cob_id = p_cm->p_hw->can_rx.StdId & 0xFFFFFF80;
 	uint8_t node_id = (uint8_t) (p_cm->p_hw->can_rx.StdId & 0x7F);
 	uint8_t bp_id = node_id - p_cm->slave_start_node_id;
-
+bpid = bp_id;
 	if(bp_id >= p_cm->slave_num) return;
 	//if(bp_get_con_state(selex_bss_app.bss.cabs[bp_id].bp) != (CO_SLAVE_CON_ST_CONNECTED && CO_SLAVE_CON_ST_AUTHORIZING))  return;
 	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);

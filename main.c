@@ -42,7 +42,7 @@ int32_t my_callback(int32_t _cmd, const uint8_t* _data, int32_t _len, void* _arg
 	return _len;
 }
 int32_t my_send_interface(const uint8_t* _data, int32_t _len){
-	HAL_UART_Transmit(&debug_com.uart_module, (uint8_t*)_data, _len, 500);
+//	HAL_UART_Transmit(&debug_com.uart_module, (uint8_t*)_data, _len, 500);
 	HAL_UART_Transmit(&hmi_com.uart_module, (uint8_t*)_data, _len, 500);
 	return _len;
 }
@@ -98,6 +98,12 @@ void TIM2_IRQHandler(void)   //1ms
 		CO_process(&CO_DEVICE,1);
 	}
 	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
+	if (selex_bss_app.bss.state == BSS_ST_MAINTAIN || selex_bss_app.bss.state == BSS_ST_ACTIVE){
+		bss_update_cabinets_state(&selex_bss_app.bss);
+		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, tim2_timestamp);
+		cab_app_update_connected_cab_state(&selex_bss_app);
+	}
+
 	HAL_TIM_IRQHandler(&hmi_timer);
 }
 
@@ -106,14 +112,14 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	sys_timestamp += sys_tick_ms;
 	switch (selex_bss_app.bss.state) {
 		case BSS_ST_MAINTAIN:
-			bss_update_cabinets_state(&selex_bss_app.bss);
-			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+//			bss_update_cabinets_state(&selex_bss_app.bss);
+//			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 			break;
 		case BSS_ST_ACTIVE:
-			cab_app_update_connected_cab_state(&selex_bss_app);
+
 			cab_app_update_io_cab_state(&selex_bss_app);
-			bss_update_cabinets_state(&selex_bss_app.bss);
-			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+
+//			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 			break;
 		case BSS_ST_UPGRADE_FW_BP:
 			sm_host_process(host_master);
@@ -152,10 +158,7 @@ void TIM3_IRQHandler(void) { //// 5ms
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
 #endif
-	if(selex_bss_app.base.sdo_service_xe_sn_done){
-		selex_bss_app.base.sdo_service_xe_sn_done = false;
-		cab_app_send_data_log(&selex_bss_app);
-	}
+
 	HAL_TIM_IRQHandler(&io_scan_timer);
 }
 
@@ -173,7 +176,6 @@ if(selex_bss_app.is_main_hmi_shutdown == true){
 //	array[len++] = frame_id;
 	array[len++] = (cob_id >> 8) & 0xFF;
 	array[len++] = (cob_id) & 0xFF;
-
 	for(uint32_t i = 0; i < p_hw->can_rx.DLC; i++){
 		array[len++] =  p_hw->rx_data[i];
 	}
