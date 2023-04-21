@@ -98,11 +98,11 @@ void TIM2_IRQHandler(void)   //1ms
 		CO_process(&CO_DEVICE,1);
 	}
 	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
-	if (selex_bss_app.bss.state == BSS_ST_MAINTAIN || selex_bss_app.bss.state == BSS_ST_ACTIVE){
-		bss_update_cabinets_state(&selex_bss_app.bss);
-		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, tim2_timestamp);
-		cab_app_update_connected_cab_state(&selex_bss_app);
-	}
+//	if (selex_bss_app.bss.state == BSS_ST_MAINTAIN || selex_bss_app.bss.state == BSS_ST_ACTIVE){
+//		bss_update_cabinets_state(&selex_bss_app.bss);
+//		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, tim2_timestamp);
+//		cab_app_update_connected_cab_state(&selex_bss_app);
+//	}
 
 	HAL_TIM_IRQHandler(&hmi_timer);
 }
@@ -112,14 +112,14 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 	sys_timestamp += sys_tick_ms;
 	switch (selex_bss_app.bss.state) {
 		case BSS_ST_MAINTAIN:
-//			bss_update_cabinets_state(&selex_bss_app.bss);
-//			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+			bss_update_cabinets_state(&selex_bss_app.bss);
+			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 			break;
 		case BSS_ST_ACTIVE:
-
+			cab_app_update_connected_cab_state(&selex_bss_app);
 			cab_app_update_io_cab_state(&selex_bss_app);
-
-//			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
+			bss_update_cabinets_state(&selex_bss_app.bss);
+			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
 			break;
 		case BSS_ST_UPGRADE_FW_BP:
 			sm_host_process(host_master);

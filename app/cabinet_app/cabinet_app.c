@@ -182,6 +182,9 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 					p_ca->base.pdo_sync_timestamp = timestamp + 20;
 				}
 			}
+			if(p_ca->bss.state == BSS_ST_MAINTAIN){
+				p_ca->is_main_hmi_shutdown = false;
+			}
 			p_ca->base.sdo_service = SDO_SERVICE_IDLE;
 			p_ca->base.assign_state = CM_ASSIGN_ST_DONE;
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
@@ -314,6 +317,12 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t m
 				delay_time_ms(10000);//10ms
 				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success){
 					p_ca->base.sdo_service = SDO_SERVICE_BOOT_BMS;
+					sw_off(&p_ca->bss.cabs[id].charger);  //xu ly khi pin dang sac ma minh muon upgrade firmware
+					if(id == 0 || id ==1 || id == 4 || id == 5 || id == 8 || id == 9 || id == 12 || id == 13 || id == 16){
+						p_ca->bss.ac_chargers[0].charging_cabin = NULL;
+					}else{
+						p_ca->bss.ac_chargers[1].charging_cabin = NULL;
+					}
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 					p_ca->is_main_hmi_shutdown = true;
 				}else{
@@ -577,7 +586,7 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 void cab_app_update_connected_cab_state(Cabinet_App *p_app) {
 	for (uint8_t id = 0; id < p_app->bss.cab_num; id++) {
 		if ((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)) {
-			p_app->bss.cabs[id].bp->base.inactive_time_ms ++;
+			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
 			if (p_app->bss.cabs[id].bp->base.inactive_time_ms <= BP_INACTIVE_TIMEOUT_mS)
 				continue;
 			cab_cell_reset(&p_app->bss.cabs[id]);
