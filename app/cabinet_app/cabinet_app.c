@@ -312,26 +312,36 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t m
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 			break;
 		case REBOOT_BP:
-			if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_idle){
+			CO_SDO_abort(&p_ca->base.CO_base.sdo_client, CO_SDO_AB_GENERAL);
+			int count = 0;
+			while (count++ < 5) {
+				CO_SDO_reset_status(&p_ca->base.CO_base.sdo_client);
+
+				// if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_idle){
 				cab_app_request_upgrade_fw_bp(p_ca, id, 2000);
-				delay_time_ms(10000);//10ms
-				if(p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success){
+				delay_time_ms(10000); //10ms
+				if (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success) {
 					p_ca->base.sdo_service = SDO_SERVICE_BOOT_BMS;
 					sw_off(&p_ca->bss.cabs[id].charger);  //xu ly khi pin dang sac ma minh muon upgrade firmware
-					if(id == 0 || id ==1 || id == 4 || id == 5 || id == 8 || id == 9 || id == 12 || id == 13 || id == 16){
+					if (id == 0 || id == 1 || id == 4 || id == 5 || id == 8 || id == 9 || id == 12 || id == 13 || id == 16) {
 						p_ca->bss.ac_chargers[0].charging_cabin = NULL;
-					}else{
+					} else {
 						p_ca->bss.ac_chargers[1].charging_cabin = NULL;
 					}
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 					p_ca->is_main_hmi_shutdown = true;
-				}else{
+
+					break;
+				} else {
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 				}
 
-			}else{
-				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+				// }else{
+				// 	p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+				// }
 			}
+
+			CO_SDO_reset_status(&p_ca->base.CO_base.sdo_client);
 			break;
 		case REBOOT_SUCCESS:
 			p_ca->base.sdo_service = SDO_SERVICE_IDLE;
