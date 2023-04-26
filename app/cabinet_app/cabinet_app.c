@@ -78,6 +78,8 @@ void cab_app_send_msg_to_hmi(Cabinet_App *p_ca) {
 //	uart_sends(&debug_com, (uint8_t*) tx_buff);
 
 }
+	// :Cmd_code,Main_obj,Id,Sub_obj,Obj_state*
+	// :W,S,0,S,0*
 void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
 	for (uint8_t i = 0; i < p_ca->hmi_csv.valid_msg_num; i++) {
 		switch (p_ca->hmi_csv.cmd_code[i]) {
@@ -214,6 +216,17 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 				p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 			} else
 				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+			break;
+		case POWER_METER:
+// switch baudrate
+			rs485_com.uart_module.Init.BaudRate = 9600;
+// send mobus
+			mobus_master_command_serialize(p_ca->slave_com);
+			mobus_master_sends(p_ca->slave_com);
+			p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
+//			while (0){
+//				p_ca-
+//			}
 			break;
 		default:
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
@@ -573,8 +586,6 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 				if (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort && p_ca->base.sdo_service == SDO_SERVICE_ACTIVE_CHARGER) {
 					p_ca->base.CO_base.sdo_client.status = CO_SDO_RT_idle;
 				}
-				//if (p_ca->bss.ac_chargers[id].charging_cabin->bp->base.node_id != p_ca->base.sdo_server.node_id_processing)
-					//continue;
 				if (p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_CHARGING) {
 					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_CHARGING;
 					p_ca->bss.ac_chargers[id].charging_cabin->on_bp_counter[id] = 0;

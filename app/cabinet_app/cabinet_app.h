@@ -52,7 +52,7 @@ typedef enum SUB_OBJS{
 	SYNC_DATA		= 'Y',
 	CAB_NUM			= 'N',
 	TEMP			= 'T',
-	S2_CAMEL_SN		= 'M',
+	POWER_METER		= 'M',
 	BSS_SN			= 'B',
 	WRITE_SN		= 'V',
 	REBOOT_BP		= 'R',
