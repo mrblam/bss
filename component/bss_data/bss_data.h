@@ -55,12 +55,23 @@ struct Charger_t{
 	Switch			input_power;
 };
 
+typedef struct Power_meter_t Power_meter;
+struct Power_meter_t{
+		uint16_t	ac_voltage;
+		uint16_t	ac_current;
+		uint16_t	ac_power;
+		uint16_t	cos;
+		uint16_t	freq;
+		uint16_t	total_power;
+};
+
 typedef struct BSS_Data_t BSS_Data;
 struct BSS_Data_t{
 	BSS_STATE 		state;
 	uint8_t 		cab_num;
 	uint8_t			charger_num;
 	IO_State	 	tilt_ss;
+	Power_meter		ac_meter;
 	Charger*		ac_chargers;
 	Switch			bss_fans[2];
 	Switch 			bss_lamps[4];
@@ -79,6 +90,7 @@ void bss_update_cabinets_state(BSS_Data* p_bss);
 void bss_set_state(BSS_Data* p_bss, BSS_STATE state);
 void bss_update_charge_state(BSS_Data* p_bss);
 void bss_warning(BSS_Data* p_bss);
+void bss_update_ac_meter(BSS_Data* p_bss);
 Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){

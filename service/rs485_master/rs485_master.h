@@ -22,6 +22,7 @@ typedef enum RS485_MASTER_STATE{
 	RS485_MASTER_ST_SEND_SYNC,
 	RS485_MASTER_ST_SUCCESS,
 	RS485_MASTER_ST_FAIL,
+	RS485_MASTER_ST_MOBUS
 } RS485_MASTER_STATE;
 
 typedef enum COMMAND_CODE{
@@ -77,6 +78,8 @@ void rs485_master_process_switch_command(RS485_Master* p_485m, uint8_t id, SLAVE
 void rs485_master_process_sync_data(RS485_Master* p_485m, uint8_t id);
 void rs485_master_log(RS485_Master* p_485m,int callback,int can);
 void rs485_send_log(RS485_Master* p_485m);
+void mobus_master_command_serialize(RS485_Master* p_485m);
+void mobus_master_sends(RS485_Master* p_485m);
 static inline RS485_MASTER_STATE rs485_master_get_state(const RS485_Master* p_485m){
 	return p_485m->state;
 }

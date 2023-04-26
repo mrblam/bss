@@ -26,23 +26,13 @@ static uint32_t 	tim2_timestamp = 0;
 static uint32_t 	check_hmi_msg_timestamp = 0;
 static uint8_t 		cab_id = 0;
 static uint8_t		node_id_high = 0;
-static uint8_t		frame_id;
-static int 		counter_callback ;
-static int		counter_can;
 int32_t my_callback(int32_t _cmd, const uint8_t* _data, int32_t _len, void* _arg ){
-//	static int cmd_index = 0;
-//	cmd_index++;
-//	frame_id = (uint8_t)_data[0];
-	counter_callback ++;
 	can_port.can_tx.StdId = ((uint16_t)_data[0] << 8) | (uint16_t)_data[1];
 	can_port.can_tx.DLC = _len - 2;
 	can_send(&can_port, (uint8_t*)(_data + 2));
-//	rs485_master_log(&rs485m,counter_callback,counter_can);
-//	rs485_send_log(&rs485m);
 	return _len;
 }
 int32_t my_send_interface(const uint8_t* _data, int32_t _len){
-//	HAL_UART_Transmit(&debug_com.uart_module, (uint8_t*)_data, _len, 500);
 	HAL_UART_Transmit(&hmi_com.uart_module, (uint8_t*)_data, _len, 500);
 	return _len;
 }
@@ -64,11 +54,9 @@ void cab_app_init(Cabinet_App *p_ca) {
 		bp_slaves[i]->sdo_server_address = 0x580 + bp_slaves[i]->node_id;
 		bp_slaves[i]->inactive_time_ms = 0;
 	}
-	/* CHARGER INIT */
 	bss_charger_init(&p_ca->bss);
 	can_master_init((CAN_master*) p_ca, bp_slaves, CABINET_CELL_NUM, &can_port);
 	can_set_receive_handle(p_ca->base.p_hw, can_receive_handle);
-	/*CANOpen Init */
 	app_co_init();
 }
 int main(void) {
@@ -98,12 +86,6 @@ void TIM2_IRQHandler(void)   //1ms
 		CO_process(&CO_DEVICE,1);
 	}
 	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
-//	if (selex_bss_app.bss.state == BSS_ST_MAINTAIN || selex_bss_app.bss.state == BSS_ST_ACTIVE){
-//		bss_update_cabinets_state(&selex_bss_app.bss);
-//		can_master_update_id_assign_process((CAN_master*) &selex_bss_app, tim2_timestamp);
-//		cab_app_update_connected_cab_state(&selex_bss_app);
-//	}
-
 	HAL_TIM_IRQHandler(&hmi_timer);
 }
 
@@ -129,9 +111,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 			break;
 	}
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
-//	sm_host_process(host_master);
-//	HAL_UART_Transmit(&debug_com.uart_module, s, 6, 500);
-//	sm_host_send_response(host_master, 0x10, 0x00, "abc", 3);
 }
 
 /* --------------------------------------------------------------------------------------- */
@@ -169,25 +148,16 @@ static void can_receive_handle(CAN_Hw *p_hw){
 	app_co_can_receive_handle(p_can_hw->RxHeader.Identifier, p_can_hw->rx_msg_data);
 #else
 	uint32_t cob_id = p_hw->can_rx.StdId;
-if(selex_bss_app.is_main_hmi_shutdown == true){
-//	selex_bss_app.is_main_hmi_shutdown = false;
-	uint8_t array[32];
-	uint8_t len = 0;
-//	array[len++] = frame_id;
-	array[len++] = (cob_id >> 8) & 0xFF;
-	array[len++] = (cob_id) & 0xFF;
-	for(uint32_t i = 0; i < p_hw->can_rx.DLC; i++){
-		array[len++] =  p_hw->rx_data[i];
+	if (selex_bss_app.is_main_hmi_shutdown == true) {
+		uint8_t array[32];
+		uint8_t len = 0;
+		array[len++] = (cob_id >> 8) & 0xFF;
+		array[len++] = (cob_id) & 0xFF;
+		for (uint32_t i = 0; i < p_hw->can_rx.DLC; i++) {
+			array[len++] = p_hw->rx_data[i];
+		}
+		sm_host_send_response(host_master, 0x10, 0x00, array, len);
 	}
-//	if(frame_id )
-//	counter_can ++;
-//	rs485_master_log(&rs485m,counter_callback,counter_can);
-//	rs485_send_log(&rs485m);
-	sm_host_send_response(host_master, 0x10, 0x00, array , len);
-}
-//	if(selex_bss_app.bss.state == BSS_ST_UPGRADE_FW_BP).
-//	return;
-
 	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
 	{
 		case CO_CAN_ID_TPDO_1:

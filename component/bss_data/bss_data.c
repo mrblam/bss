@@ -91,6 +91,11 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 	}
 }
 
+void bss_update_ac_meter(BSS_Data* p_bss){
+
+
+}
+
 void bss_warning(BSS_Data* p_bss)
 {
 //	bss_siren();
@@ -114,6 +119,7 @@ Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id){
 		if((p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol > 0)
 				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol <= BP_START_CHARGE_THRESHOLD)
 				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->state != BP_ST_DISCHARGING)
+				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->temp[1] < BP_TEMP_START_CHARGER)
 				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)){
 			available_cab_num++;
 			if(cab->bp->vol < p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol){
@@ -124,7 +130,8 @@ Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id){
 	if(available_cab_num == 0) return NULL;
 	else return cab;
 }
-
+// :R,S,0,A*
+// --> R,S,0,A,19,0,0,[0,0],[0,0],[0,0,0,0],[30,30]
 static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	*buff++=':';
 	*buff++='R';
@@ -140,11 +147,26 @@ static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	buff+=long_to_string(p_bss->state,buff);
     *buff++=',';
 	buff+=long_to_string(p_bss->tilt_ss.state,buff);
-    *buff++=',';
+	*buff++=',';
+	// AC meter
+	*buff++='[';
+	buff+=long_to_string(p_bss->ac_meter.ac_voltage,buff);
+	*buff++=',';
+	buff+=long_to_string(p_bss->ac_meter.ac_current,buff);
+	*buff++=',';
+	buff+=long_to_string(p_bss->ac_meter.ac_power,buff);
+	*buff++=',';
+	buff+=long_to_string(p_bss->ac_meter.cos,buff);
+	*buff++=',';
+	buff+=long_to_string(p_bss->ac_meter.freq,buff);
+	*buff++=',';
+	buff+=long_to_string(p_bss->ac_meter.total_power,buff);
+	*buff++=']';
+	*buff++=',';
     // Chargers
     *buff++='[';
     for(uint8_t i = 0; i < 2; i++){
-    	buff+=long_to_string(p_bss->ac_chargers[i].input_power.state, buff);
+    	buff+=long_to_string((uint32_t)p_bss->ac_chargers[i].charging_cabin, buff);
     	*buff++=',';
     }
     --buff;

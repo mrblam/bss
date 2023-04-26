@@ -20,23 +20,23 @@ void cab_cell_init(Cabinet* p_cab, uint8_t id){
 void cab_cell_update_state(Cabinet* p_cab){
         CABINET_OP_STATE old_state = p_cab->op_state;
         CABINET_OP_STATE new_state = old_state ;
-	switch(p_cab->bp->base.con_state){
-	case CO_SLAVE_CON_ST_DISCONNECT:
-		if((old_state != CAB_CELL_ST_INACTIVE) && (old_state != CAB_CELL_ST_INIT)){
-			new_state = CAB_CELL_ST_EMPTY;
-		}
-		break;
-	case CO_SLAVE_CON_ST_ASSIGNING:
-		new_state = CAB_CELL_ST_BP_ID_ASSIGN;
-		break;
-	case CO_SLAVE_CON_ST_AUTHORIZING:
-		new_state = CAB_CELL_ST_BP_ID_AUTHORIZE;
-		break;
-	case CO_SLAVE_CON_ST_CONNECTED:
-		if(old_state != CAB_CELL_ST_CHARGING){
-			new_state = CAB_CELL_ST_STANDBY;
-		}
-		break;
+	switch (p_cab->bp->base.con_state) {
+		case CO_SLAVE_CON_ST_DISCONNECT:
+			if ((old_state != CAB_CELL_ST_INACTIVE) && (old_state != CAB_CELL_ST_INIT)) {
+				new_state = CAB_CELL_ST_EMPTY;
+			}
+			break;
+		case CO_SLAVE_CON_ST_ASSIGNING:
+			new_state = CAB_CELL_ST_BP_ID_ASSIGN;
+			break;
+		case CO_SLAVE_CON_ST_AUTHORIZING:
+			new_state = CAB_CELL_ST_BP_ID_AUTHORIZE;
+			break;
+		case CO_SLAVE_CON_ST_CONNECTED:
+			if (old_state != CAB_CELL_ST_CHARGING) {
+				new_state = CAB_CELL_ST_STANDBY;
+			}
+			break;
 	}
 
 	if(new_state != old_state){
