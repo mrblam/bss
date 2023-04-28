@@ -498,6 +498,9 @@ static void rs485_receive_handle_impl(UART_hw* p_hw){
 	}
 	if(p_hw->rx_data != '\0'){
 		rs485m.rx_data[rs485m.rx_index] = p_hw->rx_data;
+		if(selex_bss_app.slave_com->state == RS485_MASTER_ST_MOBUS){
+			selex_bss_app.bss.ac_meter.rx_packet[rs485m.rx_index] = p_hw->rx_data;
+		}
 		rs485m.rx_index++;
 	}
 }

@@ -92,8 +92,12 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 }
 
 void bss_update_ac_meter(BSS_Data* p_bss){
-
-
+//	p_bss->ac_meter.ac_voltage 	= p_bss->ac_meter.rx_data[1];
+	p_bss->ac_meter.ac_current 	= 0;
+	p_bss->ac_meter.ac_power   	= 0;
+	p_bss->ac_meter.cos			= 0;
+	p_bss->ac_meter.freq		= 0;
+	p_bss->ac_meter.total_power = 0;
 }
 
 void bss_warning(BSS_Data* p_bss)
@@ -131,7 +135,7 @@ Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id){
 	else return cab;
 }
 // :R,S,0,A*
-// --> R,S,0,A,19,0,0,[0,0],[0,0],[0,0,0,0],[30,30]
+// --> R,S,0,A,19,0,0,[0,0,0,0,0,0],[0,0],[0,0],[0,0,0,0],[30,30]
 static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	*buff++=':';
 	*buff++='R';

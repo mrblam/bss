@@ -177,18 +177,18 @@ void rs485_send_log(RS485_Master* p_485m){
 	p_485m->set_receive_mode(p_485m);
 }
 void mobus_master_command_serialize(RS485_Master* p_485m){
-	char* buff = (char*)p_485m->tx_data;
+	uint8_t* buff = (uint8_t*)p_485m->tx_data;
 	*buff++= 0x01;
 	*buff++= 0x04;
 	*buff++= 0x00;
 	*buff++= 0x00;
 	*buff++= 0x00;
-	*buff++= 0x04;
+	*buff++= 0x02;
 	*buff++= 0x71;
 	*buff++= 0xCB;
 }
 void mobus_master_sends(RS485_Master* p_485m){
 	p_485m->set_transmit_mode(p_485m);
-	p_485m->p_hw->sends(p_485m->p_hw, (char*)p_485m->tx_data);
+	HAL_UART_Transmit(&p_485m->p_hw->uart_module,(uint8_t*) &p_485m->tx_data, 8, 500);
 	p_485m->set_receive_mode(p_485m);
 }

@@ -50,6 +50,22 @@ static void uart_rs485_hw_init(void){
 	uart_receives(&rs485_com, (char*)&rs485_com.rx_data);
 }
 
+void UART_set_baudrate(int baudrate){
+	rs485_com.uart_module.Instance = RS485_PORT_COM;
+	rs485_com.uart_module.Init.BaudRate = baudrate;
+	rs485_com.uart_module.Init.WordLength = UART_WORDLENGTH_8B;
+	rs485_com.uart_module.Init.StopBits = UART_STOPBITS_1;
+	rs485_com.uart_module.Init.Parity = UART_PARITY_NONE;
+	rs485_com.uart_module.Init.Mode = UART_MODE_TX_RX;
+	rs485_com.uart_module.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	rs485_com.uart_module.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&rs485_com.uart_module) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	uart_receives(&rs485_com, (char*)&rs485_com.rx_data);
+}
+
 static void uart_debug_hw_init(void)
 {
 	debug_com.uart_module.Instance = DEBUG_PORT_COM;
@@ -218,7 +234,7 @@ void USART2_IRQHandler(void){
 	sm_host_asyn_feed((char*)&debug_com.rx_data, 1, host_master);
 	if(debug_com.receive_handle != NULL)
 	{
-//		debug_com.receive_handle(&debug_com);
+		debug_com.receive_handle(&debug_com);
 	}
 }
 void UART_DMA_Init(void)

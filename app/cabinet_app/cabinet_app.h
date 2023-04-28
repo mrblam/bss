@@ -17,7 +17,7 @@
 #include "ioe.h"
 #include "bss_data.h"
 #include "rs485_master.h"
-
+#include "crc.h"
 typedef struct Cabinet_App_t Cabinet_App;
 
 extern Cabinet_App selex_bss_app;

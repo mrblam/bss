@@ -57,6 +57,7 @@ struct Charger_t{
 
 typedef struct Power_meter_t Power_meter;
 struct Power_meter_t{
+		uint8_t		rx_packet[32];
 		uint16_t	ac_voltage;
 		uint16_t	ac_current;
 		uint16_t	ac_power;

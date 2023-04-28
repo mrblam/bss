@@ -218,15 +218,24 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 			break;
 		case POWER_METER:
-// switch baudrate
-			rs485_com.uart_module.Init.BaudRate = 9600;
-// send mobus
+			UART_set_baudrate(9600);/// doc xong nho set ve 115200
+			p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
 			mobus_master_command_serialize(p_ca->slave_com);
 			mobus_master_sends(p_ca->slave_com);
-			p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
-//			while (0){
-//				p_ca-
-//			}
+			while(0);
+			uint16_t crc;
+			crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,17);
+			// check CRC
+			if(crc == 0){
+				p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+			}else{
+				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+			}
+			UART_set_baudrate(115200);
+			p_ca->slave_com->state = RS485_MASTER_ST_IDLE;
+			if(state = 0){
+				UART_set_baudrate(115200);
+			}
 			break;
 		default:
 			p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;

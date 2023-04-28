@@ -80,8 +80,8 @@ uint16_t CRC_CalculateCRC16(const uint8_t *Buffer, uint32_t Length);
  * RETURN VALUE: 32 bit result of CRC calculation
  */
 uint32_t CRC_CalculateCRC32(const uint8_t *Buffer, uint16_t Length);
-
-
+uint16_t crc16_mobus(uint16_t crc, uint8_t a);
+uint16_t MODBUS_CRC16( const unsigned char *buf, unsigned int len );
 #ifdef __cplusplus
 }
 #endif

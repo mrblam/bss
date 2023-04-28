@@ -7,9 +7,6 @@
 
 #include "max485_hw.h"
 
-#define MAX485_UART_PORT	USART2
-#define UART_BAUDRATE		115200
-
 struct Max485_Hw_t cabinet_485_hw;
 static void max485_send(struct Max485_Hw_t* p_hw, const char c);
 static void max485_sends(struct Max485_Hw_t* p_hw, const char* s);
