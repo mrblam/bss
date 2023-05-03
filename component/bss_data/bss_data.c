@@ -92,14 +92,18 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 }
 
 void bss_update_ac_meter(BSS_Data* p_bss){
-//	p_bss->ac_meter.ac_voltage 	= p_bss->ac_meter.rx_data[1];
-	p_bss->ac_meter.ac_current 	= 0; //copy giong nhiet do pdo
-	p_bss->ac_meter.ac_power   	= 0;
-	p_bss->ac_meter.cos			= 0;
-	p_bss->ac_meter.freq		= 0;
-	p_bss->ac_meter.total_power = 0;
+	p_bss->ac_meter.ac_voltage = ((uint16_t)p_bss->ac_meter.rx_packet[3] << 8) | p_bss->ac_meter.rx_packet[4];
+	p_bss->ac_meter.ac_current = ((uint16_t)p_bss->ac_meter.rx_packet[5] << 8) | p_bss->ac_meter.rx_packet[6];
+	p_bss->ac_meter.ac_power = ((uint16_t)p_bss->ac_meter.rx_packet[7] << 8) | p_bss->ac_meter.rx_packet[8];
+	p_bss->ac_meter.cos = ((uint16_t)p_bss->ac_meter.rx_packet[9] << 8) | p_bss->ac_meter.rx_packet[10];
+	p_bss->ac_meter.freq = ((uint16_t)p_bss->ac_meter.rx_packet[11] << 8) | p_bss->ac_meter.rx_packet[12];
+	p_bss->ac_meter.total_power = ((uint16_t)p_bss->ac_meter.rx_packet[13] << 8) | p_bss->ac_meter.rx_packet[14];
 }
-
+void bss_clear_packet(BSS_Data* p_bss){
+	for(int i = 0;i < 20;i++){
+		p_bss->ac_meter.rx_packet[i] = 0;
+	}
+}
 void bss_warning(BSS_Data* p_bss)
 {
 //	bss_siren();

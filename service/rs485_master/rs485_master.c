@@ -183,9 +183,9 @@ void mobus_master_command_serialize(RS485_Master* p_485m){
 	*buff++= 0x00;
 	*buff++= 0x00;
 	*buff++= 0x00;
-	*buff++= 0x02;
-	*buff++= 0x71;
-	*buff++= 0xCB;
+	*buff++= 0x06;//number resgistor
+	*buff++= 0x70;// CRC HIGH
+	*buff++= 0x08;// CRC LOW
 }
 void mobus_master_sends(RS485_Master* p_485m){
 	p_485m->set_transmit_mode(p_485m);

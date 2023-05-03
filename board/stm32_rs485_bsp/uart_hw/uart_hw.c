@@ -50,7 +50,7 @@ static void uart_rs485_hw_init(void){
 	uart_receives(&rs485_com, (char*)&rs485_com.rx_data);
 }
 
-void UART_set_baudrate(int baudrate){
+void UART_set_baudrate_rs485(int baudrate){
 	rs485_com.uart_module.Instance = RS485_PORT_COM;
 	rs485_com.uart_module.Init.BaudRate = baudrate;
 	rs485_com.uart_module.Init.WordLength = UART_WORDLENGTH_8B;

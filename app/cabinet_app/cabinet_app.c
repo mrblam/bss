@@ -75,7 +75,7 @@ void cab_app_sync_cab_data_hmi(Cabinet_App *p_ca, uint8_t cab_id) { ///not use
 void cab_app_send_msg_to_hmi(Cabinet_App *p_ca) {
 	(void) p_ca;
 	uart_sends(&hmi_com, (uint8_t*) tx_buff);
-//	uart_sends(&debug_com, (uint8_t*) tx_buff);
+	uart_sends(&debug_com, (uint8_t*) tx_buff);
 
 }
 	// :Cmd_code,Main_obj,Id,Sub_obj,Obj_state*
@@ -218,23 +218,33 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 			break;
 		case POWER_METER:
-			UART_set_baudrate(9600);/// doc xong nho set ve 115200
-			p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
-			mobus_master_command_serialize(p_ca->slave_com);
-			mobus_master_sends(p_ca->slave_com);
-			while(0);
-			uint16_t crc;
-			crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,17);
-			// check CRC
-			if(crc == 0){
-				p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-			}else{
-				p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+			if(state == 1){
+				UART_set_baudrate_rs485(9600);
+				p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
+				mobus_master_command_serialize(p_ca->slave_com);
+				mobus_master_sends(p_ca->slave_com);
+				delay_time_ms(10000);
+				uint16_t crc;
+				crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,17);
+				// check CRC
+				if(crc == 0){
+					bss_update_ac_meter(&p_ca->bss);
+					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+				}else{
+					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+				}
+				for (int i = 0;i<32;i++){
+					p_ca->slave_com->rx_data[i] = 0;
+				}
+				p_ca->slave_com->rx_index = 0;
+				bss_clear_packet(&p_ca->bss);
+				UART_set_baudrate_rs485(115200);
+				selex_bss_app.bss.ac_meter.rx_index = 0;
+				p_ca->slave_com->state = RS485_MASTER_ST_IDLE;
 			}
-			UART_set_baudrate(115200);
-			p_ca->slave_com->state = RS485_MASTER_ST_IDLE;
-			if(state = 0){
-				UART_set_baudrate(115200);
+			if(state == 0){
+				UART_set_baudrate_rs485(115200);
+				p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 			}
 			break;
 		default:

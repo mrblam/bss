@@ -34,5 +34,5 @@ void uart_hw_init(void);
 void uart_sends(UART_hw* p_hw, uint8_t* s);
 char uart_receives(UART_hw* p_hw, char* s);
 void UART_DMA_Init(void);
-void UART_set_baudrate(int baudrate);
+void UART_set_baudrate_rs485(int baudrate);
 #endif
