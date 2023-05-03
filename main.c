@@ -14,6 +14,7 @@
 //Cabinet_App selex_bss_app;
 RS485_Master rs485m;
 char s[100] = "hoanpx";
+//uint16_t crc;
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 
@@ -110,6 +111,8 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		case BSS_ST_FAIL:
 			break;
 	}
+//	selex_bss_app.bss.ac_meter.rx_index = 0;
+//	crc = MODBUS_CRC16(selex_bss_app.bss.ac_meter.rx_packet,17);
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 }
 

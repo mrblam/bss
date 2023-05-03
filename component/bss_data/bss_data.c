@@ -93,7 +93,7 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 
 void bss_update_ac_meter(BSS_Data* p_bss){
 //	p_bss->ac_meter.ac_voltage 	= p_bss->ac_meter.rx_data[1];
-	p_bss->ac_meter.ac_current 	= 0;
+	p_bss->ac_meter.ac_current 	= 0; //copy giong nhiet do pdo
 	p_bss->ac_meter.ac_power   	= 0;
 	p_bss->ac_meter.cos			= 0;
 	p_bss->ac_meter.freq		= 0;
