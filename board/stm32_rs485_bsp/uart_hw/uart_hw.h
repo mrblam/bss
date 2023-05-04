@@ -28,7 +28,7 @@ extern UART_hw rs485_com;
 
 #define UART_BAUDRATE_HMI		115200
 #define UART_BAUDRATE_SLAVE		115200
-#define UART_BAUDRATE_DEBUG		115200
+#define UART_BAUDRATE_DEBUG		9600
 
 void uart_hw_init(void);
 void uart_sends(UART_hw* p_hw, uint8_t* s);

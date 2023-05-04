@@ -39,7 +39,7 @@ void bp_reset_data(BP* p_bp){
 	p_bp->vol = 0;
 }
 
-static void bp_data_serialize_impl(BP* p_bp, char* buff){  /// add bss_sn,camel_sn
+static void bp_data_serialize_impl(BP* p_bp, char* buff){
 	*buff++ = ':';
 	*buff++ = 'R';
 	*buff++ = ',';
@@ -74,7 +74,7 @@ static void bp_data_serialize_impl(BP* p_bp, char* buff){  /// add bss_sn,camel_
 	*buff++ = ',';
 	buff += long_to_string(p_bp->soc, buff);
 	*buff++ = ',';
-	buff += long_to_string(p_bp->soh, buff);  //ma xe
+	buff += long_to_string(p_bp->soh, buff);
 	*buff++ = ',';
 	if (p_bp->base.xe_sn[0] == '\0') {
 		*buff++ = '0';

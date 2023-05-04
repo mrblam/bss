@@ -9,122 +9,6 @@
 #include "cabinet_app.h"
 #include "cabinet_hw_hal.h"
 
-#if 0
-static const uint16_t ntc_lookups[] = {
-	    58747,//-10
-	    55498,//-9
-	    52451,//-8
-	    49593,//-7
-	    46910,//-6
-	    44391,//-5
-	    42024,//-4
-	    39799,//-3
-	    37708,//-2
-	    35740,//-1
-	    33889,//0
-	    32146,//1
-	    30504,//2
-	    28957,//3
-	    27499,//4
-	    26124,//5
-	    24827,//6
-	    23603,//7
-	    22447,//8
-	    21356,//9
-	    20324,//10
-	    19350,//11
-	    18428,//12
-	    17556,//13
-	    16731,//14
-	    15951,//15
-	    15211,//16
-	    14511,//17
-	    13847,//18
-	    13219,//19
-	    12622,//20
-	    12056,//21
-	    11520,//22
-	    11010,//23
-	    10526,//24
-	    10067,//25
-	    9630,//26
-	    9215,//27
-	    8821,//28
-	    8446,//29
-	    8089,//30
-	    7750,//31
-	    7426,//32
-	    7119,//33
-	    6826,//34
-	    6546,//35
-	    6280,//36
-	    6026,//37
-	    5785,//38
-	    5554,//39
-	    5334,//40
-	    5124,//41
-	    4923,//42
-	    4731,//43
-	    4548,//44
-	    4374,//45
-	    4207,//46
-	    4047,//47
-	    3894,//48
-	    3748,//49
-	    3609,//50
-	    3475,//51
-	    3347,//52
-	    3225,//53
-	    3107,//54
-	    2995,//55
-	    2887,//56
-	    2784,//57
-	    2685,//58
-	    2590,//59
-	    2499,//60
-	    2412,//61
-	    2329,//62
-	    2248,//63
-	    2171,//64
-	    2097,//65
-	    2026,//66
-	    1958,//67
-	    1892,//68
-	    1829,//69
-	    1769,//70
-	    1710,//71
-	    1654,//72
-	    1601,//73
-	    1549,//74
-	    1499,//75
-	    1451,//76
-	    1405,//77
-	    1360,//78
-	    1318,//79
-	    1276,//80
-	    1237,//81
-	    1198,//82
-	    1162,//83
-	    1126,//84
-	    1092,//85
-	    1059,//86
-	    1027,//87
-	    996,//88
-	    966,//89
-	    938,//90
-	    910,//91
-	    884,//92
-	    858,//93
-	    833,//94
-	    809,//95
-	    786,//96
-	    763,//97
-	    742,//98
-	    721,//99
-	    700,//100
-};
-#endif
-
 static void node_id1_sw_on( Switch* p_cm);
 static void node_id2_sw_on( Switch* p_cm);
 static void node_id3_sw_on( Switch* p_cm);
@@ -319,20 +203,13 @@ static void bss_siren_impl(void);
 static void bss_charger_bp_backup_impl(BP_backup* p_bp_backup);
 static void ntc_init(Cabinet_App* p_ca);
 static void ntc_sensor_get_adc_value(NTC* p_ntc);
-
 static void rs485_set_tx_mode(RS485_Master* p_485m);
 static void rs485_set_rx_mode(RS485_Master* p_485m);
-
 static void rs485_receive_handle_impl(UART_hw* p_hw);
 static void hmi_receive_handle_impl(UART_hw* p_hw);
 static void debug_receive_handle_impl(UART_hw* p_hw);
-
 static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m);
-
 static void can_master_rpdo_process_impl(const CAN_master* const p_cm);
-
-//static void cabinet_door_close_event_handle(Cabinet *p_cab);
-//static void cabinet_door_open_event_handle(Cabinet *p_cab);
 static void can_master_slave_select_impl(const CAN_master *p_cm, const uint32_t id);
 static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_t id);
 static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id);
@@ -502,7 +379,7 @@ static void rs485_receive_handle_impl(UART_hw* p_hw){
 	}
 //	if(selex_bss_app.slave_com->state == RS485_MASTER_ST_MOBUS){
 		selex_bss_app.bss.ac_meter.rx_packet[selex_bss_app.bss.ac_meter.rx_index] = p_hw->rx_data;
-		selex_bss_app.bss.ac_meter.rx_index++;//them co che xoa index
+		selex_bss_app.bss.ac_meter.rx_index++;
 //	}
 }
 
@@ -571,12 +448,10 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 	uint8_t bp_id = node_id - p_cm->slave_start_node_id;
 bpid = bp_id;
 	if(bp_id >= p_cm->slave_num) return;
-	//if(bp_get_con_state(selex_bss_app.bss.cabs[bp_id].bp) != (CO_SLAVE_CON_ST_CONNECTED && CO_SLAVE_CON_ST_AUTHORIZING))  return;
 	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
 
 	switch(cob_id){
 	case BP_VOL_CUR_TPDO_COBID:
-//		selex_bss_app.bss.cabs[bp_id].bp->vol		= 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data);
 		if(10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) < 70000 && 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) > 40000){
 			selex_bss_app.bss.cabs[bp_id].bp->vol = 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data);
 		}
@@ -1884,79 +1759,79 @@ static void charger20_sw_off(Switch* p_sw){
 /* ------------------------------------------------------------------------------ */
 
 static void led1_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 0, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 0, SLAVE_LED, (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led2_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 1, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 1, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led3_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 2, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 2, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led4_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 3, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 3, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led5_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 4, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 4, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led6_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 5, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 5, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led7_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 6, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 6, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led8_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 7, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 7, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led9_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 8, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 8, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led10_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 9, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 9, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led11_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 10, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 10, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led12_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 11, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 11, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led13_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 12, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 12, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led14_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 13, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 13, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led15_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 14, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 14, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led16_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 15, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 15, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led17_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 16, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 16, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led18_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 17, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 17, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 static void led19_update_color(Cabinet_led* p_led){
-	rs485_master_process_switch_command(&rs485m, 18, SLAVE_LED, p_led->color);
+	rs485_master_process_switch_command(&rs485m, 18, SLAVE_LED,  (SLAVE_OBJECT_STATE)p_led->color);
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

@@ -12,11 +12,6 @@
 
 static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]
 					= {{0,1,4,5,8,9,12,13,16}, {2,3,6,7,10,11,14,15,17,18}};
-
-//static uint8_t		id_assign_cabs_charger[CHARGER_NUM][MAX_ASSIGNED_CABINET]					//0123
-//					= {{0,3}, {1,2,4,5}};
-
-
 static void bss_update_io_state(BSS_Data* p_bss);
 static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff);
 static void all_data_cabinet_serialize_impl(BSS_Data* p_bss,char* buff);
@@ -32,7 +27,6 @@ void bss_init(BSS_Data* p_bss){
 	}
 	else p_bss->ac_chargers[0].assigned_cab_num = MAX_ASSIGNED_CAB_NUM - 1;
 }
-
 void bss_charger_init(BSS_Data* p_bss){
 	for(uint8_t i = 0; i < p_bss->charger_num; i++){
 		p_bss->ac_chargers[i].charging_cabin = NULL;
@@ -43,21 +37,18 @@ void bss_charger_init(BSS_Data* p_bss){
 		}
 	}
 }
-
 void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 	BSS_STATE old_state = p_bss->state;
 	if(old_state != new_state){
 		p_bss->state = new_state;
 		p_bss->is_changed = 1;
 	}
-
 	switch(p_bss->state){
 	case BSS_ST_MAINTAIN:
 		if(old_state == BSS_ST_ACTIVE){
 			for(uint8_t i = 0; i < 2; i++){
 				p_bss->ac_chargers[i].charging_cabin = NULL;
 			}
-
 			for(uint8_t i = 0; i < p_bss->cab_num; i++){
 				if(p_bss->cabs[i].op_state != CAB_CELL_ST_INACTIVE){
 					cab_cell_reset_io(&p_bss->cabs[i]);
@@ -66,7 +57,6 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 				}
 			}
 		}
-
 		break;
 	case BSS_ST_ACTIVE:
 		for(uint8_t i = 0; i < p_bss->cab_num; i++){
@@ -83,32 +73,46 @@ void bss_set_state(BSS_Data* p_bss, BSS_STATE new_state){
 		break;
 	}
 }
-
 void bss_update_cabinets_state(BSS_Data* p_bss){
 	for(uint8_t i = 0; i < p_bss->cab_num; i++){
 		if(p_bss->cabs[i].op_state == CAB_CELL_ST_INACTIVE) continue;
 		cab_cell_update_state(&p_bss->cabs[i]);
 	}
 }
-
 void bss_update_ac_meter(BSS_Data* p_bss){
-	p_bss->ac_meter.ac_voltage = ((uint16_t)p_bss->ac_meter.rx_packet[3] << 8) | p_bss->ac_meter.rx_packet[4];
-	p_bss->ac_meter.ac_current = ((uint16_t)p_bss->ac_meter.rx_packet[5] << 8) | p_bss->ac_meter.rx_packet[6];
-	p_bss->ac_meter.ac_power = ((uint16_t)p_bss->ac_meter.rx_packet[7] << 8) | p_bss->ac_meter.rx_packet[8];
-	p_bss->ac_meter.cos = ((uint16_t)p_bss->ac_meter.rx_packet[9] << 8) | p_bss->ac_meter.rx_packet[10];
-	p_bss->ac_meter.freq = ((uint16_t)p_bss->ac_meter.rx_packet[11] << 8) | p_bss->ac_meter.rx_packet[12];
-	p_bss->ac_meter.total_power = ((uint16_t)p_bss->ac_meter.rx_packet[13] << 8) | p_bss->ac_meter.rx_packet[14];
+//	p_bss->ac_meter.ac_voltage = ((uint16_t)p_bss->ac_meter.rx_packet[3] << 8) | p_bss->ac_meter.rx_packet[4];
+//	p_bss->ac_meter.ac_current = ((uint16_t)p_bss->ac_meter.rx_packet[5] << 8) | p_bss->ac_meter.rx_packet[6];
+//	p_bss->ac_meter.ac_power = ((uint16_t)p_bss->ac_meter.rx_packet[7] << 8) | p_bss->ac_meter.rx_packet[8];
+//	p_bss->ac_meter.cos = ((uint16_t)p_bss->ac_meter.rx_packet[9] << 8) | p_bss->ac_meter.rx_packet[10];
+//	p_bss->ac_meter.freq = ((uint16_t)p_bss->ac_meter.rx_packet[11] << 8) | p_bss->ac_meter.rx_packet[12];
+//	p_bss->ac_meter.total_power = ((uint16_t)p_bss->ac_meter.rx_packet[13] << 8) | p_bss->ac_meter.rx_packet[14];
+	p_bss->ac_meter.ac_voltage = printRandoms(220, 300, 3);
+	p_bss->ac_meter.ac_current = printRandoms(0, 30, 3);
+	p_bss->ac_meter.ac_power = printRandoms(220, 3000, 3);
+	p_bss->ac_meter.cos = printRandoms(0, 1, 3);
+	p_bss->ac_meter.freq = printRandoms(20, 100, 3);
+	p_bss->ac_meter.total_energy = printRandoms(220, 3000, 3);
 }
+uint16_t printRandoms(uint16_t lower, uint16_t upper,uint16_t count)
+{
+	uint16_t num;
+    int i;
+    for (i = 0; i < count; i++) {
+        num = (rand() % (upper - lower + 1)) + lower;
+    }
+    return num;
+}
+
 void bss_clear_packet(BSS_Data* p_bss){
 	for(int i = 0;i < 20;i++){
 		p_bss->ac_meter.rx_packet[i] = 0;
 	}
 }
-void bss_warning(BSS_Data* p_bss)
-{
+//void bss_warning(BSS_Data* p_bss)
+//{
 //	bss_siren();
-
-}
+//
+//}
 
 static void bss_update_io_state(BSS_Data* p_bss){
 
@@ -120,9 +124,7 @@ static void bss_update_io_state(BSS_Data* p_bss){
 
 Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id){
 	Cabinet* cab = &p_bss->cabs[p_bss->cab_num];
-	uint8_t available_cab_num = 0;		/* Available Cabinet Number */
-
-	/* Get BP which has highest voltage to charge first */
+	uint8_t available_cab_num = 0;
 	for(uint8_t i = 0; i < p_bss->ac_chargers[charger_id].assigned_cab_num; i++){
 		if((p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol > 0)
 				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol <= BP_START_CHARGE_THRESHOLD)
@@ -138,8 +140,6 @@ Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id){
 	if(available_cab_num == 0) return NULL;
 	else return cab;
 }
-// :R,S,0,A*
-// --> R,S,0,A,19,0,0,[0,0,0,0,0,0],[0,0],[0,0],[0,0,0,0],[30,30]
 static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	*buff++=':';
 	*buff++='R';
@@ -168,7 +168,7 @@ static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	*buff++=',';
 	buff+=long_to_string(p_bss->ac_meter.freq,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.total_power,buff);
+	buff+=long_to_string(p_bss->ac_meter.total_energy,buff);
 	*buff++=']';
 	*buff++=',';
     // Chargers

@@ -64,7 +64,7 @@ struct Power_meter_t{
 		uint16_t	ac_power;
 		uint16_t	cos;
 		uint16_t	freq;
-		uint16_t	total_power;
+		uint16_t	total_energy;
 };
 
 typedef struct BSS_Data_t BSS_Data;
@@ -94,6 +94,7 @@ void bss_update_charge_state(BSS_Data* p_bss);
 void bss_warning(BSS_Data* p_bss);
 void bss_update_ac_meter(BSS_Data* p_bss);
 void bss_clear_packet(BSS_Data* p_bss);
+uint16_t printRandoms(uint16_t lower, uint16_t upper,uint16_t count);
 Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id);
 
 static inline void bss_data_serialize(BSS_Data* p_bss_data, char* buff){

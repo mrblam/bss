@@ -16,7 +16,6 @@ void cab_cell_init(Cabinet* p_cab, uint8_t id){
 	p_cab->bp = bp_construct(id);
 	p_cab->data_serialize = cab_cell_data_serialze_impl;
 }
-
 void cab_cell_update_state(Cabinet* p_cab){
         CABINET_OP_STATE old_state = p_cab->op_state;
         CABINET_OP_STATE new_state = old_state ;
@@ -38,7 +37,6 @@ void cab_cell_update_state(Cabinet* p_cab){
 			}
 			break;
 	}
-
 	if(new_state != old_state){
 		p_cab->op_state = new_state;
 	}
@@ -111,17 +109,8 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cab->cell_fan.state,buff);
     *buff++=',';
-//	buff+=long_to_string(p_cab->charger.state,buff);
-//  *buff++=',';
-//    if(p_cab->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED){
-//        for(uint8_t i = 0; *(p_cab->bp->camel_sn + i) != '\0'; i++){
-//        	*buff++= *(p_cab->bp->camel_sn + strlen((const char*)p_cab->bp->camel_sn) - 1 - i);
-//        }
-//    }
-//	*buff++=',';
 	buff+=long_to_string(p_cab->temp,buff);
     *buff++=',';
-//|| p_cab->bp->base.con_state == CO_SLAVE_CON_ST_AUTHORIZING
     if(p_cab->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED || p_cab->bp->base.con_state == CO_SLAVE_CON_ST_AUTHORIZING){
         for(uint8_t i = 0; *(p_cab->bp->base.sn + i) != '\0'; i++){
         	*buff++= *(p_cab->bp->base.sn + strlen((const char*)p_cab->bp->base.sn) - 1 - i);

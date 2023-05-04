@@ -11,10 +11,9 @@
 #include "bootloader_app.h"
 #include "host_master.h"
 
-//Cabinet_App selex_bss_app;
+
 RS485_Master rs485m;
 char s[100] = "hoanpx";
-//uint16_t crc;
 static void can_receive_handle(CAN_Hw *p_hw);
 static void cab_app_update_io_cab_state(Cabinet_App*);
 
@@ -76,7 +75,7 @@ int main(void) {
 	while (1){
 	}
 }
-void TIM2_IRQHandler(void)   //1ms
+void TIM2_IRQHandler(void)
 {
 	tim2_timestamp ++;
 	if(node_id_high){
@@ -91,7 +90,7 @@ void TIM2_IRQHandler(void)   //1ms
 }
 
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
-{					//10ms ///
+{
 	sys_timestamp += sys_tick_ms;
 	switch (selex_bss_app.bss.state) {
 		case BSS_ST_MAINTAIN:
@@ -111,25 +110,20 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 		case BSS_ST_FAIL:
 			break;
 	}
-//	selex_bss_app.bss.ac_meter.rx_index = 0;
-//	crc = MODBUS_CRC16(selex_bss_app.bss.ac_meter.rx_packet,17);
 	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 }
 
 /* --------------------------------------------------------------------------------------- */
 
-void TIM3_IRQHandler(void) { //// 5ms
+void TIM3_IRQHandler(void) {
 	com_timestamp += 5;
-	/* Process RS485 Protocol */
 	rs485_master_update_state(&rs485m, com_timestamp);
-	/* Process HMI protocol */
 	if(check_hmi_msg_timestamp == com_timestamp){
 		check_hmi_msg_timestamp = com_timestamp + CHECK_HMI_MSG_TIME_mS;
 		if(selex_bss_app.is_new_msg){
 			cab_app_check_buffer(&selex_bss_app);
 		}
-	} /// 0,5ms
-	/* Sync Data to HMI */
+	}
 	for(uint8_t i = 0; i < selex_bss_app.hmi_csv.valid_msg_num; i++){
 		if(selex_bss_app.hmi_csv.is_new_msg_to_send[i]){
 			cab_app_send_msg_to_hmi(&selex_bss_app);
@@ -175,8 +169,7 @@ static void can_receive_handle(CAN_Hw *p_hw){
 			break;
 	}
 	CO_can_receive_basic_handle(&CO_DEVICE, cob_id, p_hw->rx_data);
-	/* if assign request message */
-	if (cob_id == selex_bss_app.base.node_id_scan_cobid) // bp send can_id = 0x70
+	if (cob_id == selex_bss_app.base.node_id_scan_cobid)
 	{
 		if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_REQUEST)
 		{
@@ -191,9 +184,8 @@ static void can_receive_handle(CAN_Hw *p_hw){
 		}
 		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM)
 		{
-			/* slave confirm assign id success*/
 			if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
-			cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp); // den day
+			cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp);
 			node_id_high = 1;
 		}
 		return;
