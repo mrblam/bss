@@ -215,7 +215,7 @@ static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_
 static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id);
 static void bp_assign_id_fail_handle(CAN_master *p_cm, const uint32_t id);
 static void reassign_attemp_handle(CAN_master* p_cm);
-
+extern uint32_t sys_timestamp;
 static sw_act door_sw_interface[] = {door1_switch_on, door2_switch_on, door3_switch_on, door4_switch_on, door5_switch_on,
 								door6_switch_on, door7_switch_on, door8_switch_on, door9_switch_on, door10_switch_on,
 								door11_switch_on, door12_switch_on, door13_switch_on, door14_switch_on, door15_switch_on,
@@ -321,7 +321,7 @@ static void can_master_slave_deselect_impl(const CAN_master *p_cm, const uint32_
 static void bp_assign_id_success_handle(const CAN_master *const p_cm, const uint32_t id) {
 	(void) p_cm;
 	sw_on(&(selex_bss_app.bss.cabs[id].node_id_sw));
-	bp_reset_inactive_counter(selex_bss_app.bss.cabs[id].bp);
+//	bp_reset_inactive_counter(selex_bss_app.bss.cabs[id].bp);
 }
 
 static void bp_assign_id_fail_handle(CAN_master *p_cm, const uint32_t id) {
@@ -452,8 +452,8 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 	uint8_t bp_id = node_id - p_cm->slave_start_node_id;
 bpid = bp_id;
 	if(bp_id >= p_cm->slave_num) return;
-	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
-
+//	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
+	selex_bss_app.bss.cabs[bp_id].bp->base.inactive_time_ms = 5000 + sys_timestamp;
 	switch(cob_id){
 	case BP_VOL_CUR_TPDO_COBID:
 		if(10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) < 70000 && 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) > 40000){

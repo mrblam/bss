@@ -92,10 +92,9 @@ int main(void) {
 		case BSS_ST_FAIL:
 			break;
 		}
-
 		if(selex_bss_app.is_new_msg){
-					cab_app_check_buffer(&selex_bss_app);
-				}
+			cab_app_check_buffer(&selex_bss_app);
+		}
 		cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
 	}
 }
@@ -116,25 +115,6 @@ void TIM2_IRQHandler(void)
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {
 	sys_timestamp += sys_tick_ms;
-	/*switch (selex_bss_app.bss.state) {
-		case BSS_ST_MAINTAIN:
-			bss_update_cabinets_state(&selex_bss_app.bss);
-			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
-			break;
-		case BSS_ST_ACTIVE:
-			cab_app_update_connected_cab_state(&selex_bss_app);
-			cab_app_update_io_cab_state(&selex_bss_app);
-			bss_update_cabinets_state(&selex_bss_app.bss);
-			can_master_update_id_assign_process((CAN_master*) &selex_bss_app, sys_timestamp);
-			break;
-		case BSS_ST_UPGRADE_FW_BP:
-			sm_host_process(host_master);
-			break;
-		case BSS_ST_INIT:
-		case BSS_ST_FAIL:
-			break;
-	}
-	cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);*/
 }
 
 /* --------------------------------------------------------------------------------------- */
@@ -142,19 +122,6 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 void TIM3_IRQHandler(void) {
 	com_timestamp += 5;
 	rs485_master_update_state(&rs485m, com_timestamp);
-	/*if(check_hmi_msg_timestamp == com_timestamp){
-		check_hmi_msg_timestamp = com_timestamp + CHECK_HMI_MSG_TIME_mS;
-		if(selex_bss_app.is_new_msg){
-			cab_app_check_buffer(&selex_bss_app);
-		}
-	}*/
-	for(uint8_t i = 0; i < selex_bss_app.hmi_csv.valid_msg_num; i++){
-		if(selex_bss_app.hmi_csv.is_new_msg_to_send[i]){
-//			cab_app_send_msg_to_hmi(&selex_bss_app);
-			selex_bss_app.hmi_csv.is_new_msg_to_send[i] = 0;
-		}
-	}
-
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
 #endif

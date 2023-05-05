@@ -89,6 +89,7 @@ struct Cabinet_App_t{
 	uint8_t 			is_hmi_req_sync;
 	uint32_t			charge_timestamp;
 	bool				is_main_hmi_shutdown;
+	int count;
 };
 
 extern uint32_t sys_timestamp;

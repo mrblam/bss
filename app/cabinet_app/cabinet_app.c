@@ -94,7 +94,6 @@ void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
 			cab_app_confirm_hmi_cmd(p_ca, i, tx_buff);
 			cab_app_send_msg_to_hmi(p_ca);
 		}
-		p_ca->hmi_csv.is_new_msg_to_send[i] = 1;
 		p_ca->hmi_csv.cmd_code[i] = p_ca->hmi_csv.id[i] = p_ca->hmi_csv.main_obj[i] = p_ca->hmi_csv.obj_state[i] = p_ca->hmi_csv.sub_obj[i] = 0;
 		for (uint8_t j = 0; j < 32; j++) {
 			p_ca->hmi_csv.data[j] = '\0';
@@ -143,6 +142,7 @@ static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t ms
 			break;
 		case BSS_BP:
 			bp_data_serialize(p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]].bp, tx_buff);
+			cab_app_send_msg_to_hmi(p_ca);
 			break;
 		default:
 			break;
@@ -593,9 +593,7 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 void cab_app_update_connected_cab_state(Cabinet_App *p_app) {
 	for (uint8_t id = 0; id < p_app->bss.cab_num; id++) {
 		if ((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)) {
-			p_app->bss.cabs[id].bp->base.inactive_time_ms += APP_STATE_MACHINE_UPDATE_TICK_mS;
-			if (p_app->bss.cabs[id].bp->base.inactive_time_ms <= BP_INACTIVE_TIMEOUT_mS)
-				continue;
+			if (p_app->bss.cabs[id].bp->base.inactive_time_ms > sys_timestamp) continue;
 			cab_cell_reset(&p_app->bss.cabs[id]);
 			for (uint8_t i = 0; i < p_app->bss.charger_num; i++) {
 				if (p_app->bss.ac_chargers[i].charging_cabin != &p_app->bss.cabs[id])

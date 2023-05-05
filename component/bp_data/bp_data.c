@@ -34,7 +34,7 @@ BP* bp_construct(uint8_t id){
 void bp_reset_data(BP* p_bp){
 	bp_set_con_state(p_bp, CO_SLAVE_CON_ST_DISCONNECT);
 	p_bp->state = BP_ST_INIT;
-	p_bp->base.inactive_time_ms = 0;
+//	p_bp->base.inactive_time_ms = 0;
 	p_bp->is_data_available = 0;
 	p_bp->vol = 0;
 }
