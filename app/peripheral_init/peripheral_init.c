@@ -362,6 +362,7 @@ static void rs485_set_rx_mode(RS485_Master* p_485m){
 /* ------------------------------------------------------------------------------ */
 
 static void rs485_receive_handle_impl(UART_hw* p_hw){
+	uint8_t data = p_hw->rx_data;
 	if(p_hw->rx_data == 250){
 		if(rs485m.rx_index == 0) p_hw->rx_data = ';';
 		else p_hw->rx_data = '*';
@@ -374,12 +375,15 @@ static void rs485_receive_handle_impl(UART_hw* p_hw){
 		return;
 	}
 	if(p_hw->rx_data != '\0'){
-		rs485m.rx_data[rs485m.rx_index] = p_hw->rx_data;
+		rs485m.rx_data[rs485m.rx_index] = data; //p_hw->rx_data;
 		rs485m.rx_index++;
 	}
 //	if(selex_bss_app.slave_com->state == RS485_MASTER_ST_MOBUS){
-		selex_bss_app.bss.ac_meter.rx_packet[selex_bss_app.bss.ac_meter.rx_index] = p_hw->rx_data;
+		selex_bss_app.bss.ac_meter.rx_packet[selex_bss_app.bss.ac_meter.rx_index] = data; //p_hw->rx_data;
 		selex_bss_app.bss.ac_meter.rx_index++;
+		if(selex_bss_app.bss.ac_meter.rx_index >= 20){
+			selex_bss_app.bss.ac_meter.rx_index = 0;
+		}
 //	}
 }
 
@@ -387,7 +391,7 @@ static void hmi_receive_handle_impl(UART_hw* p_hw){
 	if(p_hw->rx_data == '*'){
 		selex_bss_app.is_new_msg = 1;
 	}
-	if(selex_bss_app.rx_index == 32){
+	if(selex_bss_app.rx_index >= 32){
 		selex_bss_app.rx_index = 0;
 		return;
 	}

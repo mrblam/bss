@@ -10,7 +10,7 @@
 #include "master_hw_hal.h"
 
 Cabinet_App selex_bss_app;
-
+static int count = 0;
 static char tx_buff[200];
 static char data_log[200];
 static uint32_t charge_no_cur_timestamp[2] = { 0, 0 };
@@ -75,7 +75,9 @@ void cab_app_send_msg_to_hmi(Cabinet_App *p_ca) {
 	uart_sends(&debug_com, (uint8_t*) tx_buff);
 
 }
+
 void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
+
 	for (uint8_t i = 0; i < p_ca->hmi_csv.valid_msg_num; i++) {
 		switch (p_ca->hmi_csv.cmd_code[i]) {
 			case HMI_WRITE:
@@ -90,13 +92,13 @@ void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
 		}
 		if (p_ca->hmi_csv.sub_obj[i] != ALL) {
 			cab_app_confirm_hmi_cmd(p_ca, i, tx_buff);
+			cab_app_send_msg_to_hmi(p_ca);
 		}
 		p_ca->hmi_csv.is_new_msg_to_send[i] = 1;
 		p_ca->hmi_csv.cmd_code[i] = p_ca->hmi_csv.id[i] = p_ca->hmi_csv.main_obj[i] = p_ca->hmi_csv.obj_state[i] = p_ca->hmi_csv.sub_obj[i] = 0;
-		for (uint8_t i = 0; i < 32; i++) {
-			p_ca->hmi_csv.data[i] = '\0';
+		for (uint8_t j = 0; j < 32; j++) {
+			p_ca->hmi_csv.data[j] = '\0';
 		}
-		while (p_ca->hmi_csv.is_new_msg_to_send[i] != 0);
 	}
 	p_ca->hmi_csv.valid_msg_num = 0;
 }
@@ -120,6 +122,7 @@ static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t ms
 		case BSS_STATION:
 			if (p_ca->hmi_csv.sub_obj[msg_id] == ALL) {
 				bss_data_serialize(&p_ca->bss, tx_buff);
+				cab_app_send_msg_to_hmi(p_ca);
 			} else {
 				p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
 				cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);
@@ -131,6 +134,7 @@ static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t ms
 			}else{
 				if (p_ca->hmi_csv.sub_obj[msg_id] == ALL) {
 					cab_cell_data_serialize(&p_ca->bss.cabs[p_ca->hmi_csv.id[msg_id]], tx_buff);
+					cab_app_send_msg_to_hmi(p_ca);
 				} else {
 					p_ca->hmi_csv.obj_state[msg_id] = cab_app_get_obj_state(p_ca, msg_id);
 					cab_app_confirm_hmi_cmd(p_ca, msg_id, tx_buff);

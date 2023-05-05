@@ -16,17 +16,17 @@ SRCS+=app/cabinet_app/cabinet_app.c \
 	app/canopen_app/app_co_od/app_co_manu_od.c \
 	app/canopen_app/app_co_od/app_co_od.c \
 	app/canopen_app/app_co_storage_init/app_co_storage_init.c \
-	app/peripheral_init/peripheral_init.c \
-	app/bootloader_app/bootloader_app.c
-SRCS+=component/adc_sensor/adc_sensor.c \
-	component/bp_data/bp_data.c \
+	app/peripheral_init/peripheral_init.c
+#	app/bootloader_app/bootloader_app.c
+SRCS+= component/bp_data/bp_data.c \
 	component/bss_data/bss_data.c \
 	component/cabinet_cell/cabinet_cell.c \
 	component/cabinet_door/cabinet_door.c \
 	component/io_state/io_state.c \
-	component/ioe/ioe.c \
-	component/ntc/ntc.c \
 	component/switch/switch.c 
+	#component/adc_sensor/adc_sensor.c
+	#component/ioe/ioe.c 
+	#component/ntc/ntc.c 
 SRCS+=service/can_master/can_master.c \
 	service/rs485_master/rs485_master.c \
 	service/host_master/host_master.c
@@ -91,8 +91,8 @@ DEFS:=
 
 #--------------------------------------------------------
 
-OPTIMIZE=-O0
-#OPTIMIZE=-Og
+#OPTIMIZE=-O0
+OPTIMIZE=-Og
 
 # Option arguments for C compiler.
 CFLAGS+= $(INCLUDES)
