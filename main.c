@@ -108,6 +108,9 @@ void TIM2_IRQHandler(void)
 	if(selex_bss_app.base.sdo_service != SDO_SERVICE_BOOT_BMS){
 		CO_process(&CO_DEVICE,1);
 	}
+	if (selex_bss_app.base.CO_base.sdo_client.state == CO_SDO_ST_IDLE && selex_bss_app.base.CO_base.sdo_client.status == CO_SDO_RT_success){
+		selex_bss_app.base.CO_base.sdo_client.status = CO_SDO_RT_idle;
+	}
 	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
 	HAL_TIM_IRQHandler(&hmi_timer);
 }
