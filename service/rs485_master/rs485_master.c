@@ -176,19 +176,87 @@ void rs485_send_log(RS485_Master* p_485m){
 	p_485m->p_hw->sends(p_485m->p_hw, (char*)p_485m->tx_data);
 	p_485m->set_receive_mode(p_485m);
 }
-void mobus_master_command_serialize(RS485_Master* p_485m){
+void mobus_master_command_serialize(RS485_Master* p_485m,uint8_t cmd){
 	uint8_t* buff = (uint8_t*)p_485m->tx_data;
-	*buff++= 0x01;
-	*buff++= 0x04;
-	*buff++= 0x00;
-	*buff++= 0x00;
-	*buff++= 0x00;
-	*buff++= 0x06;//number resgistor
-	*buff++= 0x70;// CRC HIGH
-	*buff++= 0x08;// CRC LOW
+	switch (cmd){
+	case 1:
+		*buff++ = 0x01;
+		*buff++ = 0x04;
+		*buff++ = 0x00;
+		*buff++ = 0x00;
+		*buff++ = 0x00;
+		*buff++ = 0x02; //
+		*buff++ = 0x71; // CRC HIGH
+		*buff++ = 0xCB; // CRC LOW
+		break;
+	case 2:
+		*buff++ = 0x01;
+		*buff++ = 0x04;
+		*buff++ = 0x00;
+		*buff++ = 0x08;
+		*buff++ = 0x00;
+		*buff++ = 0x02; // data length 2 word - 4 bytes
+		*buff++ = 0xF0; // CRC HIGH
+		*buff++ = 0x09; // CRC LOW
+		break;
+	case 3:
+		*buff++ = 0x01;
+		*buff++ = 0x04;
+		*buff++ = 0x00;
+		*buff++ = 0x12;
+		*buff++ = 0x00;
+		*buff++ = 0x02; // data length 2 word - 4 bytes
+		*buff++ = 0xD1; // CRC HIGH
+		*buff++ = 0xCE; // CRC LOW
+		break;
+	case 4:
+		*buff++ = 0x01;
+		*buff++ = 0x04;
+		*buff++ = 0x00;
+		*buff++ = 0x2A;
+		*buff++ = 0x00;
+		*buff++ = 0x02; // data length 2 word - 4 bytes
+		*buff++ = 0x50; // CRC HIGH
+		*buff++ = 0x03; // CRC LOW
+		break;
+	case 5:
+		*buff++ = 0x01;
+		*buff++ = 0x04;
+		*buff++ = 0x00;
+		*buff++ = 0x36;
+		*buff++ = 0x00;
+		*buff++ = 0x02; // data length 2 word - 4 bytes
+		*buff++ = 0x91; // CRC HIGH
+		*buff++ = 0xC5; // CRC LOW
+		break;
+	case 6:
+		*buff++ = 0x01;
+		*buff++ = 0x04;
+		*buff++ = 0x01;
+		*buff++ = 0x00;
+		*buff++ = 0x00;
+		*buff++ = 0x02; // data length 2 word - 4 bytes
+		*buff++ = 0x70; // CRC HIGH
+		*buff++ = 0x37; // CRC LOW
+		break;
+	}
 }
 void mobus_master_sends(RS485_Master* p_485m){
+//	p_485m->p_hw->uart_module.Init.BaudRate = 9600;
+////	p_485m->p_hw->uart_module.Init.Parity = UART_PARITY_NONE;
+//	if (HAL_UART_Init(&p_485m->p_hw->uart_module) != HAL_OK)
+//		{
+//			Error_Handler();
+//		}
+//	p_485m->tx_data[0] = 0x02;
+//	p_485m->tx_data[1] = 0x01;
+//	p_485m->tx_data[2] = 0x01;
+//	p_485m->tx_data[3] = 0x01;
+//	p_485m->tx_data[4] = 0x01;
+//	p_485m->tx_data[5] = 0x01;
+//	p_485m->tx_data[6] = 0x01;
+//	p_485m->tx_data[7] = 0x01;
 	p_485m->set_transmit_mode(p_485m);
-	HAL_UART_Transmit(&p_485m->p_hw->uart_module,(uint8_t*) &p_485m->tx_data, 8, 500);
+	HAL_UART_Transmit(&p_485m->p_hw->uart_module,(uint8_t*) &p_485m->tx_data, 8, 1000);
 	p_485m->set_receive_mode(p_485m);
 }

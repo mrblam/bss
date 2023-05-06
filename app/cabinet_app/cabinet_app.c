@@ -214,18 +214,17 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 			if(state == 1){
 				UART_set_baudrate_rs485(9600);
 				p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
-				mobus_master_command_serialize(p_ca->slave_com);
+				mobus_master_command_serialize(p_ca->slave_com,1);
 				mobus_master_sends(p_ca->slave_com);
-				delay_time_ms(10000);
+				while(selex_bss_app.bss.ac_meter.rx_index != 8);
+				delay_time_ms(100000000);
 				uint16_t crc;
-				crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,17);
+				crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,9);
 				if(crc == 0){
 					bss_update_ac_meter(&p_ca->bss);
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 				}else{
-					bss_update_ac_meter(&p_ca->bss);// random data
-					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;// random data
-//					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 				}
 				for (int i = 0;i<32;i++){
 					p_ca->slave_com->rx_data[i] = 0;
@@ -511,7 +510,6 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 				if ((p_ca->bss.ac_chargers[id].charging_cabin->bp->vol >= BP_OVER_CHARGE_THRESHOLD) && (p_ca->bss.ac_chargers[id].charging_cabin->bp->cur < CUR_STOP_CHARGER_THRESHOLD)){
 					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
 					if (p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_STANDBY) {
-						p_ca->base.sdo_service = SDO_SERVICE_IDLE;
 						sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 						p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
 						p_ca->bss.ac_chargers[id].charging_cabin = NULL;
@@ -527,7 +525,6 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 				{
 					cab_app_deactive_charge(p_ca, p_ca->bss.ac_chargers[id].charging_cabin->cab_id, timestamp);
 					if (p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_STANDBY) {
-						p_ca->base.sdo_service = SDO_SERVICE_IDLE;
 						sw_off(&p_ca->bss.ac_chargers[id].charging_cabin->charger);
 						p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_STANDBY;
 						p_ca->bss.ac_chargers[id].charging_cabin = NULL;
@@ -559,7 +556,6 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 				p_ca->bss.ac_chargers[id].charging_cabin->on_bp_counter[id]++;
 				if (p_ca->bss.ac_chargers[id].charging_cabin->bp->state == BP_ST_CHARGING) {
 					p_ca->bss.ac_chargers[id].charging_cabin->op_state = CAB_CELL_ST_CHARGING;
-					p_ca->base.sdo_service = SDO_SERVICE_IDLE;
 					p_ca->bss.ac_chargers[id].charging_cabin->on_bp_counter[id] = 0;
 				}
 				if (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_abort && p_ca->base.sdo_service == SDO_SERVICE_ACTIVE_CHARGER) {

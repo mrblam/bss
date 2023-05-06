@@ -375,16 +375,16 @@ static void rs485_receive_handle_impl(UART_hw* p_hw){
 		return;
 	}
 	if(p_hw->rx_data != '\0'){
-		rs485m.rx_data[rs485m.rx_index] = data; //p_hw->rx_data;
+		rs485m.rx_data[rs485m.rx_index] = data;
 		rs485m.rx_index++;
 	}
-//	if(selex_bss_app.slave_com->state == RS485_MASTER_ST_MOBUS){
-		selex_bss_app.bss.ac_meter.rx_packet[selex_bss_app.bss.ac_meter.rx_index] = data; //p_hw->rx_data;
+	if(selex_bss_app.slave_com->state == RS485_MASTER_ST_MOBUS){
+		selex_bss_app.bss.ac_meter.rx_packet[selex_bss_app.bss.ac_meter.rx_index] = data;
 		selex_bss_app.bss.ac_meter.rx_index++;
-		if(selex_bss_app.bss.ac_meter.rx_index >= 20){
+		if(selex_bss_app.bss.ac_meter.rx_index >= 10){
 			selex_bss_app.bss.ac_meter.rx_index = 0;
 		}
-//	}
+	}
 }
 
 static void hmi_receive_handle_impl(UART_hw* p_hw){

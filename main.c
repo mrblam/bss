@@ -96,6 +96,17 @@ int main(void) {
 			cab_app_check_buffer(&selex_bss_app);
 		}
 		cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
+//		rs485m.tx_data[0] = 0x01;
+//		rs485m.tx_data[1] = 0x04;
+//		rs485m.tx_data[2] = 0x00;
+//		rs485m.tx_data[3] = 0x00;
+//		rs485m.tx_data[4] = 0x00;
+//		rs485m.tx_data[5] = 0x02;
+//		rs485m.tx_data[6] = 0x71;
+//		rs485m.tx_data[7] = 0xCB;
+//		rs485m.set_transmit_mode(&rs485m);
+//		HAL_UART_Transmit(&rs485m.p_hw->uart_module,(uint8_t*) &rs485m.tx_data, 8, 1000);
+//		rs485m.set_receive_mode(&rs485m);
 	}
 }
 void TIM2_IRQHandler(void)
@@ -108,8 +119,11 @@ void TIM2_IRQHandler(void)
 	if(selex_bss_app.base.sdo_service != SDO_SERVICE_BOOT_BMS){
 		CO_process(&CO_DEVICE,1);
 	}
-	if (selex_bss_app.base.CO_base.sdo_client.state == CO_SDO_ST_IDLE && selex_bss_app.base.CO_base.sdo_client.status == CO_SDO_RT_success){
-		selex_bss_app.base.CO_base.sdo_client.status = CO_SDO_RT_idle;
+	if(selex_bss_app.base.sdo_service == SDO_SERVICE_ACTIVE_CHARGER || selex_bss_app.base.sdo_service == SDO_SERVICE_DEACTIVE_CHARGER){
+		if (selex_bss_app.base.CO_base.sdo_client.state == CO_SDO_ST_IDLE && selex_bss_app.base.CO_base.sdo_client.status == CO_SDO_RT_success){
+			selex_bss_app.base.CO_base.sdo_client.status = CO_SDO_RT_idle;
+			selex_bss_app.base.sdo_service = SDO_SERVICE_IDLE;
+		}
 	}
 	can_master_update_sn_assign_process((CAN_master*) &selex_bss_app);
 	HAL_TIM_IRQHandler(&hmi_timer);
@@ -124,7 +138,9 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 
 void TIM3_IRQHandler(void) {
 	com_timestamp += 5;
-	rs485_master_update_state(&rs485m, com_timestamp);
+	if(selex_bss_app.slave_com->state != RS485_MASTER_ST_MOBUS){
+		rs485_master_update_state(&rs485m, com_timestamp);
+	}
 #if ENABLE_IWDG_TIMER
 	HAL_IWDG_Refresh(&hiwdg);
 #endif

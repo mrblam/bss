@@ -80,18 +80,25 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 	}
 }
 void bss_update_ac_meter(BSS_Data* p_bss){
-//	p_bss->ac_meter.ac_voltage = ((uint16_t)p_bss->ac_meter.rx_packet[3] << 8) | p_bss->ac_meter.rx_packet[4];
+	p_bss->ac_meter.ac_voltage =((uint32_t)p_bss->ac_meter.rx_packet[3] << 24) |
+								((uint32_t)p_bss->ac_meter.rx_packet[4] << 16) |
+								((uint32_t)p_bss->ac_meter.rx_packet[5] << 8)  |
+								p_bss->ac_meter.rx_packet[6];
 //	p_bss->ac_meter.ac_current = ((uint16_t)p_bss->ac_meter.rx_packet[5] << 8) | p_bss->ac_meter.rx_packet[6];
 //	p_bss->ac_meter.ac_power = ((uint16_t)p_bss->ac_meter.rx_packet[7] << 8) | p_bss->ac_meter.rx_packet[8];
 //	p_bss->ac_meter.cos = ((uint16_t)p_bss->ac_meter.rx_packet[9] << 8) | p_bss->ac_meter.rx_packet[10];
 //	p_bss->ac_meter.freq = ((uint16_t)p_bss->ac_meter.rx_packet[11] << 8) | p_bss->ac_meter.rx_packet[12];
 //	p_bss->ac_meter.total_power = ((uint16_t)p_bss->ac_meter.rx_packet[13] << 8) | p_bss->ac_meter.rx_packet[14];
-	p_bss->ac_meter.ac_voltage = printRandoms(220, 300, 3);
-	p_bss->ac_meter.ac_current = printRandoms(0, 30, 3);
-	p_bss->ac_meter.ac_power = printRandoms(220, 3000, 3);
-	p_bss->ac_meter.cos = printRandoms(0, 1, 3);
-	p_bss->ac_meter.freq = printRandoms(20, 100, 3);
-	p_bss->ac_meter.total_energy = printRandoms(220, 3000, 3);
+//	p_bss->ac_meter.ac_voltage = printRandoms(220, 300, 3);
+//	p_bss->ac_meter.ac_current = printRandoms(0, 30, 3);
+//	p_bss->ac_meter.ac_power = printRandoms(220, 3000, 3);
+//	p_bss->ac_meter.cos = printRandoms(0, 1, 3);
+//	p_bss->ac_meter.freq = printRandoms(20, 100, 3);
+//	p_bss->ac_meter.total_energy = printRandoms(220, 3000, 3);
+
+	union { uint32_t b; float f; } u;
+	u.b = p_bss->ac_meter.ac_voltage;
+	p_bss->ac_meter.result = u.f;
 }
 uint16_t printRandoms(uint16_t lower, uint16_t upper,uint16_t count)
 {
@@ -158,7 +165,7 @@ static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	*buff++=',';
 	// AC meter
 	*buff++='[';
-	buff+=long_to_string(p_bss->ac_meter.ac_voltage,buff);
+	buff+=long_to_string(p_bss->ac_meter.result,buff);
 	*buff++=',';
 	buff+=long_to_string(p_bss->ac_meter.ac_current,buff);
 	*buff++=',';

@@ -13,7 +13,7 @@
 #include "string_util.h"
 #include "cabinet_cell.h"
 #include "app_config.h"
-
+#include "math.h"
 typedef enum BSS_LED_COLOR{
 	LED_NONE 	= 0,
 	LED_RED 	= 1,
@@ -58,13 +58,15 @@ struct Charger_t{
 typedef struct Power_meter_t Power_meter;
 struct Power_meter_t{
 		uint8_t		rx_index;
-		uint8_t		rx_packet[20];
-		uint16_t	ac_voltage;
-		uint16_t	ac_current;
-		uint16_t	ac_power;
-		uint16_t	cos;
-		uint16_t	freq;
-		uint16_t	total_energy;
+		uint8_t		rx_packet[10];
+		uint32_t	ac_voltage;
+		uint32_t	ac_current;
+		uint32_t	ac_power;
+		uint32_t	cos;
+		uint32_t	freq;
+		uint32_t	total_energy;
+		float 		result;
+
 };
 
 typedef struct BSS_Data_t BSS_Data;
@@ -85,7 +87,6 @@ struct BSS_Data_t{
 	BSS_Led			led;
 	BP_backup		bp_backup;
 };
-
 void bss_init(BSS_Data* p_bss);
 void bss_charger_init(BSS_Data* p_bss);
 void bss_update_cabinets_state(BSS_Data* p_bss);
