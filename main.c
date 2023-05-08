@@ -95,18 +95,7 @@ int main(void) {
 		if(selex_bss_app.is_new_msg){
 			cab_app_check_buffer(&selex_bss_app);
 		}
-		cab_app_process_hmi_command(&selex_bss_app, sys_timestamp);
-//		rs485m.tx_data[0] = 0x01;
-//		rs485m.tx_data[1] = 0x04;
-//		rs485m.tx_data[2] = 0x00;
-//		rs485m.tx_data[3] = 0x00;
-//		rs485m.tx_data[4] = 0x00;
-//		rs485m.tx_data[5] = 0x02;
-//		rs485m.tx_data[6] = 0x71;
-//		rs485m.tx_data[7] = 0xCB;
-//		rs485m.set_transmit_mode(&rs485m);
-//		HAL_UART_Transmit(&rs485m.p_hw->uart_module,(uint8_t*) &rs485m.tx_data, 8, 1000);
-//		rs485m.set_receive_mode(&rs485m);
+		cab_app_process_hmi_command(&selex_bss_app, sys_timestamp, &sys_timestamp);
 	}
 }
 void TIM2_IRQHandler(void)

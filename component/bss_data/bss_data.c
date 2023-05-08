@@ -79,39 +79,36 @@ void bss_update_cabinets_state(BSS_Data* p_bss){
 		cab_cell_update_state(&p_bss->cabs[i]);
 	}
 }
-void bss_update_ac_meter(BSS_Data* p_bss){
+void bss_update_ac_meter(BSS_Data* p_bss,uint8_t cmd){
 	p_bss->ac_meter.ac_voltage =((uint32_t)p_bss->ac_meter.rx_packet[3] << 24) |
 								((uint32_t)p_bss->ac_meter.rx_packet[4] << 16) |
 								((uint32_t)p_bss->ac_meter.rx_packet[5] << 8)  |
 								p_bss->ac_meter.rx_packet[6];
-//	p_bss->ac_meter.ac_current = ((uint16_t)p_bss->ac_meter.rx_packet[5] << 8) | p_bss->ac_meter.rx_packet[6];
-//	p_bss->ac_meter.ac_power = ((uint16_t)p_bss->ac_meter.rx_packet[7] << 8) | p_bss->ac_meter.rx_packet[8];
-//	p_bss->ac_meter.cos = ((uint16_t)p_bss->ac_meter.rx_packet[9] << 8) | p_bss->ac_meter.rx_packet[10];
-//	p_bss->ac_meter.freq = ((uint16_t)p_bss->ac_meter.rx_packet[11] << 8) | p_bss->ac_meter.rx_packet[12];
-//	p_bss->ac_meter.total_power = ((uint16_t)p_bss->ac_meter.rx_packet[13] << 8) | p_bss->ac_meter.rx_packet[14];
-//	p_bss->ac_meter.ac_voltage = printRandoms(220, 300, 3);
-//	p_bss->ac_meter.ac_current = printRandoms(0, 30, 3);
-//	p_bss->ac_meter.ac_power = printRandoms(220, 3000, 3);
-//	p_bss->ac_meter.cos = printRandoms(0, 1, 3);
-//	p_bss->ac_meter.freq = printRandoms(20, 100, 3);
-//	p_bss->ac_meter.total_energy = printRandoms(220, 3000, 3);
-
 	union { uint32_t b; float f; } u;
 	u.b = p_bss->ac_meter.ac_voltage;
-	p_bss->ac_meter.result = u.f;
+	switch (cmd){
+	case 1:
+		p_bss->ac_meter.vol_result = u.f;
+		break;
+	case 2:
+		p_bss->ac_meter.cur_result = u.f;
+		break;
+	case 3:
+		p_bss->ac_meter.power_result = u.f;
+		break;
+	case 4:
+		p_bss->ac_meter.cos_result = u.f;
+		break;
+	case 5:
+		p_bss->ac_meter.freq_result = u.f;
+		break;
+	case 6:
+		p_bss->ac_meter.total_result = u.f;
+		break;
+	}
 }
-uint16_t printRandoms(uint16_t lower, uint16_t upper,uint16_t count)
-{
-	uint16_t num;
-    int i;
-    for (i = 0; i < count; i++) {
-        num = (rand() % (upper - lower + 1)) + lower;
-    }
-    return num;
-}
-
 void bss_clear_packet(BSS_Data* p_bss){
-	for(int i = 0;i < 20;i++){
+	for(int i = 0;i < 10;i++){
 		p_bss->ac_meter.rx_packet[i] = 0;
 	}
 }
@@ -165,17 +162,17 @@ static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	*buff++=',';
 	// AC meter
 	*buff++='[';
-	buff+=long_to_string(p_bss->ac_meter.result,buff);
+	buff+=long_to_string(p_bss->ac_meter.vol_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.ac_current,buff);
+	buff+=long_to_string(p_bss->ac_meter.cur_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.ac_power,buff);
+	buff+=long_to_string(p_bss->ac_meter.power_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.cos,buff);
+	buff+=long_to_string(p_bss->ac_meter.cos_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.freq,buff);
+	buff+=long_to_string(p_bss->ac_meter.freq_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.total_energy,buff);
+	buff+=long_to_string(p_bss->ac_meter.total_result,buff);
 	*buff++=']';
 	*buff++=',';
     // Chargers

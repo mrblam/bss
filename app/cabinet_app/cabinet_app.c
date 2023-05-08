@@ -21,9 +21,9 @@ static void delay_time_ms(int time_ms);
 static void delay_ms_timer(uint16_t ms);
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App *p_ca);
 static void cab_app_reset_buffer(Cabinet_App *p_ca);
-static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t id, const uint32_t timestamp);
+static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t id, const uint32_t timestamp,uint32_t* timestamp1);
 static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t id);
-static void cab_app_process_hmi_write_command(Cabinet_App *p_ca, const uint8_t msg_id, const uint32_t timestamp);
+static void cab_app_process_hmi_write_command(Cabinet_App *p_ca, const uint8_t msg_id, const uint32_t timestamp,uint32_t* timestamp1);
 static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t msg_id);
 static void cab_app_confirm_hmi_cmd(Cabinet_App *p_ca, const uint8_t msg_id, char *buff);
 static uint8_t cab_app_get_obj_state(Cabinet_App *p_ca, const uint8_t msg_id);
@@ -77,12 +77,12 @@ void cab_app_send_msg_to_hmi(Cabinet_App *p_ca) {
 
 }
 
-void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
+void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp,uint32_t* timestamp1) {
 
 	for (uint8_t i = 0; i < p_ca->hmi_csv.valid_msg_num; i++) {
 		switch (p_ca->hmi_csv.cmd_code[i]) {
 			case HMI_WRITE:
-				cab_app_process_hmi_write_command(p_ca, i, timestamp);
+				cab_app_process_hmi_write_command(p_ca, i, timestamp, timestamp1);
 				break;
 			case HMI_READ:
 				cab_app_process_hmi_read_command(p_ca, i);
@@ -102,10 +102,10 @@ void cab_app_process_hmi_command(Cabinet_App *p_ca, const uint32_t timestamp) {
 	}
 	p_ca->hmi_csv.valid_msg_num = 0;
 }
-static void cab_app_process_hmi_write_command(Cabinet_App *p_ca, const uint8_t msg_id, const uint32_t timestamp) {
+static void cab_app_process_hmi_write_command(Cabinet_App *p_ca, const uint8_t msg_id, const uint32_t timestamp, uint32_t* timestamp1) {
 	switch (p_ca->hmi_csv.main_obj[msg_id]) {
 		case BSS_STATION:
-			cab_app_process_hmi_write_bss_cmd(p_ca, msg_id, timestamp);
+			cab_app_process_hmi_write_bss_cmd(p_ca, msg_id, timestamp, timestamp1);
 			break;
 		case BSS_CABINET:
 			cab_app_process_hmi_write_cab_cmd(p_ca, msg_id);
@@ -149,7 +149,7 @@ static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t ms
 			break;
 	}
 }
-static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t msg_id, const uint32_t timestamp) {
+static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t msg_id, const uint32_t timestamp,uint32_t* timestamp1) {
 	uint8_t id = p_ca->hmi_csv.id[msg_id];
 	uint8_t state = p_ca->hmi_csv.obj_state[msg_id];
 	SUB_OBJS sub_obj = p_ca->hmi_csv.sub_obj[msg_id];
@@ -213,29 +213,31 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 			break;
 		case POWER_METER:
 			if(state == 1){
-				selex_bss_app.bss.ac_meter.timeout = timestamp + 5000;
-				p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
-				UART_set_baudrate_rs485(9600);
-				mobus_master_command_serialize(p_ca->slave_com,1);
-				mobus_master_sends(p_ca->slave_com);
-				while(selex_bss_app.bss.ac_meter.finish_read == false);
-				uint16_t crc;
-				crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,9);
-				if(crc == 0){
-					bss_update_ac_meter(&p_ca->bss);
-					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
-				}else{
-					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+				for(uint8_t cmd = 1;cmd < 7;cmd ++){
+					selex_bss_app.bss.ac_meter.timeout = *timestamp1 + READ_AC_METTER_TIMEOUT_mS;
+					p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
+					UART_set_baudrate_rs485(9600);
+					mobus_master_command_serialize(p_ca->slave_com,cmd);
+					mobus_master_sends(p_ca->slave_com);
+					while(selex_bss_app.bss.ac_meter.finish_read == false);
+					uint16_t crc;
+					crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,9);
+					if(crc == 0){
+						bss_update_ac_meter(&p_ca->bss,cmd);
+						p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
+					}else{
+						p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+					}
+					for (int i = 0;i<32;i++){
+						p_ca->slave_com->rx_data[i] = 0;
+					}
+					p_ca->slave_com->rx_index = 0;
+					bss_clear_packet(&p_ca->bss);
+					UART_set_baudrate_rs485(115200);
+					selex_bss_app.bss.ac_meter.rx_index = 0;
+					p_ca->slave_com->state = RS485_MASTER_ST_IDLE;
+					selex_bss_app.bss.ac_meter.finish_read = false;
 				}
-				for (int i = 0;i<32;i++){
-					p_ca->slave_com->rx_data[i] = 0;
-				}
-				p_ca->slave_com->rx_index = 0;
-				bss_clear_packet(&p_ca->bss);
-				UART_set_baudrate_rs485(115200);
-				selex_bss_app.bss.ac_meter.rx_index = 0;
-				p_ca->slave_com->state = RS485_MASTER_ST_IDLE;
-				selex_bss_app.bss.ac_meter.finish_read = false;
 			}
 			if(state == 0){
 				UART_set_baudrate_rs485(115200);
