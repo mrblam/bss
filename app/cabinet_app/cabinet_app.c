@@ -18,6 +18,7 @@ static uint32_t swicth_time_charger = 0;
 uint32_t sys_timestamp = 0;
 static uint16_t delay_time_10ms = 0;
 static void delay_time_ms(int time_ms);
+static void delay_ms_timer(uint16_t ms);
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App *p_ca);
 static void cab_app_reset_buffer(Cabinet_App *p_ca);
 static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t id, const uint32_t timestamp);
@@ -212,12 +213,12 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 			break;
 		case POWER_METER:
 			if(state == 1){
-				UART_set_baudrate_rs485(9600);
+				selex_bss_app.bss.ac_meter.timeout = timestamp + 5000;
 				p_ca->slave_com->state = RS485_MASTER_ST_MOBUS;
+				UART_set_baudrate_rs485(9600);
 				mobus_master_command_serialize(p_ca->slave_com,1);
 				mobus_master_sends(p_ca->slave_com);
-				while(selex_bss_app.bss.ac_meter.rx_index != 8);
-				delay_time_ms(100000000);
+				while(selex_bss_app.bss.ac_meter.finish_read == false);
 				uint16_t crc;
 				crc = MODBUS_CRC16(p_ca->bss.ac_meter.rx_packet,9);
 				if(crc == 0){
@@ -234,6 +235,7 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 				UART_set_baudrate_rs485(115200);
 				selex_bss_app.bss.ac_meter.rx_index = 0;
 				p_ca->slave_com->state = RS485_MASTER_ST_IDLE;
+				selex_bss_app.bss.ac_meter.finish_read = false;
 			}
 			if(state == 0){
 				UART_set_baudrate_rs485(115200);
@@ -647,6 +649,12 @@ static void delay_time_ms(int time_ms){
 		for(j = 0; j < 40;j++);
 	}
 }
+static void delay_ms_timer(uint16_t ms)
+{
+    __HAL_TIM_SET_COUNTER(&io_scan_timer,0);  // set the counter value a 0
+    while (__HAL_TIM_GET_COUNTER(&io_scan_timer) < ms);  // wait for the counter to reach the us input in the parameter
+}
+
 void cab_app_request_upgrade_fw_bp(Cabinet_App *p_ca, uint8_t cab_id, const uint32_t timestamp) {
 	p_ca->base.bms_new_fw_req = 1;
 	can_master_write_bms_object(&p_ca->base, cab_id, BMS_NEW_FW_REQ, timestamp);

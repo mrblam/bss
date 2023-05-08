@@ -132,6 +132,11 @@ void TIM2_IRQHandler(void)
 void HAL_STATE_MACHINE_UPDATE_TICK(void)
 {
 	sys_timestamp += sys_tick_ms;
+	if(selex_bss_app.slave_com->state == RS485_MASTER_ST_MOBUS){
+		if(sys_timestamp > selex_bss_app.bss.ac_meter.timeout){
+			selex_bss_app.bss.ac_meter.finish_read = true;
+		}
+	}
 }
 
 /* --------------------------------------------------------------------------------------- */

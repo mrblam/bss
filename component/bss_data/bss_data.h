@@ -66,7 +66,8 @@ struct Power_meter_t{
 		uint32_t	freq;
 		uint32_t	total_energy;
 		float 		result;
-
+		uint32_t	timeout;
+		bool		finish_read;
 };
 
 typedef struct BSS_Data_t BSS_Data;
