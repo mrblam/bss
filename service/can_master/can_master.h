@@ -138,8 +138,8 @@ typedef enum SDO_SERVICE{
 	SDO_SERVICE_WRITE_SN_XE,
 	SDO_SERVICE_READ_SN_XE,
 	SDO_SERVICE_READ_BP_SW_VERSION,
-	SDO_SERVICE_BOOT_BMS
-
+	SDO_SERVICE_BOOT_BMS,
+	SDO_SERVICE_REQ_BOOT_BMS
 }SDO_SERVICE;
 
 struct CAN_master_t{
@@ -183,7 +183,8 @@ struct CAN_master_t{
 	void (*rpdo_process)(const CAN_master* const p_cm);
 	void 				(*read_serial_number_bp)(void);
 	bool 				(*sdo_write_object)(void);
-
+	uint32_t					sdo_timeout;
+	bool						sdo_finish;
 };
 
 extern uint8_t reassign_attemp_cnt;

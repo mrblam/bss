@@ -126,6 +126,11 @@ void HAL_STATE_MACHINE_UPDATE_TICK(void)
 			selex_bss_app.bss.ac_meter.finish_read = true;
 		}
 	}
+	if(selex_bss_app.base.sdo_service == SDO_SERVICE_REQ_BOOT_BMS){
+		if(sys_timestamp > selex_bss_app.base.sdo_timeout){
+			selex_bss_app.base.sdo_finish = true;
+		}
+	}
 }
 
 /* --------------------------------------------------------------------------------------- */

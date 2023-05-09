@@ -22,7 +22,7 @@ static void delay_ms_timer(uint16_t ms);
 static uint8_t cab_app_check_valid_hmi_msg(Cabinet_App *p_ca);
 static void cab_app_reset_buffer(Cabinet_App *p_ca);
 static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t id, const uint32_t timestamp,uint32_t* timestamp1);
-static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t id);
+static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t id, const uint32_t timestamp);
 static void cab_app_process_hmi_write_command(Cabinet_App *p_ca, const uint8_t msg_id, const uint32_t timestamp,uint32_t* timestamp1);
 static void cab_app_process_hmi_read_command(Cabinet_App *p_ca, const uint8_t msg_id);
 static void cab_app_confirm_hmi_cmd(Cabinet_App *p_ca, const uint8_t msg_id, char *buff);
@@ -108,7 +108,7 @@ static void cab_app_process_hmi_write_command(Cabinet_App *p_ca, const uint8_t m
 			cab_app_process_hmi_write_bss_cmd(p_ca, msg_id, timestamp, timestamp1);
 			break;
 		case BSS_CABINET:
-			cab_app_process_hmi_write_cab_cmd(p_ca, msg_id);
+			cab_app_process_hmi_write_cab_cmd(p_ca, msg_id, timestamp);
 			break;
 		case BSS_BP:
 			break;
@@ -249,7 +249,7 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 			break;
 	}
 }
-static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t msg_id) {
+static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t msg_id,const uint32_t timestamp) {
 	SUB_OBJS sub_obj = p_ca->hmi_csv.sub_obj[msg_id];
 	uint8_t state = p_ca->hmi_csv.obj_state[msg_id];
 	uint8_t id = p_ca->hmi_csv.id[msg_id];
@@ -335,10 +335,12 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t m
 		case REBOOT_BP:
 			CO_SDO_abort(&p_ca->base.CO_base.sdo_client, CO_SDO_AB_GENERAL);
 			int count = 0;
-			while (count++ < 5) {
+//			while (count++ < 5) {
 				CO_SDO_reset_status(&p_ca->base.CO_base.sdo_client);
+				p_ca->base.sdo_timeout = timestamp + 100;
+				p_ca->base.sdo_service = SDO_SERVICE_REQ_BOOT_BMS;
 				cab_app_request_upgrade_fw_bp(p_ca, id, 2000);
-				delay_time_ms(10000);
+				while(p_ca->base.sdo_finish == false);
 				if (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success) {
 					p_ca->base.sdo_service = SDO_SERVICE_BOOT_BMS;
 					sw_off(&p_ca->bss.cabs[id].charger);
@@ -350,11 +352,12 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t m
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 					p_ca->is_main_hmi_shutdown = true;
 
-					break;
+//					break;
 				} else {
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
 				}
-			}
+//			}
+			p_ca->base.sdo_finish = false;
 			CO_SDO_reset_status(&p_ca->base.CO_base.sdo_client);
 			break;
 		case REBOOT_SUCCESS:
