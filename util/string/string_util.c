@@ -4,7 +4,7 @@
 
 static const uint8_t digit_char[10]={'0','1','2','3','4','5','6','7','8','9'};
 static const uint8_t hex_digit[] ={'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-
+static void string_reverse(char* str, int len);
 void string_swap(const char* p_buffer,char* p_msg,const uint8_t len){
 	uint8_t i=0;
 	for(i=0;i<len;i++){
@@ -16,7 +16,7 @@ int long_to_string(const uint32_t data,char* s){
 	uint32_t remain=data;
 	uint8_t digit=0;
 	uint8_t index=0;
-        uint8_t buffer[16]= {0};
+    uint8_t buffer[16]= {0};
 	while(remain >=10){
 		digit = remain%10;
 		buffer[index]=digit_char[digit];
@@ -24,7 +24,7 @@ int long_to_string(const uint32_t data,char* s){
 		remain =(uint32_t)(remain/10);
 	}
 	buffer[index]=digit_char[remain];
-        string_swap(buffer,s,index+1);
+        string_swap((char*)buffer,s,index+1);
 	s[index+1]='\0';
 	return index+1;
 }
@@ -108,4 +108,40 @@ uint32_t string_to_long(char* str)
         mult = mult*10;
     }
     return re;
+}
+
+int float_to_string(const float data, char* s) {
+	  int i = 0;
+	  int num = (int)data;
+	  float decimal = data - num;
+	  int decimal_places = 2; 			// Số chữ số sau dấu thập phân
+	  if (num == 0) {
+	    s[i++] = '0';
+	  } else {
+	    while (num > 0) {
+	      s[i++] = num % 10 + '0';
+	      num /= 10;
+	    }
+	  }
+	  string_reverse(s, i);
+	  s[i++] = '.';
+	  while (decimal_places-- > 0) {
+	    decimal *= 10;
+	    int digit = (int)decimal;
+	    s[i++] = digit + '0';
+	    decimal -= digit;
+	  }
+	  s[i] = '\0';
+	  return i;
+	}
+
+static void string_reverse(char* str, int len) {
+  int i = 0, j = len - 1;
+  while (i < j) {
+    char temp = str[i];
+    str[i] = str[j];
+    str[j] = temp;
+    i++;
+    j--;
+  }
 }

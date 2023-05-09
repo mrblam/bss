@@ -162,17 +162,17 @@ static void bss_data_serialize_impl(BSS_Data* p_bss, char* buff){
 	*buff++=',';
 	// AC meter
 	*buff++='[';
-	buff+=long_to_string(p_bss->ac_meter.vol_result,buff);
+	buff+=float_to_string(p_bss->ac_meter.vol_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.cur_result,buff);
+	buff+=float_to_string(p_bss->ac_meter.cur_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.power_result,buff);
+	buff+=float_to_string(p_bss->ac_meter.power_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.cos_result,buff);
+	buff+=float_to_string(p_bss->ac_meter.cos_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.freq_result,buff);
+	buff+=float_to_string(p_bss->ac_meter.freq_result,buff);
 	*buff++=',';
-	buff+=long_to_string(p_bss->ac_meter.total_result,buff);
+	buff+=float_to_string(p_bss->ac_meter.total_result,buff);
 	*buff++=']';
 	*buff++=',';
     // Chargers
