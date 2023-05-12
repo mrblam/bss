@@ -163,6 +163,7 @@ static void can_receive_handle(CAN_Hw *p_hw){
 			array[len++] = p_hw->rx_data[i];
 		}
 		sm_host_send_response(host_master, 0x10, 0x00, array, len);
+		return;
 	}
 	switch(p_hw->can_rx.StdId & 0xFFFFFF80)
 	{

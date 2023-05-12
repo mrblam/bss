@@ -453,7 +453,7 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 bpid = bp_id;
 	if(bp_id >= p_cm->slave_num) return;
 //	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
-	selex_bss_app.bss.cabs[bp_id].bp->base.inactive_time_ms = 5000 + sys_timestamp;
+	selex_bss_app.bss.cabs[bp_id].bp->base.inactive_time_ms = 10000 + sys_timestamp;
 	switch(cob_id){
 	case BP_VOL_CUR_TPDO_COBID:
 		if(10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) < 70000 && 10*(uint32_t)CO_getUint16(p_cm->p_hw->rx_data) > 40000){

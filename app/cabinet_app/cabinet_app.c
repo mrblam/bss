@@ -585,16 +585,19 @@ void cab_app_update_charge(Cabinet_App *p_ca, const uint32_t timestamp) {
 }
 void cab_app_update_connected_cab_state(Cabinet_App *p_app) {
 	for (uint8_t id = 0; id < p_app->bss.cab_num; id++) {
-		if ((p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)) {
-			if (p_app->bss.cabs[id].bp->base.inactive_time_ms > sys_timestamp) continue;
-			cab_cell_reset(&p_app->bss.cabs[id]);
-			for (uint8_t i = 0; i < p_app->bss.charger_num; i++) {
-				if (p_app->bss.ac_chargers[i].charging_cabin != &p_app->bss.cabs[id])
+//		if (p_app->bss.cabs[id].bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED) {
+			if ((p_app->bss.cabs[id].op_state == CAB_CELL_ST_STANDBY) || (p_app->bss.cabs[id].op_state == CAB_CELL_ST_CHARGING) ){
+				if (p_app->bss.cabs[id].bp->base.inactive_time_ms > sys_timestamp)
 					continue;
-				sw_off(&p_app->bss.ac_chargers[i].charging_cabin->charger);
-				p_app->bss.ac_chargers[id].charging_cabin = NULL;
+				cab_cell_reset(&p_app->bss.cabs[id]);
+				for (uint8_t i = 0; i < p_app->bss.charger_num; i++) {
+					if (p_app->bss.ac_chargers[i].charging_cabin != &p_app->bss.cabs[id])
+						continue;
+					sw_off(&p_app->bss.ac_chargers[i].charging_cabin->charger);
+					p_app->bss.ac_chargers[id].charging_cabin = NULL;
+				}
 			}
-		}
+//		}
 	}
 }
 void cab_app_write_bss_sn(Cabinet_App *p_ca, uint8_t cab_id, const uint32_t timestamp) {
