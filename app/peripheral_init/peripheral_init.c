@@ -450,7 +450,7 @@ static void can_master_rpdo_process_impl(const CAN_master* const p_cm){
 	uint32_t cob_id = p_cm->p_hw->can_rx.StdId & 0xFFFFFF80;
 	uint8_t node_id = (uint8_t) (p_cm->p_hw->can_rx.StdId & 0x7F);
 	uint8_t bp_id = node_id - p_cm->slave_start_node_id;
-bpid = bp_id;
+
 	if(bp_id >= p_cm->slave_num) return;
 //	bp_reset_inactive_counter(selex_bss_app.bss.cabs[bp_id].bp);
 	selex_bss_app.bss.cabs[bp_id].bp->base.inactive_time_ms = 10000 + sys_timestamp;

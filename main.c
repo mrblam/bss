@@ -103,7 +103,6 @@ void TIM2_IRQHandler(void)
 	tim2_timestamp ++;
 	if(node_id_high){
 		node_id_high = 0;
-		selex_bss_app.bss.cabs[selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id].bp->base.inactive_time_ms = 10000 + sys_timestamp;
 		can_master_slave_deselect(&selex_bss_app.base,selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id);
 	}
 	if(selex_bss_app.base.sdo_service != SDO_SERVICE_BOOT_BMS){
@@ -195,6 +194,7 @@ static void can_receive_handle(CAN_Hw *p_hw){
 		}
 		else if (selex_bss_app.base.assign_state == CM_ASSIGN_ST_WAIT_CONFIRM)
 		{
+			selex_bss_app.bss.cabs[selex_bss_app.base.assigning_slave->node_id - selex_bss_app.base.slave_start_node_id].bp->base.inactive_time_ms = 10000 + sys_timestamp;
 			if (p_hw->rx_data[0] != selex_bss_app.base.assigning_slave->node_id) return;
 			cm_start_authorize_slave((CAN_master*) &selex_bss_app,selex_bss_app.base.assigning_slave, sys_timestamp);
 			node_id_high = 1;
