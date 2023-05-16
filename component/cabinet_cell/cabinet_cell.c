@@ -26,20 +26,23 @@ void cab_cell_update_state(Cabinet* p_cab){
 			}
 			break;
 		case CO_SLAVE_CON_ST_ASSIGNING:
-			new_state = CAB_CELL_ST_BP_ID_ASSIGN;
+			new_state = CAB_CELL_ST_BP_ID_ASSIGN;//2
 			break;
 		case CO_SLAVE_CON_ST_AUTHORIZING:
-			new_state = CAB_CELL_ST_BP_ID_AUTHORIZE;
+			new_state = CAB_CELL_ST_BP_ID_AUTHORIZE;///3
 			break;
 		case CO_SLAVE_CON_ST_CONNECTED:
 			if (old_state != CAB_CELL_ST_CHARGING) {
 				new_state = CAB_CELL_ST_STANDBY;
 			}
 			break;
+		default:
+			new_state = CAB_CELL_ST_EMPTY;
+			break;
 	}
-	if(new_state != old_state){
+//	if(new_state != old_state){
 		p_cab->op_state = new_state;
-	}
+//	}
 }
 
 void cab_cell_update_io_state(Cabinet* p_cab){
@@ -111,7 +114,8 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cab->temp,buff);
     *buff++=',';
-    if(p_cab->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED || p_cab->bp->base.con_state == CO_SLAVE_CON_ST_AUTHORIZING){
+    if(p_cab->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED
+			|| p_cab->bp->base.con_state == CO_SLAVE_CON_ST_AUTHORIZING){
         for(uint8_t i = 0; *(p_cab->bp->base.sn + i) != '\0'; i++){
         	*buff++= *(p_cab->bp->base.sn + strlen((const char*)p_cab->bp->base.sn) - 1 - i);
         }
