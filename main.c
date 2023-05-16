@@ -213,7 +213,7 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 	cab_id++;
 
 #if ENABLE_CHARGER
-	cab_app_update_charge(p_app, com_timestamp);
+	cab_app_update_charge(p_app);
 #endif
 //	if(sys_timestamp % 5000 == 0){
 //	p_app->bss.bp_backup.get_voltage(&p_app->bss.bp_backup);

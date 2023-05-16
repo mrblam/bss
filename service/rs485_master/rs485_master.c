@@ -185,9 +185,9 @@ void mobus_master_command_serialize(RS485_Master* p_485m,uint8_t cmd){
 		*buff++ = 0x00;
 		*buff++ = 0x00;
 		*buff++ = 0x00;
-		*buff++ = 0x02; //
-		*buff++ = 0x71; // CRC HIGH
-		*buff++ = 0xCB; // CRC LOW
+		*buff++ = 0x02;
+		*buff++ = 0x71;
+		*buff++ = 0xCB;
 		break;
 	case 2:
 		*buff++ = 0x01;
@@ -195,9 +195,9 @@ void mobus_master_command_serialize(RS485_Master* p_485m,uint8_t cmd){
 		*buff++ = 0x00;
 		*buff++ = 0x08;
 		*buff++ = 0x00;
-		*buff++ = 0x02; // data length 2 word - 4 bytes
-		*buff++ = 0xF0; // CRC HIGH
-		*buff++ = 0x09; // CRC LOW
+		*buff++ = 0x02;
+		*buff++ = 0xF0;
+		*buff++ = 0x09;
 		break;
 	case 3:
 		*buff++ = 0x01;
@@ -205,9 +205,9 @@ void mobus_master_command_serialize(RS485_Master* p_485m,uint8_t cmd){
 		*buff++ = 0x00;
 		*buff++ = 0x12;
 		*buff++ = 0x00;
-		*buff++ = 0x02; // data length 2 word - 4 bytes
-		*buff++ = 0xD1; // CRC HIGH
-		*buff++ = 0xCE; // CRC LOW
+		*buff++ = 0x02;
+		*buff++ = 0xD1;
+		*buff++ = 0xCE;
 		break;
 	case 4:
 		*buff++ = 0x01;
@@ -215,9 +215,9 @@ void mobus_master_command_serialize(RS485_Master* p_485m,uint8_t cmd){
 		*buff++ = 0x00;
 		*buff++ = 0x2A;
 		*buff++ = 0x00;
-		*buff++ = 0x02; // data length 2 word - 4 bytes
-		*buff++ = 0x50; // CRC HIGH
-		*buff++ = 0x03; // CRC LOW
+		*buff++ = 0x02;
+		*buff++ = 0x50;
+		*buff++ = 0x03;
 		break;
 	case 5:
 		*buff++ = 0x01;
@@ -225,9 +225,9 @@ void mobus_master_command_serialize(RS485_Master* p_485m,uint8_t cmd){
 		*buff++ = 0x00;
 		*buff++ = 0x36;
 		*buff++ = 0x00;
-		*buff++ = 0x02; // data length 2 word - 4 bytes
-		*buff++ = 0x91; // CRC HIGH
-		*buff++ = 0xC5; // CRC LOW
+		*buff++ = 0x02;
+		*buff++ = 0x91;
+		*buff++ = 0xC5;
 		break;
 	case 6:
 		*buff++ = 0x01;
@@ -235,9 +235,9 @@ void mobus_master_command_serialize(RS485_Master* p_485m,uint8_t cmd){
 		*buff++ = 0x01;
 		*buff++ = 0x00;
 		*buff++ = 0x00;
-		*buff++ = 0x02; // data length 2 word - 4 bytes
-		*buff++ = 0x70; // CRC HIGH
-		*buff++ = 0x37; // CRC LOW
+		*buff++ = 0x02;
+		*buff++ = 0x70;
+		*buff++ = 0x37;
 		break;
 	}
 }
