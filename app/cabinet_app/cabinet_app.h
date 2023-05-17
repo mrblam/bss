@@ -71,6 +71,7 @@ struct CSV_t{
 	uint8_t			obj_state[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			data[32];
 	uint8_t			firmware[1024];
+	uint32_t        sdo_abort_code[2];
 	uint8_t			is_new_data;
 	uint8_t			is_new_msg_to_send[AVAILABLE_HMI_MSG_NUM];
 	uint8_t 		valid_msg_num;
@@ -89,7 +90,8 @@ struct Cabinet_App_t{
 	uint8_t 			is_hmi_req_sync;
 	uint32_t			charge_timestamp;
 	bool				is_main_hmi_shutdown;
-	int count;
+	int 				count;
+	uint32_t			upgrade_timeout;
 };
 
 extern uint32_t sys_timestamp;

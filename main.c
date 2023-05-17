@@ -30,6 +30,7 @@ int32_t my_callback(int32_t _cmd, const uint8_t* _data, int32_t _len, void* _arg
 	can_port.can_tx.StdId = ((uint16_t)_data[0] << 8) | (uint16_t)_data[1];
 	can_port.can_tx.DLC = _len - 2;
 	can_send(&can_port, (uint8_t*)(_data + 2));
+	selex_bss_app.upgrade_timeout = sys_timestamp + 5000;
 	return _len;
 }
 int32_t my_send_interface(const uint8_t* _data, int32_t _len){
@@ -45,6 +46,7 @@ void cab_app_init(Cabinet_App *p_ca) {
 	p_ca->bss.cabs = &bss_cabinets[0];
 	p_ca->bss.ac_chargers = &bss_chargers[0];
 	p_ca->bss.ac_meter.rx_index = 0;
+	p_ca->is_main_hmi_shutdown = false;
 	bss_init(&p_ca->bss);
 	peripheral_init(p_ca);
 	for (int i = 0; i < CABINET_INIT; i++) {
@@ -87,6 +89,12 @@ int main(void) {
 			break;
 		case BSS_ST_UPGRADE_FW_BP:
 			sm_host_process(host_master);
+			if(selex_bss_app.upgrade_timeout < sys_timestamp
+				&& selex_bss_app.base.sdo_service == SDO_SERVICE_BOOT_BMS ){
+				selex_bss_app.is_main_hmi_shutdown = false;
+				selex_bss_app.bss.state = BSS_ST_ACTIVE;
+				selex_bss_app.base.sdo_service = SDO_SERVICE_IDLE;
+			}
 			break;
 		case BSS_ST_INIT:
 		case BSS_ST_FAIL:

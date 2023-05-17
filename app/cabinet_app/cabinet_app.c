@@ -333,31 +333,32 @@ static void cab_app_process_hmi_write_cab_cmd(Cabinet_App *p_ca, const uint8_t m
 			break;
 		case REBOOT_BP:
 			CO_SDO_abort(&p_ca->base.CO_base.sdo_client, CO_SDO_AB_GENERAL);
-//			int count = 0;
-//			while (count++ < 5) {
+			int count = 0;
+			while (count++ < 5) {
 				CO_SDO_reset_status(&p_ca->base.CO_base.sdo_client);
-				p_ca->base.sdo_timeout = timestamp + 100;
+				p_ca->base.sdo_timeout = timestamp + 500;
 				p_ca->base.sdo_service = SDO_SERVICE_REQ_BOOT_BMS;
 				cab_app_request_upgrade_fw_bp(p_ca, id);
 				while(p_ca->base.sdo_finish == false);
 				if (p_ca->base.CO_base.sdo_client.status == CO_SDO_RT_success) {
 					p_ca->base.sdo_service = SDO_SERVICE_BOOT_BMS;
-					sw_off(&p_ca->bss.cabs[id].charger);
-					if (id == 0 || id == 1 || id == 4 || id == 5 || id == 8 || id == 9 || id == 12 || id == 13 || id == 16) {
-						p_ca->bss.ac_chargers[0].charging_cabin = NULL;
-					} else {
-						p_ca->bss.ac_chargers[1].charging_cabin = NULL;
-					}
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_OK;
 					p_ca->is_main_hmi_shutdown = true;
-
-//					break;
+					p_ca->upgrade_timeout = timestamp + 5000;
+					break;
 				} else {
 					p_ca->hmi_csv.obj_state[msg_id] = STATE_FAIL;
+					p_ca->base.sdo_service = SDO_SERVICE_IDLE;
 				}
-//			}
+			}
 			p_ca->base.sdo_finish = false;
 			CO_SDO_reset_status(&p_ca->base.CO_base.sdo_client);
+			sw_off(&p_ca->bss.cabs[id].charger);
+			if (id == 0 || id == 1 || id == 4 || id == 5 || id == 8 || id == 9 || id == 12 || id == 13 || id == 16) {
+				p_ca->bss.ac_chargers[0].charging_cabin = NULL;
+			} else {
+				p_ca->bss.ac_chargers[1].charging_cabin = NULL;
+			}
 			break;
 		case REBOOT_SUCCESS:
 			p_ca->base.sdo_service = SDO_SERVICE_IDLE;
