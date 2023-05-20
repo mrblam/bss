@@ -129,11 +129,18 @@ static void bss_update_io_state(BSS_Data* p_bss){
 Cabinet* bss_get_cab_need_charge(BSS_Data* p_bss, uint8_t charger_id){
 	Cabinet* cab = &p_bss->cabs[p_bss->cab_num];
 	uint8_t available_cab_num = 0;
+	uint8_t max_cell_temp = 0;
 	for(uint8_t i = 0; i < p_bss->ac_chargers[charger_id].assigned_cab_num; i++){
+		max_cell_temp = p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->temp[0];
+		for (uint8_t u = 1; u < 6; u++) {
+			if (max_cell_temp < p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->temp[u]) {
+				max_cell_temp = p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->temp[u];
+			}
+		}
 		if((p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol > 0)
 				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol <= BP_START_CHARGE_THRESHOLD)
 				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->state != BP_ST_DISCHARGING)
-				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->temp[1] < BP_TEMP_START_CHARGER)
+				&& (max_cell_temp < BP_TEMP_START_CHARGER)
 				&& (p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED)){
 			available_cab_num++;
 			if(cab->bp->vol < p_bss->ac_chargers[charger_id].assigned_cabs[i]->bp->vol){
