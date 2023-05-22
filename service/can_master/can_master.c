@@ -42,6 +42,7 @@ void can_master_start_assign_slave(CAN_master *p_cm, CO_Slave *slave,
 
 void cm_start_authorize_slave(CAN_master *p_cm, CO_Slave *slave, uint32_t timestamp) {
 	p_cm->assign_state = CM_ASSIGN_ST_AUTHORIZING;
+	p_cm->authorizing_timeout = timestamp + 10000;
 }
 void can_set_read_sn_func_pointer(CAN_master *p_cm,void (*read_serial_number_bp)(void)) {
 	p_cm->read_serial_number_bp = read_serial_number_bp;
@@ -131,7 +132,9 @@ void can_master_update_id_assign_process(CAN_master *p_cm,const uint32_t timesta
 		p_cm->assign_timeout = timestamp + SLAVE_SELECT_CONFIRM_TIMEOUT_mS;
 		break;
 	case CM_ASSIGN_ST_AUTHORIZING:
-
+		if (p_cm->authorizing_timeout < timestamp) {
+			p_cm->assign_state = CM_ASSIGN_ST_FAIL;
+		}
 		can_master_slave_deselect(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
 		if(p_cm->CO_base.sdo_client.status == CO_SDO_RT_idle){
 			can_master_read_slave_sn(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id, timestamp);
@@ -147,7 +150,6 @@ void can_master_update_id_assign_process(CAN_master *p_cm,const uint32_t timesta
 			retry_read_sn_bp = 0;
 			co_slave_set_con_state(p_cm->assigning_slave, CO_SLAVE_CON_ST_AUTHORIZING);
 			p_cm->on_slave_assign_success(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
-			p_cm->pdo_sync_timestamp = timestamp + 20;
 			reassign_attemp_cnt = 0;
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
 			can_master_read_bp_version_software(p_cm, p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);
@@ -162,6 +164,7 @@ void can_master_update_id_assign_process(CAN_master *p_cm,const uint32_t timesta
 			p_cm->CO_base.sdo_client.status = CO_SDO_RT_idle;
 			p_cm->sdo_service = SDO_SERVICE_IDLE;
 		}
+
 		break;
 	case CM_ASSIGN_ST_FAIL:
 		p_cm->on_slave_assign_fail(p_cm,p_cm->assigning_slave->node_id - p_cm->slave_start_node_id);

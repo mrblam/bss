@@ -172,11 +172,6 @@ static void cab_app_process_hmi_write_bss_cmd(Cabinet_App *p_ca, const uint8_t m
 			break;
 		case STATE:
 			bss_set_state(&p_ca->bss, (BSS_STATE) state);
-			if (p_ca->bss.state == BSS_ST_ACTIVE) {
-				if (p_ca->base.pdo_sync_timestamp == 0) {
-					p_ca->base.pdo_sync_timestamp = timestamp + 20;
-				}
-			}
 			if(p_ca->bss.state == BSS_ST_MAINTAIN){
 				p_ca->is_main_hmi_shutdown = false;
 			}

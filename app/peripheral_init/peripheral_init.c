@@ -331,7 +331,6 @@ static void bp_assign_id_fail_handle(CAN_master *p_cm, const uint32_t id) {
 			p_cm->reassign_attemp(p_cm);
 			return;
 		}
-		selex_bss_app.base.pdo_sync_timestamp = sys_timestamp + 100;
 	}
 	cab_cell_update_state(&selex_bss_app.bss.cabs[id]);
 	sw_off(&(selex_bss_app.bss.cabs[id].node_id_sw));

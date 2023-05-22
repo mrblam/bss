@@ -185,6 +185,7 @@ struct CAN_master_t{
 	bool 				(*sdo_write_object)(void);
 	uint32_t					sdo_timeout;
 	bool						sdo_finish;
+	uint32_t					authorizing_timeout;
 };
 
 extern uint8_t reassign_attemp_cnt;
