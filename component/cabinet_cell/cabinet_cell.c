@@ -128,6 +128,8 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     else{
     	*buff++='0';
     }
+    *buff++=',';
+	buff+=long_to_string(p_cab->assign_state,buff);
     *buff++='*';
     *buff++='\n';
     *buff++='\0';

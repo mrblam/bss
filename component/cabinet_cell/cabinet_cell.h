@@ -56,6 +56,7 @@ struct Cabinet_t{
 	Cabinet_led			led;
 	uint8_t				temp;
 	uint8_t 			is_changed;
+	uint8_t				assign_state;
 	void (*data_serialize)(Cabinet* p_cab, char* buff);
 	CABINET_OP_STATE 	fail_state;
 	uint8_t				on_bp_counter[2];

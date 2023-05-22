@@ -107,8 +107,7 @@ void can_master_write_bms_object(CAN_master *p_cm, uint8_t cab_id,
 		break;
 	}
 }
-void can_master_update_id_assign_process(CAN_master *p_cm,
-		const uint32_t timestamp) {
+void can_master_update_id_assign_process(CAN_master *p_cm,const uint32_t timestamp) {
 	static uint8_t retry_read_sn_bp = 0;
 	switch (p_cm->assign_state) {
 	case CM_ASSIGN_ST_WAIT_REQUEST:

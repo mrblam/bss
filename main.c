@@ -219,6 +219,7 @@ static void cab_app_update_io_cab_state(Cabinet_App* p_app)
 		cab_id = 0;
 	}
 	cab_cell_update_io_state(&p_app->bss.cabs[cab_id]);
+	p_app->bss.cabs[cab_id].assign_state = p_app->base.assign_state;
 	cab_id++;
 
 #if ENABLE_CHARGER
