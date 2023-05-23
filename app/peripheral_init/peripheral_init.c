@@ -436,7 +436,15 @@ static void rs485_parse_slave_msg_handle_impl(RS485_Master* p_485m){
 			token = strtok(NULL, ",");
 			selex_bss_app.bss.cabs[p_485m->csv.id].charger.state = string_to_long(token);
 			token = strtok(NULL, ",");
-			selex_bss_app.bss.cabs[p_485m->csv.id].temp = string_to_long(token);
+			selex_bss_app.bss.cabs[p_485m->csv.id].temp[0] = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].temp[1] = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].temp[2] = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].temp[3] = string_to_long(token);
+			token = strtok(NULL, ",");
+			selex_bss_app.bss.cabs[p_485m->csv.id].temp[4] = string_to_long(token);
 			p_485m->state = RS485_MASTER_ST_SUCCESS;
 			break;
 		default:

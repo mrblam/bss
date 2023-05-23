@@ -49,9 +49,9 @@ void cab_cell_update_io_state(Cabinet* p_cab){
 	cab_cell_update_door_state(p_cab, (DOOR_STATE)io_get_state(&p_cab->door.io_state));
 
 #if ENABLE_CELL_FAN
-	if((p_cab->temp >= 45)
-			&& (p_cab->temp < 101)) sw_on(&p_cab->cell_fan);
-	else if(p_cab->temp <= 40){
+	if((p_cab->temp[0] >= 45)
+			&& (p_cab->temp[0] < 101)) sw_on(&p_cab->cell_fan);
+	else if(p_cab->temp[0] <= 40){
 		if(p_cab->cell_fan.state == SW_ST_ON) sw_off(&p_cab->cell_fan);
 	}
 #endif
@@ -112,7 +112,17 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cab->cell_fan.state,buff);
     *buff++=',';
-	buff+=long_to_string(p_cab->temp,buff);
+    *buff++='[';
+	buff+=long_to_string(p_cab->temp[0],buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[1],buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[2],buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[3],buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[4],buff);
+	*buff++=']';
     *buff++=',';
     if(p_cab->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED
 			|| p_cab->bp->base.con_state == CO_SLAVE_CON_ST_AUTHORIZING){

@@ -59,7 +59,7 @@ static char* cab_serialize(Cabinet* p_cc, char* buff){
 	*buff++=',';
 	buff+=long_to_string(p_cc->cell_fan->state,buff);
 	*buff++=',';
-	buff+=long_to_string(p_cc->temp,buff);
+	buff+=long_to_string(p_cc->temp[0],buff);
 	*buff++='*';
 	*buff++='\0';
 	return buff;

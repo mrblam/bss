@@ -405,7 +405,7 @@ static uint8_t cab_app_get_obj_state(Cabinet_App *p_ca, const uint8_t msg_id) {
 			if (bss_obj == BSS_STATION) {
 				obj_state = p_ca->bss.bss_temps[obj_id];
 			} else
-				obj_state = p_ca->bss.cabs[obj_id].temp;
+				obj_state = p_ca->bss.cabs[obj_id].temp[0];
 			break;
 		default:
 			break;

@@ -70,7 +70,7 @@ struct CSV_t{
 	SUB_OBJS		sub_obj[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			obj_state[AVAILABLE_HMI_MSG_NUM];
 	uint8_t			data[32];
-	uint8_t			firmware[1024];
+	uint8_t			firmware[10];
 	uint32_t        sdo_abort_code[2];
 	uint8_t			is_new_data;
 	uint8_t			is_new_msg_to_send[AVAILABLE_HMI_MSG_NUM];
