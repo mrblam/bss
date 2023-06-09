@@ -112,17 +112,7 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     *buff++=',';
 	buff+=long_to_string(p_cab->cell_fan.state,buff);
     *buff++=',';
-    *buff++='[';
 	buff+=long_to_string(p_cab->temp[0],buff);
-    *buff++=',';
-	buff+=long_to_string(p_cab->temp[1],buff);
-    *buff++=',';
-	buff+=long_to_string(p_cab->temp[2],buff);
-    *buff++=',';
-	buff+=long_to_string(p_cab->temp[3],buff);
-    *buff++=',';
-	buff+=long_to_string(p_cab->temp[4],buff);
-	*buff++=']';
     *buff++=',';
     if(p_cab->bp->base.con_state == CO_SLAVE_CON_ST_CONNECTED
 			|| p_cab->bp->base.con_state == CO_SLAVE_CON_ST_AUTHORIZING){
@@ -140,6 +130,14 @@ static void cab_cell_data_serialze_impl(Cabinet* p_cab, char* buff){
     }
     *buff++=',';
 	buff+=long_to_string(p_cab->assign_state,buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[1],buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[2],buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[3],buff);
+    *buff++=',';
+	buff+=long_to_string(p_cab->temp[4],buff);
     *buff++='*';
     *buff++='\n';
     *buff++='\0';
